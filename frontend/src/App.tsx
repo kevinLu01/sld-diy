@@ -11,7 +11,10 @@ const ProductsPage = lazy(() => import('./pages/Products'));
 const ProductDetailPage = lazy(() => import('./pages/ProductDetail'));
 const CartPage = lazy(() => import('./pages/Cart'));
 const DIYToolPage = lazy(() => import('./pages/DIYTool'));
+const DIYProjectsPage = lazy(() => import('./pages/DIYProjects'));
 const OrdersPage = lazy(() => import('./pages/Orders'));
+const SolutionsPage = lazy(() => import('./pages/Solutions'));
+const SolutionDetailPage = lazy(() => import('./pages/SolutionDetail'));
 const LoginPage = lazy(() => import('./pages/Login'));
 
 // 创建 React Query 客户端
@@ -57,15 +60,10 @@ const App: React.FC = () => {
                 <Route path="products/:id" element={<ProductDetailPage />} />
                 <Route path="cart" element={<CartPage />} />
                 <Route path="diy" element={<DIYToolPage />} />
+                <Route path="solutions" element={<SolutionsPage />} />
+                <Route path="solutions/:id" element={<SolutionDetailPage />} />
                 <Route path="user/orders" element={<OrdersPage />} />
-                <Route
-                  path="solutions"
-                  element={
-                    <div style={{ padding: 40, textAlign: 'center' }}>
-                      <h2>解决方案页面开发中...</h2>
-                    </div>
-                  }
-                />
+                <Route path="user/diy-projects" element={<DIYProjectsPage />} />
                 <Route
                   path="knowledge"
                   element={

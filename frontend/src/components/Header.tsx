@@ -67,6 +67,12 @@ const AppHeader: React.FC = () => {
           onClick: () => navigate('/user/orders'),
         },
         {
+          key: 'diy-projects',
+          icon: <ToolOutlined />,
+          label: '我的DIY方案',
+          onClick: () => navigate('/user/diy-projects'),
+        },
+        {
           type: 'divider',
         },
         {
