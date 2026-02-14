@@ -8,7 +8,6 @@ import {
   Typography,
   Tag,
   Modal,
-  Descriptions,
   Popconfirm,
   message,
   Empty,
@@ -18,10 +17,9 @@ import {
   EditOutlined,
   DeleteOutlined,
   ShareAltOutlined,
-  ShoppingCartOutlined,
   EyeOutlined,
 } from '@ant-design/icons';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { diyService } from '@/services/diy';
 import dayjs from 'dayjs';
 
@@ -29,7 +27,6 @@ const { Title, Text, Paragraph } = Typography;
 
 const DIYProjectsPage: React.FC = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [shareModalVisible, setShareModalVisible] = useState(false);
   const [shareData, setShareData] = useState<any>(null);
 

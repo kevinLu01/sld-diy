@@ -24,7 +24,7 @@ const { Title, Text } = Typography;
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
-  const { items, loading, totalAmount, fetchCart, updateItem, removeItem, clearCart } =
+  const { items, loading, fetchCart, updateItem, removeItem, clearCart } =
     useCartStore();
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
 

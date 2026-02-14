@@ -19,7 +19,6 @@ import {
   ClockCircleOutlined,
   CheckCircleOutlined,
   CloseCircleOutlined,
-  ShoppingOutlined,
 } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { orderService } from '@/services/order';
@@ -368,7 +367,7 @@ const OrdersPage: React.FC = () => {
                         </>
                       ),
                     },
-                    selectedOrder.status !== 'pending' && {
+                    ...(selectedOrder.status !== 'pending' ? [{
                       color: 'green',
                       children: (
                         <>
@@ -380,9 +379,9 @@ const OrdersPage: React.FC = () => {
                           )}
                         </>
                       ),
-                    },
-                    (selectedOrder.status === 'shipped' ||
-                      selectedOrder.status === 'completed') && {
+                    }] : []),
+                    ...((selectedOrder.status === 'shipped' ||
+                      selectedOrder.status === 'completed') ? [{
                       color: 'green',
                       children: (
                         <>
@@ -390,8 +389,8 @@ const OrdersPage: React.FC = () => {
                           <div style={{ fontSize: 12, color: '#999' }}>待更新</div>
                         </>
                       ),
-                    },
-                    selectedOrder.status === 'completed' && {
+                    }] : []),
+                    ...(selectedOrder.status === 'completed' ? [{
                       color: 'green',
                       children: (
                         <>
@@ -399,8 +398,8 @@ const OrdersPage: React.FC = () => {
                           <div style={{ fontSize: 12, color: '#999' }}>待更新</div>
                         </>
                       ),
-                    },
-                  ].filter(Boolean)}
+                    }] : []),
+                  ]}
                 />
               </Card>
             </Space>

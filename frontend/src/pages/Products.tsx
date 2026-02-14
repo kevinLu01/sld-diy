@@ -20,7 +20,7 @@ import { productService } from '@/services/product';
 import { useCartStore } from '@/store/cart';
 import { message } from 'antd';
 
-const { Title, Paragraph } = Typography;
+const { Title } = Typography;
 const { Search } = Input;
 
 const ProductsPage: React.FC = () => {

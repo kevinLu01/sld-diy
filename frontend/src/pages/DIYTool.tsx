@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Steps,
@@ -16,8 +16,6 @@ import {
   Image,
   Tag,
   message,
-  Modal,
-  Spin,
   Alert,
   Divider,
 } from 'antd';
@@ -27,7 +25,7 @@ import {
   SaveOutlined,
   ShoppingCartOutlined,
 } from '@ant-design/icons';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { diyService } from '@/services/diy';
 import type { Product } from '@/types';
 
@@ -45,16 +43,9 @@ const DIYToolPage: React.FC = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
   const [currentStep, setCurrentStep] = useState(0);
-  const [scenario, setScenario] = useState<string>('');
   const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([]);
   const [recommendedProducts, setRecommendedProducts] = useState<Record<string, Product[]>>({});
   const [compatibilityResult, setCompatibilityResult] = useState<any>(null);
-
-  // 获取DIY配置
-  const { data: configData } = useQuery({
-    queryKey: ['diy-config'],
-    queryFn: () => diyService.getConfig(),
-  });
 
   // 获取推荐的产品
   const recommendMutation = useMutation({
@@ -108,7 +99,6 @@ const DIYToolPage: React.FC = () => {
         message.warning('请选择应用场景');
         return;
       }
-      setScenario(values.scenario);
       setCurrentStep(1);
     } else if (currentStep === 1) {
       // 配置需求

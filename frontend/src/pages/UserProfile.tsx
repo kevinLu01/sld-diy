@@ -8,7 +8,6 @@ import {
   Form,
   Input,
   Button,
-  Upload,
   Avatar,
   message,
   Tabs,
@@ -22,13 +21,11 @@ import {
   UserOutlined,
   MailOutlined,
   PhoneOutlined,
-  EnvironmentOutlined,
   EditOutlined,
   PlusOutlined,
   DeleteOutlined,
 } from '@ant-design/icons';
 import { useUserStore } from '@/store/user';
-import type { UploadFile } from 'antd';
 
 const { Title, Text } = Typography;
 
@@ -66,7 +63,7 @@ const UserProfilePage: React.FC = () => {
     },
   ]);
 
-  const handleProfileUpdate = async (values: any) => {
+  const handleProfileUpdate = async (_values: any) => {
     try {
       // 这里应该调用API更新用户信息
       message.success('个人信息更新成功');

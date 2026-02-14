@@ -18,7 +18,7 @@ const { Title, Paragraph } = Typography;
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
 
-  const { data: categories } = useQuery({
+  useQuery({
     queryKey: ['categories'],
     queryFn: () => productService.getCategories(),
   });

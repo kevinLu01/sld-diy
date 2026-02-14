@@ -11,7 +11,6 @@ import {
   List,
   Avatar,
   Button,
-  Tabs,
   Empty,
   Spin,
 } from 'antd';
@@ -31,7 +30,7 @@ const { Title, Paragraph, Text } = Typography;
 const { Search } = Input;
 
 // 临时mock数据
-const getKnowledgeData = async (params: any) => {
+const getKnowledgeData = async (_params: any) => {
   return {
     data: {
       items: [
