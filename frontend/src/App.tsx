@@ -15,6 +15,9 @@ const DIYProjectsPage = lazy(() => import('./pages/DIYProjects'));
 const OrdersPage = lazy(() => import('./pages/Orders'));
 const SolutionsPage = lazy(() => import('./pages/Solutions'));
 const SolutionDetailPage = lazy(() => import('./pages/SolutionDetail'));
+const KnowledgePage = lazy(() => import('./pages/Knowledge'));
+const KnowledgeDetailPage = lazy(() => import('./pages/KnowledgeDetail'));
+const UserProfilePage = lazy(() => import('./pages/UserProfile'));
 const LoginPage = lazy(() => import('./pages/Login'));
 
 // 创建 React Query 客户端
@@ -62,24 +65,11 @@ const App: React.FC = () => {
                 <Route path="diy" element={<DIYToolPage />} />
                 <Route path="solutions" element={<SolutionsPage />} />
                 <Route path="solutions/:id" element={<SolutionDetailPage />} />
+                <Route path="knowledge" element={<KnowledgePage />} />
+                <Route path="knowledge/:id" element={<KnowledgeDetailPage />} />
                 <Route path="user/orders" element={<OrdersPage />} />
                 <Route path="user/diy-projects" element={<DIYProjectsPage />} />
-                <Route
-                  path="knowledge"
-                  element={
-                    <div style={{ padding: 40, textAlign: 'center' }}>
-                      <h2>知识库页面开发中...</h2>
-                    </div>
-                  }
-                />
-                <Route
-                  path="user/profile"
-                  element={
-                    <div style={{ padding: 40, textAlign: 'center' }}>
-                      <h2>个人中心开发中...</h2>
-                    </div>
-                  }
-                />
+                <Route path="user/profile" element={<UserProfilePage />} />
                 <Route
                   path="*"
                   element={
