@@ -8,6 +8,10 @@ import MainLayout from './components/Layout';
 // 懒加载页面组件
 const HomePage = lazy(() => import('./pages/Home'));
 const ProductsPage = lazy(() => import('./pages/Products'));
+const ProductDetailPage = lazy(() => import('./pages/ProductDetail'));
+const CartPage = lazy(() => import('./pages/Cart'));
+const DIYToolPage = lazy(() => import('./pages/DIYTool'));
+const OrdersPage = lazy(() => import('./pages/Orders'));
 const LoginPage = lazy(() => import('./pages/Login'));
 
 // 创建 React Query 客户端
@@ -50,23 +54,10 @@ const App: React.FC = () => {
               <Route path="/" element={<MainLayout />}>
                 <Route index element={<HomePage />} />
                 <Route path="products" element={<ProductsPage />} />
-                <Route
-                  path="products/:id"
-                  element={
-                    <div style={{ padding: 40, textAlign: 'center' }}>
-                      <h2>产品详情页开发中...</h2>
-                      <p>Product ID: {window.location.pathname.split('/')[2]}</p>
-                    </div>
-                  }
-                />
-                <Route
-                  path="diy"
-                  element={
-                    <div style={{ padding: 40, textAlign: 'center' }}>
-                      <h2>DIY配套工具开发中...</h2>
-                    </div>
-                  }
-                />
+                <Route path="products/:id" element={<ProductDetailPage />} />
+                <Route path="cart" element={<CartPage />} />
+                <Route path="diy" element={<DIYToolPage />} />
+                <Route path="user/orders" element={<OrdersPage />} />
                 <Route
                   path="solutions"
                   element={
@@ -84,18 +75,10 @@ const App: React.FC = () => {
                   }
                 />
                 <Route
-                  path="cart"
+                  path="user/profile"
                   element={
                     <div style={{ padding: 40, textAlign: 'center' }}>
-                      <h2>购物车页面开发中...</h2>
-                    </div>
-                  }
-                />
-                <Route
-                  path="user/*"
-                  element={
-                    <div style={{ padding: 40, textAlign: 'center' }}>
-                      <h2>用户中心开发中...</h2>
+                      <h2>个人中心开发中...</h2>
                     </div>
                   }
                 />
