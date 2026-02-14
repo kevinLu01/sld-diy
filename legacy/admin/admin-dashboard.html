@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台 - 生利达商城</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');body{font-family:'Noto Sans SC',sans-serif}</style>
+</head>
+<body class="bg-gray-100">
+    <div class="flex min-h-screen">
+        <!-- 侧边栏 -->
+        <aside class="w-64 bg-gray-900 text-white fixed h-full">
+            <div class="p-6 border-b border-gray-800">
+                <div class="flex items-center">
+                    <i class="fas fa-snowflake text-2xl text-blue-400 mr-2"></i>
+                    <span class="text-xl font-bold">生利达后台</span>
+                </div>
+            </div>
+            <nav class="mt-4">
+                <a href="#" onclick="showPage('dashboard')" class="nav-item flex items-center px-6 py-3 hover:bg-gray-800" data-page="dashboard">
+                    <i class="fas fa-home w-6"></i>仪表盘
+                </a>
+                <a href="#" onclick="showPage('products')" class="nav-item flex items-center px-6 py-3 hover:bg-gray-800" data-page="products">
+                    <i class="fas fa-cube w-6"></i>产品管理
+                </a>
+                <a href="#" onclick="showPage('categories')" class="nav-item flex items-center px-6 py-3 hover:bg-gray-800" data-page="categories">
+                    <i class="fas fa-tags w-6"></i>分类管理
+                </a>
+                <a href="#" onclick="showPage('brands')" class="nav-item flex items-center px-6 py-3 hover:bg-gray-800" data-page="brands">
+                    <i class="fas fa-star w-6"></i>品牌管理
+                </a>
+                <a href="#" onclick="showPage('orders')" class="nav-item flex items-center px-6 py-3 hover:bg-gray-800" data-page="orders">
+                    <i class="fas fa-shopping-bag w-6"></i>订单管理
+                </a>
+                <a href="#" onclick="showPage('solutions')" class="nav-item flex items-center px-6 py-3 hover:bg-gray-800" data-page="solutions">
+                    <i class="fas fa-lightbulb w-6"></i>解决方案
+                </a>
+                <a href="#" onclick="showPage('articles')" class="nav-item flex items-center px-6 py-3 hover:bg-gray-800" data-page="articles">
+                    <i class="fas fa-book w-6"></i>知识库
+                </a>
+                <a href="#" onclick="showPage('users')" class="nav-item flex items-center px-6 py-3 hover:bg-gray-800" data-page="users">
+                    <i class="fas fa-users w-6"></i>用户管理
+                </a>
+                <a href="#" onclick="showPage('diy')" class="nav-item flex items-center px-6 py-3 hover:bg-gray-800" data-page="diy">
+                    <i class="fas fa-tools w-6"></i>DIY配置
+                </a>
+                <a href="login.html" class="flex items-center px-6 py-3 hover:bg-gray-800 mt-4 border-t border-gray-800">
+                    <i class="fas fa-sign-out-alt w-6"></i>退出登录
+                </a>
+            </nav>
+        </aside>
+        
+        <main class="ml-64 flex-1">
+            <header class="bg-white shadow-sm border-b h-16 flex items-center justify-between px-8">
+                <h1 id="pageTitle" class="text-xl font-bold text-gray-800">仪表盘</h1>
+                <div class="flex items-center space-x-4">
+                    <span id="adminUser" class="text-gray-600">管理员</span>
+                </div>
+            </header>
+            
+            <div class="p-8">
+                <!-- Dashboard -->
+                <div id="dashboardPage" class="page">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <div class="flex items-center justify-between">
+                                <div><p class="text-gray-500 text-sm">总产品</p><p id="statProducts" class="text-3xl font-bold">-</p></div>
+                                <i class="fas fa-cube text-4xl text-blue-200"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <div class="flex items-center justify-between">
+                                <div><p class="text-gray-500 text-sm">总订单</p><p id="statOrders" class="text-3xl font-bold">-</p></div>
+                                <i class="fas fa-shopping-bag text-4xl text-green-200"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <div class="flex items-center justify-between">
+                                <div><p class="text-gray-500 text-sm">总用户</p><p id="statUsers" class="text-3xl font-bold">-</p></div>
+                                <i class="fas fa-users text-4xl text-purple-200"></i>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <div class="flex items-center justify-between">
+                                <div><p class="text-gray-500 text-sm">总方案</p><p id="statSolutions" class="text-3xl font-bold">-</p></div>
+                                <i class="fas fa-lightbulb text-4xl text-yellow-200"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <h3 class="text-lg font-bold mb-4">最近订单</h3>
+                        <div id="recentOrders"></div>
+                    </div>
+                </div>
+
+                <!-- Products -->
+                <div id="productsPage" class="page hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">产品管理</h2>
+                        <button onclick="showProductModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                            <i class="fas fa-plus mr-2"></i>添加产品
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-xl shadow overflow-hidden">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">产品</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">品牌</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">分类</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">价格</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">库存</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productsTable" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Categories -->
+                <div id="categoriesPage" class="page hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">分类管理</h2>
+                        <button onclick="showCategoryModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                            <i class="fas fa-plus mr-2"></i>添加分类
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-xl shadow overflow-hidden">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">名称</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">Slug</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categoriesTable" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Brands -->
+                <div id="brandsPage" class="page hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">品牌管理</h2>
+                        <button onclick="showBrandModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                            <i class="fas fa-plus mr-2"></i>添加品牌
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-xl shadow overflow-hidden">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">品牌</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="brandsTable" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Orders -->
+                <div id="ordersPage" class="page hidden">
+                    <h2 class="text-xl font-bold mb-4">订单管理</h2>
+                    <div class="bg-white rounded-xl shadow overflow-hidden">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">订单号</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">用户</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">金额</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">状态</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">日期</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTable" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Solutions -->
+                <div id="solutionsPage" class="page hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">解决方案</h2>
+                        <button onclick="showSolutionModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                            <i class="fas fa-plus mr-2"></i>添加方案
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-xl shadow overflow-hidden">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">名称</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">行业</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">价格</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">使用次数</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="solutionsTable" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Articles -->
+                <div id="articlesPage" class="page hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">知识库</h2>
+                        <button onclick="showArticleModal()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                            <i class="fas fa-plus mr-2"></i>添加文章
+                        </button>
+                    </div>
+                    <div class="bg-white rounded-xl shadow overflow-hidden">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">标题</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">分类</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">浏览</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="articlesTable" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Users -->
+                <div id="usersPage" class="page hidden">
+                    <h2 class="text-xl font-bold mb-4">用户管理</h2>
+                    <div class="bg-white rounded-xl shadow overflow-hidden">
+                        <table class="w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">用户名</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">邮箱</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">状态</th>
+                                    <th class="px-6 py-3 text-left text-sm font-medium text-gray-500">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTable" class="divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- DIY 配置 -->
+                <div id="diyPage" class="page hidden">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold">DIY配置管理</h2>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- 选项配置 -->
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold">选项配置</h3>
+                                <button onclick="showDiyConfigModal()" class="px-3 py-1 bg-green-600 text-white rounded text-sm">添加</button>
+                            </div>
+                            <div id="diyConfigsTable" class="max-h-96 overflow-y-auto"></div>
+                        </div>
+                        
+                        <!-- 推荐配置 -->
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold">场景推荐配置</h3>
+                                <button onclick="showDiyRecModal()" class="px-3 py-1 bg-green-600 text-white rounded text-sm">添加</button>
+                            </div>
+                            <div id="diyRecsTable" class="max-h-96 overflow-y-auto"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 通用弹窗 -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b flex justify-between items-center sticky top-0 bg-white">
+                <h3 id="modalTitle" class="text-xl font-bold"></h3>
+                <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div id="modalContent" class="p-6"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api/v1';
+        
+        // 检查登录
+        let token = localStorage.getItem('adminToken');
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+        
+        const headers = { 
+            'Authorization': 'Bearer ' + token, 
+            'Content-Type': 'application/json' 
+        };
+        
+        const pageTitles = { 
+            dashboard: '仪表盘', 
+            products: '产品管理', 
+            categories: '分类管理', 
+            brands: '品牌管理', 
+            orders: '订单管理', 
+            solutions: '解决方案', 
+            articles: '知识库', 
+            users: '用户管理',
+            diy: 'DIY配置' 
+        };
+        
+        // 页面切换
+        function showPage(page) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page').forEach(function(p) { 
+                p.classList.add('hidden'); 
+            });
+            
+            // 显示当前页面
+            document.getElementById(page + 'Page').classList.remove('hidden');
+            
+            // 更新导航状态
+            document.querySelectorAll('.nav-item').forEach(function(n) { 
+                n.classList.remove('bg-gray-800', 'text-white'); 
+            });
+            var navItem = document.querySelector('[data-page="' + page + '"]');
+            if (navItem) {
+                navItem.classList.add('bg-gray-800', 'text-white');
+            }
+            
+            // 更新标题
+            document.getElementById('pageTitle').textContent = pageTitles[page];
+            
+            // 加载数据
+            if (page === 'dashboard') loadStats();
+            if (page === 'products') loadProducts();
+            if (page === 'categories') loadCategories();
+            if (page === 'brands') loadBrands();
+            if (page === 'orders') loadOrders();
+            if (page === 'solutions') loadSolutions();
+            if (page === 'articles') loadArticles();
+            if (page === 'users') loadUsers();
+            if (page === 'diy') { loadDiyConfigs(); loadDiyRecommendations(); }
+        }
+        
+        // API 请求
+        async function apiCall(url, options) {
+            options = options || {};
+            try {
+                var res = await fetch(url, Object.assign({
+                    headers: Object.assign({}, headers, options.headers)
+                }, options));
+                return await res.json();
+            } catch (e) { 
+                console.error(e); 
+                alert('请求失败: ' + e.message); 
+                return null; 
+            }
+        }
+        
+        // 通用函数
+        function getStatusClass(status) {
+            var classes = { 
+                pending: 'bg-yellow-100 text-yellow-700', 
+                paid: 'bg-blue-100 text-blue-700', 
+                processing: 'bg-purple-100 text-purple-700', 
+                shipped: 'bg-indigo-100 text-indigo-700', 
+                completed: 'bg-green-100 text-green-700', 
+                cancelled: 'bg-gray-100 text-gray-700' 
+            };
+            return classes[status] || 'bg-gray-100 text-gray-700';
+        }
+        
+        function getStatusText(status) {
+            var texts = { 
+                pending: '待付款', 
+                paid: '已付款', 
+                processing: '处理中', 
+                shipped: '已发货', 
+                completed: '已完成', 
+                cancelled: '已取消' 
+            };
+            return texts[status] || status;
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+        }
+        
+        // ===== 仪表盘 =====
+        async function loadStats() {
+            var data = await apiCall(API_BASE + '/admin/stats');
+            if (!data || data.code !== 200) return;
+            
+            document.getElementById('statProducts').textContent = data.data.products;
+            document.getElementById('statOrders').textContent = data.data.orders;
+            document.getElementById('statUsers').textContent = data.data.users;
+            document.getElementById('statSolutions').textContent = data.data.solutions;
+            
+            // 最近订单
+            var ordersRes = await apiCall(API_BASE + '/admin/orders?limit=5');
+            if (ordersRes && ordersRes.code === 200) {
+                var html = '<table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-2 text-left">订单号</th><th class="px-4 py-2 text-left">金额</th><th class="px-4 py-2 text-left">状态</th></tr></thead><tbody>';
+                ordersRes.data.items.forEach(function(o) {
+                    html += '<tr><td class="px-4 py-2">' + o.orderNo + '</td><td class="px-4 py-2">¥' + o.totalAmount + '</td><td class="px-4 py-2"><span class="px-2 py-1 rounded text-xs ' + getStatusClass(o.status) + '">' + getStatusText(o.status) + '</span></td></tr>';
+                });
+                html += '</tbody></table>';
+                document.getElementById('recentOrders').innerHTML = html;
+            }
+        }
+        
+        // ===== 产品 =====
+        async function loadProducts() {
+            var data = await apiCall(API_BASE + '/admin/products?limit=100');
+            if (!data || data.code !== 200) return;
+            
+            var html = '';
+            data.data.items.forEach(function(p) {
+                html += '<tr>' +
+                    '<td class="px-6 py-4"><div class="flex items-center"><div class="flex-shrink-0 h-10 w-10"><img class="h-10 w-10 rounded" src="' + (p.images || 'https://placehold.co/40') + '" alt=""></div><div class="ml-4"><div class="text-sm font-medium text-gray-900">' + p.name + '</div><div class="text-sm text-gray-500">' + p.sku + '</div></div></div></td>' +
+                    '<td class="px-6 py-4 text-sm text-gray-500">' + (p.brand || '-') + '</td>' +
+                    '<td class="px-6 py-4 text-sm text-gray-500">' + (p.category || '-') + '</td>' +
+                    '<td class="px-6 py-4 text-sm text-gray-900">¥' + p.price + '</td>' +
+                    '<td class="px-6 py-4 text-sm text-gray-500">' + (p.stock || 0) + '</td>' +
+                    '<td class="px-6 py-4 text-sm font-medium"><button onclick="deleteProduct(' + p.id + ')" class="text-red-600 hover:text-red-900">删除</button></td>' +
+                '</tr>';
+            });
+            document.getElementById('productsTable').innerHTML = html || '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">暂无数据</td></tr>';
+        }
+        
+        async function showProductModal(id) {
+            var categories = await apiCall(API_BASE + '/admin/categories');
+            var brands = await apiCall(API_BASE + '/admin/brands');
+            
+            var categoryOptions = '';
+            var brandOptions = '';
+            
+            if (categories && categories.code === 200) {
+                categories.data.forEach(function(c) {
+                    categoryOptions += '<option value="' + c.id + '">' + c.name + '</option>';
+                });
+            }
+            if (brands && brands.code === 200) {
+                brands.data.forEach(function(b) {
+                    brandOptions += '<option value="' + b.id + '">' + b.name + '</option>';
+                });
+            }
+            
+            document.getElementById('modalTitle').textContent = id ? '编辑产品' : '添加产品';
+            document.getElementById('modalContent').innerHTML = 
+                '<form id="productForm" class="space-y-4">' +
+                    '<div><label class="block text-sm font-medium mb-1">产品名称 *</label><input type="text" name="name" required class="w-full px-3 py-2 border rounded-lg"></div>' +
+                    '<div class="grid grid-cols-2 gap-4">' +
+                        '<div><label class="block text-sm font-medium mb-1">SKU *</label><input type="text" name="sku" required class="w-full px-3 py-2 border rounded-lg"></div>' +
+                        '<div><label class="block text-sm font-medium mb-1">价格 *</label><input type="number" name="price" required class="w-full px-3 py-2 border rounded-lg"></div>' +
+                    '</div>' +
+                    '<div class="grid grid-cols-2 gap-4">' +
+                        '<div><label class="block text-sm font-medium mb-1">分类</label><select name="categoryId" class="w-full px-3 py-2 border rounded-lg">' + categoryOptions + '</select></div>' +
+                        '<div><label class="block text-sm font-medium mb-1">品牌</label><select name="brandId" class="w-full px-3 py-2 border rounded-lg"><option value="">选择品牌</option>' + brandOptions + '</select></div>' +
+                    '</div>' +
+                    '<div><label class="block text-sm font-medium mb-1">描述</label><textarea name="description" rows="3" class="w-full px-3 py-2 border rounded-lg"></textarea></div>' +
+                    '<div><label class="block text-sm font-medium mb-1">图片URL</label><input type="text" name="images" class="w-full px-3 py-2 border rounded-lg"></div>' +
+                    '<div class="grid grid-cols-2 gap-4">' +
+                        '<div><label class="block text-sm font-medium mb-1">库存</label><input type="number" name="stockQuantity" value="0" class="w-full px-3 py-2 border rounded-lg"></div>' +
+                        '<div><label class="block text-sm font-medium mb-1">单位</label><input type="text" name="unit" value="件" class="w-full px-3 py-2 border rounded-lg"></div>' +
+                    '</div>' +
+                    '<div class="flex justify-end space-x-2 pt-4">' +
+                        '<button type="button" onclick="closeModal()" class="px-4 py-2 border rounded-lg">取消</button>' +
+                        '<button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">保存</button>' +
+                    '</div>' +
+                '</form>';
+            
+            document.getElementById('productForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                var formData = new FormData(e.target);
+                var data = Object.fromEntries(formData);
+                data.price = Number(data.price);
+                data.stockQuantity = Number(data.stockQuantity);
+                data.brandId = data.brandId ? Number(data.brandId) : null;
+                data.categoryId = Number(data.categoryId);
+                
+                var url = id ? API_BASE + '/admin/products/' + id : API_BASE + '/admin/products';
+                var method = id ? 'PUT' : 'POST';
+                
+                var res = await apiCall(url, { method: method, body: JSON.stringify(data) });
+                if (res && res.code === 200) {
+                    closeModal();
+                    loadProducts();
+                    alert(id ? '更新成功' : '创建成功');
+                } else {
+                    alert(res && res.message || '操作失败');
+                }
+            });
+            
+            document.getElementById('modal').classList.remove('hidden');
+        }
+        
+        async function deleteProduct(id) {
+            if (!confirm('确定删除此产品?')) return;
+            var res = await apiCall(API_BASE + '/admin/products/' + id, { method: 'DELETE' });
+            if (res && res.code === 200) {
+                loadProducts();
+                alert('删除成功');
+            } else {
+                alert(res && res.message || '删除失败');
+            }
+        }
+        
+        // ===== 分类 =====
+        async function loadCategories() {
+            var data = await apiCall(API_BASE + '/admin/categories');
+            if (!data || data.code !== 200) return;
+            
+            var html = '';
+            data.data.forEach(function(c) {
+                html += '<tr>' +
+                    '<td class="px-6 py-4 text-sm font-medium text-gray-900">' + c.name + '</td>' +
+                    '<td class="px-6 py-4 text-sm text-gray-500">' + c.slug + '</td>' +
+                    '<td class="px-6 py-4 text-sm font-medium">' +
+                        '<button onclick="deleteCategory(' + c.id + ')" class="text-red-600 hover:text-red-900">删除</button>' +
+                    '</td>' +
+                '</tr>';
+            });
+            document.getElementById('categoriesTable').innerHTML = html || '<tr><td colspan="3" class="px-6 py-4 text-center text-gray-500">暂无数据</td></tr>';
+        }
+        
+        function showCategoryModal() {
+            document.getElementById('modalTitle').textContent = '添加分类';
+            document.getElementById('modalContent').innerHTML = 
+                '<form id="categoryForm" class="space-y-4">' +
+                    '<div><label class="block text-sm font-medium mb-1">名称 *</label><input type="text" name="name" required class="w-full px-3 py-2 border rounded-lg"></div>' +
+                    '<div><label class="block text-sm font-medium mb-1">Slug *</label><input type="text" name="slug" required class="w-full px-3 py-2 border rounded-lg" placeholder="如: compressors"></div>' +
+                    '<div><label class="block text-sm font-medium mb-1">图标</label><input type="text" name="icon" class="w-full px-3 py-2 border rounded-lg" placeholder="FontAwesome图标类名"></div>' +
+                    '<div class="flex justify-end space-x-2 pt-4">' +
+                        '<button type="button" onclick="closeModal()" class="px-4 py-2 border rounded-lg">取消</button>' +
+                        '<button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">保存</button>' +
+                    '</div>' +
+                '</form>';
+            
+            document.getElementById('categoryForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                var formData = new FormData(e.target);
+                var data = Object.fromEntries(formData);
+                
+                var res = await apiCall(API_BASE + '/admin/categories', { method: 'POST', body: JSON.stringify(data) });
+                if (res && res.code === 200) {
+                    closeModal();
+                    loadCategories();
+                    alert('创建成功');
+                } else {
+                    alert(res && res.message || '操作失败');
+                }
+            });
+            
+            document.getElementById('modal').classList.remove('hidden');
+        }
+        
+        async function deleteCategory(id) {
+            if (!confirm('确定删除此分类?')) return;
+            var res = await apiCall(API_BASE + '/admin/categories/' + id, { method: 'DELETE' });
+            if (res && res.code === 200) {
+                loadCategories();
+                alert('删除成功');
+            } else {
+                alert(res && res.message || '删除失败');
+            }
+        }
+        
+        // ===== 品牌 =====
+        async function loadBrands() {
+            var data = await apiCall(API_BASE + '/admin/brands');
+            if (!data || data.code !== 200) return;
+            
+            var html = '';
+            data.data.forEach(function(b) {
+                html += '<tr>' +
+                    '<td class="px-6 py-4 text-sm font-medium text-gray-900">' + b.name + '</td>' +
+                    '<td class="px-6 py-4 text-sm font-medium">' +
+                        '<button onclick="deleteBrand(' + b.id + ')" class="text-red-600 hover:text-red-900">删除</button>' +
+                    '</td>' +
+                '</tr>';
+            });
+            document.getElementById('brandsTable').innerHTML = html || '<tr><td colspan="2" class="px-6 py-4 text-center text-gray-500">暂无数据</td></tr>';
+        }
+        
+        function showBrandModal() {
+            document.getElementById('modalTitle').textContent = '添加品牌';
+            document.getElementById('modalContent').innerHTML = 
+                '<form id="brandForm" class="space-y-4">' +
+                    '<div><label class="block text-sm font-medium mb-1">品牌名称 *</label><input type="text" name="name" required class="w-full px-3 py-2 border rounded-lg"></div>' +
+                    '<div><label class="block text-sm font-medium mb-1">描述</label><textarea name="description" rows="3" class="w-full px-3 py-2 border rounded-lg"></textarea></div>' +
+                    '<div><label class="block text-sm font-medium mb-1">Logo URL</label><input type="text" name="logo" class="w-full px-3 py-2 border rounded-lg"></div>' +
+                    '<div class="flex justify-end space-x-2 pt-4">' +
+                        '<button type="button" onclick="closeModal()" class="px-4 py-2 border rounded-lg">取消</button>' +
+                        '<button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">保存</button>' +
+                    '</div>' +
+                '</form>';
+            
+            document.getElementById('brandForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                var formData = new FormData(e.target);
+                var data = Object.fromEntries(formData);
+                
+                var res = await apiCall(API_BASE + '/admin/brands', { method: 'POST', body: JSON.stringify(data) });
+                if (res && res.code === 200) {
+                    closeModal();
+                    loadBrands();
+                    alert('创建成功');
+                } else {
+                    alert(res && res.message || '操作失败');
+                }
+            });
+            
+            document.getElementById('modal').classList.remove('hidden');
+        }
+        
+        async function deleteBrand(id) {
+            if (!confirm('确定删除此品牌?')) return;
+            var res = await apiCall(API_BASE + '/admin/brands/' + id, { method: 'DELETE' });
+            if (res && res.code === 200) {
+                loadBrands();
+                alert('删除成功');
+            } else {
+                alert(res && res.message || '删除失败');
+            }
+        }
+        
+        // ===== 订单 =====
+        async function loadOrders() {
+            var data = await apiCall(API_BASE + '/admin/orders?limit=50');
+            if (!data || data.code !== 200) return;
+            
+            var html = '';
+            data.data.items.forEach(function(o) {
+                html += '<tr>' +
+                    '<td class="px-6 py-4 text-sm font-medium text-gray-900">' + o.orderNo + '</td>' +
+                    '<td class="px-6 py-4 text-sm text-gray-500">' + (o.userName || '-') + '</td>' +
+                    '<td class="px-6 py-4 text-sm text-gray-900">¥' + o.totalAmount + '</td>' +
+                    '<td class="px-6 py-4"><span class="px-2 py-1 rounded text-xs ' + getStatusClass(o.status) + '">' + getStatusText(o.status) + '</span></td>' +
+                    '<td class="px-6 py-4 text-sm text-gray-500">' + new Date(o.createdAt).toLocaleDateString() + '</td>' +
+                '</tr>';
+            });
+            document.getElementById('ordersTable').innerHTML = html || '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">暂无数据</td></tr>';
+        }
+        
+        // ===== 解决方案 =====
+        async function loadSolutions() {
+            var data = await apiCall(API_BASE + '/admin/solutions');
+            if (!data || data.code !== 200) return;
+            
+            var html = '';
+            data.data.forEach(function(s) {
+                html += '<tr>' +
+                    '<td class="px-6 py-4 text-sm font-medium text-gray-900">' + s.title + '</td>' +
+                    '<td class="px-6 py-4 text-sm text-gray-500">' + (s.industry || '-') + '</td>' +
+                    '<td class="px-6 py-4 text-sm text-gray-900">¥' + Number(s.totalPrice || 0).toLocaleString() + '</td>' +
+                    '<td class="px-6 py-4 text-sm text-gray-500">' + s.usageCount + '</td>' +
+                    '<td class="px-6 py-4 text-sm font-medium">' +
+                        '<button onclick="deleteSolution(' + s.id + ')" class="text-red-600 hover:text-red-900">删除</button>' +
+                    '</td>' +
+                '</tr>';
+            });
+            document.getElementById('solutionsTable').innerHTML = html || '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">暂无数据</td></tr>';
+        }
+        
+        function showSolutionModal() {
+            document.getElementById('modalTitle').textContent = '添加解决方案';
+            document.getElementById('modalContent').innerHTML = 
+                '<form id="solutionForm" class="space-y-4">' +
+                    '<div><label class="block text-sm font-medium mb-1">方案名称 *</label><input type="text" name="title" required class="w-full px-3 py-2 border rounded-lg"></div>' +
+                    '<div class="grid grid-cols-2 gap-4">' +
+                        '<div><label class="block text-sm font-medium mb-1">行业</label><input type="text" name="industry" class="w-full px-3 py-2 border rounded-lg" placeholder="如：餐饮、零售"></div>' +
+                        '<div><label class="block text-sm font-medium mb-1">应用场景</label><input type="text" name="scenario" class="w-full px-3 py-2 border rounded-lg" placeholder="如：cold_storage"></div>' +
+                    '</div>' +
+                    '<div class="grid grid-cols-2 gap-4">' +
+                        '<div><label class="block text-sm font-medium mb-1">温度范围</label><input type="text" name="temperatureRange" class="w-full px-3 py-2 border rounded-lg" placeholder="如：-5~0°C"></div>' +
+                        '<div><label class="block text-sm font-medium mb-1">容量范围</label><input type="text" name="capacityRange" class="w-full px-3 py-2 border rounded-lg" placeholder="如：20-100m³"></div>' +
+                    '</div>' +
+                    '<div><label class="block text-sm font-medium mb-1">方案特点</label><input type="text" name="features" class="w-full px-3 py-2 border rounded-lg" placeholder="如：节能30%,低噪音"></div>' +
+                    '<div><label class="block text-sm font-medium mb-1">封面图片URL</label><input type="text" name="coverImage" class="w-full px-3 py-2 border rounded-lg"></div>' +
+                    '<div><label class="block text-sm font-medium mb-1">总价(¥)</label><input type="number" name="totalPrice" class="w-full px-3 py-2 border rounded-lg"></div>' +
+                    '<div><label class="block text-sm font-medium mb-1">描述</label><textarea name="description" rows="3" class="w-full px-3 py-2 border rounded-lg"></textarea></div>' +
+                    '<div><label class="block text-sm font-medium mb-1">安装指南</label><textarea name="installationGuide" rows="3" class="w-full px-3 py-2 border rounded-lg"></textarea></div>' +
+                    '<div class="flex justify-end space-x-2 pt-4">' +
+                        '<button type="button" onclick="closeModal()" class="px-4 py-2 border rounded-lg">取消</button>' +
+                        '<button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">保存</button>' +
+                    '</div>' +
+                '</form>';
+            
+            document.getElementById('solutionForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                var formData = new FormData(e.target);
+                var data = Object.fromEntries(formData);
+                data.totalPrice = data.totalPrice ? Number(data.totalPrice) : 0;
+                
+                var res = await apiCall(API_BASE + '/admin/solutions', { method: 'POST', body: JSON.stringify(data) });
+                if (res && res.code === 200) {
+                    closeModal();
+                    loadSolutions();
+                    alert('创建成功');
+                } else {
+                    alert(res && res.message || '操作失败');
+                }
+            });
+            
+            document.getElementById('modal').classList.remove('hidden');
+        }
+        
+        async function deleteSolution(id) {
+            if (!confirm('确定删除此解决方案?')) return;
+            var res = await apiCall(API_BASE + '/admin/solutions/' + id, { method: 'DELETE' });
+            if (res && res.code === 200) {
+                loadSolutions();
+                alert('删除成功');
+            } else {
+                alert(res && res.message || '删除失败');
+            }
+        }
+        
+        // ===== 知识库 =====
+        async function loadArticles() {
+            var data = await apiCall(API_BASE + '/admin/articles?limit=100');
+            if (!data || data.code !== 200) return;
+            
+            var html = '';
+            data.data.items.forEach(function(a) {
+                html += '<tr>' +
+                    '<td class="px-6 py-4 text-sm font-medium text-gray-900">' + a.title + '</td>' +
+                    '<td class="px-6 py-4 text-sm text-gray-500">' + (a.category || '-') + '</td>' +
+                    '<td class="px-6 py-4 text-sm text-gray-500">' + (a.viewCount || 0) + '</td>' +
+                    '<td class="px-6 py-4 text-sm font-medium">' +
+                        '<button onclick="deleteArticle(' + a.id + ')" class="text-red-600 hover:text-red-900">删除</button>' +
+                    '</td>' +
+                '</tr>';
+            });
+            document.getElementById('articlesTable').innerHTML = html || '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">暂无数据</td></tr>';
+        }
+        
+        function showArticleModal() {
+            document.getElementById('modalTitle').textContent = '添加文章';
+            document.getElementById('modalContent').innerHTML = 
+                '<form id="articleForm" class="space-y-4">' +
+                    '<div><label class="block text-sm font-medium mb-1">标题 *</label><input type="text" name="title" required class="w-full px-3 py-2 border rounded-lg"></div>' +
+                    '<div><label class="block text-sm font-medium mb-1">分类</label><input type="text" name="category" class="w-full px-3 py-2 border rounded-lg" placeholder="如：技术指南"></div>' +
+                    '<div><label class="block text-sm font-medium mb-1">内容 *</label><textarea name="content" rows="8" required class="w-full px-3 py-2 border rounded-lg"></textarea></div>' +
+                    '<div class="flex justify-end space-x-2 pt-4">' +
+                        '<button type="button" onclick="closeModal()" class="px-4 py-2 border rounded-lg">取消</button>' +
+                        '<button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">保存</button>' +
+                    '</div>' +
+                '</form>';
+            
+            document.getElementById('articleForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                var formData = new FormData(e.target);
+                var data = Object.fromEntries(formData);
+                
+                var res = await apiCall(API_BASE + '/admin/articles', { method: 'POST', body: JSON.stringify(data) });
+                if (res && res.code === 200) {
+                    closeModal();
+                    loadArticles();
+                    alert('创建成功');
+                } else {
+                    alert(res && res.message || '操作失败');
+                }
+            });
+            
+            document.getElementById('modal').classList.remove('hidden');
+        }
+        
+        async function deleteArticle(id) {
+            if (!confirm('确定删除此文章?')) return;
+            var res = await apiCall(API_BASE + '/admin/articles/' + id, { method: 'DELETE' });
+            if (res && res.code === 200) {
+                loadArticles();
+                alert('删除成功');
+            } else {
+                alert(res && res.message || '删除失败');
+            }
+        }
+        
+        // ===== 用户 =====
+        async function loadUsers() {
+            var data = await apiCall(API_BASE + '/admin/users?limit=100');
+            if (!data || data.code !== 200) return;
+            
+            var html = '';
+            data.data.items.forEach(function(u) {
+                var btnText = u.status === 'active' ? '禁用' : '启用';
+                html += '<tr>' +
+                    '<td class="px-6 py-4 text-sm font-medium text-gray-900">' + u.username + '</td>' +
+                    '<td class="px-6 py-4 text-sm text-gray-500">' + u.email + '</td>' +
+                    '<td class="px-6 py-4"><span class="px-2 py-1 rounded text-xs ' + (u.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700') + '">' + (u.status === 'active' ? '正常' : '禁用') + '</span></td>' +
+                    '<td class="px-6 py-4 text-sm font-medium">' +
+                        '<button onclick="toggleUserStatus(' + u.id + ',\'' + u.status + '\')" class="text-blue-600 hover:text-blue-900">' + btnText + '</button>' +
+                    '</td>' +
+                '</tr>';
+            });
+            document.getElementById('usersTable').innerHTML = html || '<tr><td colspan="4" class="px-6 py-4 text-center text-gray-500">暂无数据</td></tr>';
+        }
+        
+        async function toggleUserStatus(id, currentStatus) {
+            var newStatus = currentStatus === 'active' ? 'disabled' : 'active';
+            var res = await apiCall(API_BASE + '/admin/users/' + id, { method: 'PUT', body: JSON.stringify({ status: newStatus }) });
+            if (res && res.code === 200) {
+                loadUsers();
+                alert('更新成功');
+            } else {
+                alert(res && res.message || '更新失败');
+            }
+        }
+        
+        // ===== DIY配置 =====
+        async function loadDiyConfigs() {
+            var data = await apiCall(API_BASE + '/admin/diy-configs');
+            if (!data || data.code !== 200) return;
+            
+            var grouped = {};
+            data.data.forEach(function(c) {
+                if (!grouped[c.category]) grouped[c.category] = [];
+                grouped[c.category].push(c);
+            });
+            
+            var html = '';
+            var categoryLabels = { scenario: '应用场景', temperature: '温度范围', capacityUnit: '容量单位', productType: '产品类型' };
+            for (var cat in grouped) {
+                html += '<div class="mb-4"><h4 class="font-bold text-sm text-gray-500 mb-2">' + (categoryLabels[cat] || cat) + '</h4>';
+                grouped[cat].forEach(function(c) {
+                    html += '<div class="flex items-center justify-between py-2 border-b"><div><span class="font-medium">' + c.label + '</span><span class="text-gray-400 text-sm ml-2">(' + c.key + ')</span></div><button onclick="deleteDiyConfig(' + c.id + ')" class="text-red-600 text-sm">删除</button></div>';
+                });
+                html += '</div>';
+            }
+            document.getElementById('diyConfigsTable').innerHTML = html || '<p class="text-gray-500">暂无配置</p>';
+        }
+        
+        function showDiyConfigModal() {
+            document.getElementById('modalTitle').textContent = '添加DIY配置';
+            document.getElementById('modalContent').innerHTML = 
+                '<form id="diyConfigForm" class="space-y-4">' +
+                    '<div><label class="block text-sm font-medium mb-1">类别 *</label><select name="category" required class="w-full px-3 py-2 border rounded-lg"><option value="scenario">应用场景</option><option value="temperature">温度范围</option><option value="capacityUnit">容量单位</option><option value="productType">产品类型</option></select></div>' +
+                    '<div class="grid grid-cols-2 gap-4"><div><label class="block text-sm font-medium mb-1">Key *</label><input type="text" name="key" required class="w-full px-3 py-2 border rounded-lg" placeholder="如: cold_storage"></div><div><label class="block text-sm font-medium mb-1">排序</label><input type="number" name="sortOrder" value="0" class="w-full px-3 py-2 border rounded-lg"></div></div>' +
+                    '<div><label class="block text-sm font-medium mb-1">显示名称 *</label><input type="text" name="label" required class="w-full px-3 py-2 border rounded-lg"></div>' +
+                    '<div><label class="block text-sm font-medium mb-1">值</label><input type="text" name="value" class="w-full px-3 py-2 border rounded-lg"></div>' +
+                    '<div><label class="block text-sm font-medium mb-1">图标</label><input type="text" name="icon" class="w-full px-3 py-2 border rounded-lg" placeholder="fas fa-xxx"></div>' +
+                    '<div><label class="block text-sm font-medium mb-1">描述</label><input type="text" name="description" class="w-full px-3 py-2 border rounded-lg"></div>' +
+                    '<div class="flex justify-end"><button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">保存</button></div>' +
+                '</form>';
+            
+            document.getElementById('diyConfigForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                var formData = new FormData(e.target);
+                var data = Object.fromEntries(formData);
+                data.sortOrder = Number(data.sortOrder) || 0;
+                
+                var res = await apiCall(API_BASE + '/admin/diy-configs', { method: 'POST', body: JSON.stringify(data) });
+                if (res && res.code === 200) {
+                    closeModal();
+                    loadDiyConfigs();
+                    alert('创建成功');
+                } else {
+                    alert(res && res.message || '操作失败');
+                }
+            });
+            
+            document.getElementById('modal').classList.remove('hidden');
+        }
+        
+        async function deleteDiyConfig(id) {
+            if (!confirm('确定删除?')) return;
+            var res = await apiCall(API_BASE + '/admin/diy-configs/' + id, { method: 'DELETE' });
+            if (res && res.code === 200) {
+                loadDiyConfigs();
+                alert('删除成功');
+            }
+        }
+        
+        // ===== DIY推荐配置 =====
+        async function loadDiyRecommendations() {
+            var data = await apiCall(API_BASE + '/admin/diy-recommendations');
+            if (!data || data.code !== 200) return;
+            
+            var html = '<table class="w-full text-sm"><thead><tr><th class="text-left py-2">场景</th><th class="text-left py-2">产品类型</th><th class="text-left py-2">分类</th><th class="text-left py-2">必选</th><th class="text-left py-2">操作</th></tr></thead><tbody>';
+            var scenarioLabels = { cold_storage: '冷库制冷', supermarket: '商超冷柜', hvac: '中央空调', industrial: '工业制冷' };
+            data.data.forEach(function(r) {
+                html += '<tr class="border-b"><td class="py-2">' + (scenarioLabels[r.scenario] || r.scenario) + '</td><td class="py-2">' + r.productType + '</td><td class="py-2">' + (r.category ? r.category.name : '-') + '</td><td class="py-2">' + (r.isRequired ? '是' : '否') + '</td><td class="py-2"><button onclick="deleteDiyRec(' + r.id + ')" class="text-red-600">删除</button></td></tr>';
+            });
+            html += '</tbody></table>';
+            document.getElementById('diyRecsTable').innerHTML = html || '<p class="text-gray-500">暂无配置</p>';
+        }
+        
+        function showDiyRecModal() {
+            var categoryOptions = '';
+            fetch(API_BASE + '/admin/categories').then(function(res) { return res.json(); }).then(function(result) {
+                if (result.code === 200) {
+                    result.data.forEach(function(c) {
+                        categoryOptions += '<option value="' + c.id + '">' + c.name + '</option>';
+                    });
+                }
+            });
+            
+            document.getElementById('modalTitle').textContent = '添加推荐配置';
+            document.getElementById('modalContent').innerHTML = 
+                '<form id="diyRecForm" class="space-y-4">' +
+                    '<div class="grid grid-cols-2 gap-4"><div><label class="block text-sm font-medium mb-1">场景 *</label><select name="scenario" required class="w-full px-3 py-2 border rounded-lg"><option value="cold_storage">冷库制冷</option><option value="supermarket">商超冷柜</option><option value="hvac">中央空调</option><option value="industrial">工业制冷</option></select></div><div><label class="block text-sm font-medium mb-1">产品类型 *</label><input type="text" name="productType" required class="w-full px-3 py-2 border rounded-lg" placeholder="compressors"></div></div>' +
+                    '<div><label class="block text-sm font-medium mb-1">产品分类 *</label><select name="categoryId" required class="w-full px-3 py-2 border rounded-lg"><option value="">选择分类</option></select></div>' +
+                    '<div class="grid grid-cols-3 gap-4"><div><label class="block text-sm font-medium mb-1">优先级</label><input type="number" name="priority" value="0" class="w-full px-3 py-2 border rounded-lg"></div><div><label class="block text-sm font-medium mb-1">最小数量</label><input type="number" name="minQuantity" value="1" class="w-full px-3 py-2 border rounded-lg"></div><div><label class="block text-sm font-medium mb-1">最大数量</label><input type="number" name="maxQuantity" value="1" class="w-full px-3 py-2 border rounded-lg"></div></div>' +
+                    '<div class="flex items-center"><input type="checkbox" name="isRequired" value="true" class="mr-2"><label class="text-sm">必选</label></div>' +
+                    '<div class="flex justify-end"><button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">保存</button></div>' +
+                '</form>';
+            
+            // Load categories
+            fetch(API_BASE + '/admin/categories').then(function(res) { return res.json(); }).then(function(result) {
+                if (result.code === 200) {
+                    var select = document.querySelector('#diyRecForm select[name="categoryId"]');
+                    result.data.forEach(function(c) {
+                        var opt = document.createElement('option');
+                        opt.value = c.id;
+                        opt.textContent = c.name;
+                        select.appendChild(opt);
+                    });
+                }
+            });
+            
+            document.getElementById('diyRecForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                var formData = new FormData(e.target);
+                var data = Object.fromEntries(formData);
+                data.categoryId = Number(data.categoryId);
+                data.priority = Number(data.priority) || 0;
+                data.minQuantity = Number(data.minQuantity) || 1;
+                data.maxQuantity = Number(data.maxQuantity) || 1;
+                data.isRequired = data.isRequired === 'true';
+                
+                var res = await apiCall(API_BASE + '/admin/diy-recommendations', { method: 'POST', body: JSON.stringify(data) });
+                if (res && res.code === 200) {
+                    closeModal();
+                    loadDiyRecommendations();
+                    alert('创建成功');
+                } else {
+                    alert(res && res.message || '操作失败');
+                }
+            });
+            
+            document.getElementById('modal').classList.remove('hidden');
+        }
+        
+        async function deleteDiyRec(id) {
+            if (!confirm('确定删除?')) return;
+            var res = await apiCall(API_BASE + '/admin/diy-recommendations/' + id, { method: 'DELETE' });
+            if (res && res.code === 200) {
+                loadDiyRecommendations();
+                alert('删除成功');
+            }
+        }
+        
+        // 初始化
+        showPage('dashboard');
+    </script>
+</body>
+</html>

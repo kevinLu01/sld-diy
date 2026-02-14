@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能DIY配套工具 - 生利达冷冻设备</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+        body { font-family: 'Noto Sans SC', sans-serif; }
+        .step-active { background: linear-gradient(135deg, #0066cc 0%, #00aaff 100%); color: white; }
+        .step-completed { background: #10b981; color: white; }
+        .step-inactive { background: #e5e7eb; color: #9ca3af; }
+        .product-card { transition: all 0.3s ease; border: 2px solid transparent; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1); }
+        .product-card.selected { border-color: #0066cc; background: #eff6ff; }
+        .scenario-card { transition: all 0.3s ease; }
+        .scenario-card:hover, .scenario-card.selected { transform: scale(1.05); }
+        .scenario-card.selected { border-color: #0066cc; box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.2); }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="flex items-center">
+                        <i class="fas fa-snowflake text-3xl text-blue-600"></i>
+                        <span class="ml-2 text-xl font-bold">生利达</span>
+                    </a>
+                    <span class="ml-4 text-gray-400">|</span>
+                    <span class="ml-4 text-lg font-semibold text-gray-700">智能DIY配套工具</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="saveProject()" class="text-blue-600 hover:text-blue-700">
+                        <i class="fas fa-save mr-2"></i>保存方案
+                    </button>
+                    <button onclick="shareProject()" class="text-blue-600 hover:text-blue-700">
+                        <i class="fas fa-share-alt mr-2"></i>分享
+                    </button>
+                    <a href="index.html" class="text-gray-600 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="mb-8">
+            <div class="flex items-center justify-between">
+                <div class="flex-1" id="step0Container">
+                    <div class="flex items-center">
+                        <div id="step0" class="step-active w-10 h-10 rounded-full flex items-center justify-center font-bold cursor-pointer" onclick="goToStep(0)">0</div>
+                        <div id="stepLine0" class="flex-1 h-1 bg-gray-300 mx-2"></div>
+                    </div>
+                    <p id="step0Text" class="text-sm font-semibold mt-2 text-blue-600">选择模板</p>
+                </div>
+                <div class="flex-1" id="step1Container">
+                    <div class="flex items-center">
+                        <div id="step1" class="step-inactive w-10 h-10 rounded-full flex items-center justify-center font-bold cursor-pointer" onclick="goToStep(1)">1</div>
+                        <div id="stepLine1" class="flex-1 h-1 bg-gray-300 mx-2"></div>
+                    </div>
+                    <p id="step1Text" class="text-sm font-semibold mt-2 text-gray-400">需求配置</p>
+                </div>
+                <div class="flex-1" id="step2Container">
+                    <div class="flex items-center">
+                        <div id="step2" class="step-inactive w-10 h-10 rounded-full flex items-center justify-center font-bold cursor-pointer" onclick="goToStep(2)">2</div>
+                        <div id="stepLine2" class="flex-1 h-1 bg-gray-300 mx-2"></div>
+                    </div>
+                    <p id="step2Text" class="text-sm font-semibold mt-2 text-gray-400">选择配件</p>
+                </div>
+                <div class="flex-1" id="step3Container">
+                    <div class="flex items-center">
+                        <div id="step3" class="step-inactive w-10 h-10 rounded-full flex items-center justify-center font-bold cursor-pointer" onclick="goToStep(3)">3</div>
+                        <div id="stepLine3" class="flex-1 h-1 bg-gray-300 mx-2"></div>
+                    </div>
+                    <p id="step3Text" class="text-sm font-semibold mt-2 text-gray-400">方案确认</p>
+                </div>
+                <div class="flex-1" id="step4Container">
+                    <div class="flex items-center">
+                        <div id="step4" class="step-inactive w-10 h-10 rounded-full flex items-center justify-center font-bold cursor-pointer" onclick="goToStep(4)">4</div>
+                    </div>
+                    <p id="step4Text" class="text-sm font-semibold mt-2 text-gray-400">生成订单</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2">
+                <div id="step0Content" class="step-content">
+                    <div class="bg-white rounded-xl shadow-lg p-8">
+                        <h2 class="text-2xl font-bold mb-2 flex items-center">
+                            <i class="fas fa-layer-group text-blue-600 mr-3"></i>
+                            选择解决方案模板
+                        </h2>
+                        <p class="text-gray-500 mb-6">从现有解决方案模板开始，或自定义配置</p>
+                        
+                        <div id="solutionTemplates" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="text-center py-8 text-gray-400">
+                                <i class="fas fa-spinner fa-spin text-2xl mb-3"></i>
+                                <p>加载解决方案模板...</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8 text-center">
+                            <button onclick="skipTemplate()" class="px-6 py-3 border-2 border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-600 transition">
+                                <i class="fas fa-plus mr-2"></i>自定义配置（跳过模板）
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="step1Content" class="step-content hidden">
+                    <div class="bg-white rounded-xl shadow-lg p-8">
+                        <h2 class="text-2xl font-bold mb-6 flex items-center">
+                            <i class="fas fa-sliders-h text-blue-600 mr-3"></i>
+                            配置您的制冷系统
+                        </h2>
+                        
+                        <div class="mb-8">
+                            <label class="block text-sm font-semibold mb-4 text-gray-700">
+                                1. 应用场景 <span class="text-red-500">*</span>
+                            </label>
+                            <div id="scenarioCards" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div class="text-center py-8 text-gray-400 col-span-4">
+                                    <i class="fas fa-spinner fa-spin text-2xl mb-3"></i>
+                                    <p>加载中...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-8">
+                            <label class="block text-sm font-semibold mb-4 text-gray-700">
+                                2. 技术参数 <span class="text-red-500">*</span>
+                            </label>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm text-gray-600 mb-2">温度范围</label>
+                                    <select id="temperatureRange" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none">
+                                        <option value="-25~-18">-25°C ~ -18°C (低温冷冻)</option>
+                                        <option value="-5~0" selected>-5°C ~ 0°C (冷藏保鲜)</option>
+                                        <option value="0~5">0°C ~ 5°C (冷藏)</option>
+                                        <option value="5~15">5°C ~ 15°C (恒温)</option>
+                                        <option value="custom">自定义温度</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-600 mb-2">制冷量需求</label>
+                                    <div class="flex items-center space-x-2">
+                                        <input type="number" id="coolingCapacity" value="50" class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none">
+                                        <select id="capacityUnit" class="px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none">
+                                            <option value="kW">kW</option>
+                                            <option value="HP">HP</option>
+                                            <option value="BTU">BTU/h</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-600 mb-2">容积/面积</label>
+                                    <div class="flex items-center space-x-2">
+                                        <input type="number" id="volume" value="100" class="flex-1 px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none">
+                                        <select id="volumeUnit" class="px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none">
+                                            <option value="m3">m³</option>
+                                            <option value="m2">m²</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm text-gray-600 mb-2">环境温度</label>
+                                    <select id="ambientTemp" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none">
+                                        <option value="20~30">20°C ~ 30°C (常温)</option>
+                                        <option value="30~40" selected>30°C ~ 40°C (炎热)</option>
+                                        <option value="40~50">40°C ~ 50°C (高温)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-8">
+                            <button class="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center" onclick="toggleAdvanced()">
+                                <i class="fas fa-chevron-down mr-2" id="advancedIcon"></i>
+                                高级选项
+                            </button>
+                            <div id="advancedOptions" class="hidden mt-4 p-4 bg-gray-50 rounded-lg">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <label class="flex items-center space-x-2">
+                                        <input type="checkbox" id="energySaving" class="w-4 h-4 text-blue-600">
+                                        <span class="text-sm">节能优先</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2">
+                                        <input type="checkbox" id="lowNoise" checked class="w-4 h-4 text-blue-600">
+                                        <span class="text-sm">低噪音运行</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2">
+                                        <input type="checkbox" id="smartControl" class="w-4 h-4 text-blue-600">
+                                        <span class="text-sm">智能控制系统</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2">
+                                        <input type="checkbox" id="remoteMonitoring" class="w-4 h-4 text-blue-600">
+                                        <span class="text-sm">远程监控</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex space-x-4">
+                            <button onclick="getRecommendations()" class="flex-1 bg-blue-600 text-white py-4 rounded-lg font-semibold hover:bg-blue-700 flex items-center justify-center">
+                                <i class="fas fa-magic mr-2"></i>
+                                智能推荐配件
+                            </button>
+                            <button onclick="resetForm()" class="px-6 py-4 border-2 border-gray-300 rounded-lg font-semibold hover:border-blue-600 hover:text-blue-600">
+                                重置
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step2Content" class="step-content hidden">
+                    <div class="bg-white rounded-xl shadow-lg p-8">
+                        <h3 class="text-xl font-bold mb-6 flex items-center justify-between">
+                            <span><i class="fas fa-lightbulb text-yellow-500 mr-2"></i>智能推荐配件</span>
+                            <span class="text-sm text-gray-500 font-normal">点击选择配件</span>
+                        </h3>
+
+                        <div id="productSections"></div>
+
+                        <div class="flex space-x-4 mt-8">
+                            <button onclick="goToStep(1)" class="px-6 py-3 border-2 border-gray-300 rounded-lg font-semibold hover:border-blue-600">
+                                <i class="fas fa-arrow-left mr-2"></i>上一步
+                            </button>
+                            <button onclick="goToStep(3)" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700">
+                                确认选择<i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step3Content" class="step-content hidden">
+                    <div class="bg-white rounded-xl shadow-lg p-8">
+                        <h3 class="text-xl font-bold mb-6"><i class="fas fa-clipboard-check text-green-600 mr-2"></i>方案确认</h3>
+                        
+                        <div id="confirmationSummary"></div>
+
+                        <div id="compatibilityResult" class="mt-6"></div>
+
+                        <div class="flex space-x-4 mt-8">
+                            <button onclick="goToStep(2)" class="px-6 py-3 border-2 border-gray-300 rounded-lg font-semibold hover:border-blue-600">
+                                <i class="fas fa-arrow-left mr-2"></i>返回修改
+                            </button>
+                            <button onclick="goToStep(4)" class="flex-1 bg-orange-500 text-white py-3 rounded-lg font-semibold hover:bg-orange-600">
+                                生成订单<i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step4Content" class="step-content hidden">
+                    <div class="bg-white rounded-xl shadow-lg p-8">
+                        <div class="text-center py-8">
+                            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                                <i class="fas fa-check text-4xl text-green-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold mb-4">方案配置完成！</h3>
+                            <p class="text-gray-600 mb-8">您的制冷系统方案已准备就绪，可以选择以下操作</p>
+                            
+                            <div class="flex justify-center space-x-4">
+                                <button onclick="createOrder()" class="bg-orange-500 text-white px-8 py-4 rounded-lg font-semibold hover:bg-orange-600">
+                                    <i class="fas fa-shopping-cart mr-2"></i>立即购买
+                                </button>
+                                <button onclick="saveProject()" class="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700">
+                                    <i class="fas fa-save mr-2"></i>保存方案
+                                </button>
+                                <button onclick="shareProject()" class="border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50">
+                                    <i class="fas fa-share-alt mr-2"></i>分享方案
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-xl shadow-lg p-6 sticky top-24">
+                    <h3 class="text-lg font-bold mb-4 flex items-center">
+                        <i class="fas fa-clipboard-list text-blue-600 mr-2"></i>
+                        方案预览
+                    </h3>
+
+                    <div id="previewContent">
+                        <div class="mb-6">
+                            <div class="bg-blue-50 rounded-lg p-4 mb-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm text-gray-600">应用场景</span>
+                                    <span id="previewScenario" class="font-semibold">未选择</span>
+                                </div>
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm text-gray-600">温度范围</span>
+                                    <span id="previewTemp" class="font-semibold">-5°C ~ 0°C</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-600">制冷量</span>
+                                    <span id="previewCapacity" class="font-semibold">50 kW</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <h4 class="text-sm font-semibold text-gray-700 mb-3">已选配件 (<span id="selectedCount">0</span>/6)</h4>
+                            <div id="selectedProducts" class="space-y-3">
+                                <div class="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center text-sm text-gray-500">
+                                    <i class="fas fa-plus-circle mr-2"></i>
+                                    请先配置需求
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-t pt-4">
+                            <div class="space-y-2 mb-4">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600">配件小计</span>
+                                    <span id="previewSubtotal" class="font-semibold">¥0</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600">运费</span>
+                                    <span class="text-green-600 font-semibold">免运费</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-600">预计安装费</span>
+                                    <span class="font-semibold">¥800</span>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center mb-4 py-3 border-t border-b">
+                                <span class="font-bold text-lg">合计</span>
+                                <span id="previewTotal" class="font-bold text-2xl text-blue-600">¥0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="suggestions" class="mt-4 bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded hidden">
+                        <div class="flex items-start">
+                            <i class="fas fa-lightbulb text-yellow-600 mt-1 mr-2"></i>
+                            <div class="text-xs text-yellow-800">
+                                <p class="font-semibold mb-1">专家建议</p>
+                                <p id="suggestionText"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api/v1';
+        let currentStep = 0;
+        let selectedScenario = null;
+        let selectedSolutionId = null;
+        let selectedSolutionProducts = [];
+        let recommendations = {};
+        let selectedProducts = {};
+        let totalPrice = 0;
+        let diyConfig = null;
+        
+        // Load DIY config from API
+        async function loadDiyConfig() {
+            try {
+                const res = await fetch(`${API_BASE}/diy/config`);
+                const result = await res.json();
+                if (result.code !== 200) return;
+                
+                diyConfig = result.data;
+                
+                // Build config map
+                const configs = {};
+                diyConfig.configs.forEach(c => {
+                    if (!configs[c.category]) configs[c.category] = [];
+                    configs[c.category].push(c);
+                });
+                
+                // Render scenarios
+                const scenarioContainer = document.getElementById('scenarioCards');
+                if (scenarioContainer) {
+                    const scenarios = configs.scenario || [];
+                    const tempRanges = configs.temperature || [];
+                    const capacityUnits = configs.capacityUnit || [];
+                    
+                    // Update temperature options
+                    const tempSelect = document.getElementById('temperatureRange');
+                    if (tempSelect && tempRanges.length > 0) {
+                        tempSelect.innerHTML = tempRanges.map(t => 
+                            `<option value="${t.value || t.key}">${t.label}</option>`
+                        ).join('');
+                    }
+                    
+                    // Update capacity unit options
+                    const capSelect = document.getElementById('capacityUnit');
+                    if (capSelect && capacityUnits.length > 0) {
+                        capSelect.innerHTML = capacityUnits.map(c => 
+                            `<option value="${c.key}">${c.label}</option>`
+                        ).join('');
+                    }
+                    
+                    // Render scenario cards
+                    if (scenarios.length > 0) {
+                        scenarioContainer.innerHTML = scenarios.map(s => {
+                            const iconClass = s.icon || 'fa-cog';
+                            return `
+                                <div class="scenario-card border-2 border-gray-200 rounded-xl p-6 cursor-pointer text-center" data-scenario="${s.key}" onclick="selectScenario(this)">
+                                    <i class="fas ${iconClass} text-4xl text-gray-600 mb-3"></i>
+                                    <p class="font-medium">${s.label}</p>
+                                    <p class="text-xs text-gray-500 mt-1">${s.value || ''}</p>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load DIY config:', e);
+            }
+        }
+        
+        // Initialize
+        loadDiyConfig();
+
+        // Load solutions on page init
+        async function loadSolutions() {
+            try {
+                const res = await fetch(`${API_BASE}/diy/solutions`);
+                const result = await res.json();
+                if (result.code !== 200) return;
+                
+                const container = document.getElementById('solutionTemplates');
+                if (result.data.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-8 text-gray-400">
+                            <i class="fas fa-inbox text-2xl mb-3"></i>
+                            <p>暂无可用模板</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = result.data.map(s => `
+                    <div class="border-2 border-gray-200 rounded-xl overflow-hidden cursor-pointer hover:border-blue-500 transition solution-card" onclick="selectSolutionTemplate(${s.id}, '${s.title.replace(/'/g, "\\'")}', ${JSON.stringify(s).replace(/"/g, '&quot;')})">
+                        ${s.coverImage ? `<img src="${s.coverImage}" alt="${s.title}" class="w-full h-32 object-cover">` : `<div class="w-full h-32 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center"><i class="fas fa-snowflake text-4xl text-white"></i></div>`}
+                        <div class="p-4">
+                            <h3 class="font-bold text-lg mb-1">${s.title}</h3>
+                            <p class="text-sm text-gray-500 mb-2">${s.industry || ''} ${s.scenario || ''}</p>
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-blue-600 font-semibold">¥${s.totalPrice?.toLocaleString() || 0}</span>
+                                <span class="text-gray-400">${s.productCount}个配件</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Check URL for solutionId parameter (from solution-detail.html)
+                const params = new URLSearchParams(window.location.search);
+                const solutionId = params.get('solutionId');
+                if (solutionId) {
+                    const solution = result.data.find(s => s.id === parseInt(solutionId));
+                    if (solution) {
+                        // Auto-select the solution from URL
+                        setTimeout(() => {
+                            const card = document.querySelector(`.solution-card`);
+                            if (card) {
+                                selectSolutionTemplate(solution.id, solution.title, solution);
+                                document.querySelectorAll('.solution-card').forEach(c => c.classList.remove('border-blue-500', 'ring-2', 'ring-blue-500'));
+                                card.classList.add('border-blue-500', 'ring-2', 'ring-blue-500');
+                            }
+                        }, 500);
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load solutions:', e);
+            }
+        }
+
+        function selectSolutionTemplate(id, title, solution) {
+            selectedSolutionId = id;
+            selectedSolutionProducts = solution.products || [];
+            
+            // Update UI to show selected
+            document.querySelectorAll('.solution-card').forEach(card => card.classList.remove('border-blue-500', 'ring-2', 'ring-blue-500'));
+            event.currentTarget.classList.add('border-blue-500', 'ring-2', 'ring-blue-500');
+            
+            // Set scenario based on solution
+            if (solution.scenario) {
+                const scenarioMap = {
+                    'cold_storage': 'cold_storage',
+                    'supermarket': 'supermarket',
+                    'supermarket_freezer': 'supermarket',
+                    'hvac': 'hvac',
+                    'industrial': 'industrial'
+                };
+                selectedScenario = scenarioMap[solution.scenario] || solution.scenario;
+                document.querySelectorAll('.scenario-card').forEach(card => {
+                    if (card.dataset.scenario === selectedScenario) {
+                        card.classList.add('selected');
+                    }
+                });
+            }
+            
+            // Set temperature range
+            if (solution.temperatureRange) {
+                const tempSelect = document.getElementById('temperatureRange');
+                const tempOptions = Array.from(tempSelect.options).map(o => o.value);
+                if (tempOptions.includes(solution.temperatureRange)) {
+                    tempSelect.value = solution.temperatureRange;
+                }
+            }
+            
+            // Pre-select products from solution
+            selectedProducts = {};
+            selectedSolutionProducts.forEach(sp => {
+                if (sp.product) {
+                    selectedProducts[sp.product.categoryId] = sp.product;
+                }
+            });
+            
+            // Update preview
+            document.getElementById('previewScenario').textContent = title;
+            
+            alert(`已选择模板: ${title}，点击"下一步"继续配置`);
+        }
+
+        function skipTemplate() {
+            selectedSolutionId = null;
+            selectedSolutionProducts = [];
+            goToStep(1);
+        }
+
+        // Load solutions when page loads
+        loadSolutions();
+
+        function selectScenario(el) {
+            document.querySelectorAll('.scenario-card').forEach(card => card.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedScenario = el.dataset.scenario;
+            
+            const names = { cold_storage: '冷库制冷', supermarket: '商超冷柜', hvac: '中央空调', industrial: '工业制冷' };
+            document.getElementById('previewScenario').textContent = names[selectedScenario];
+        }
+
+        function toggleAdvanced() {
+            const options = document.getElementById('advancedOptions');
+            const icon = document.getElementById('advancedIcon');
+            options.classList.toggle('hidden');
+            icon.classList.toggle('fa-chevron-down');
+            icon.classList.toggle('fa-chevron-up');
+        }
+
+        function updatePreview() {
+            document.getElementById('previewTemp').textContent = document.getElementById('temperatureRange').value + '°C';
+            document.getElementById('previewCapacity').textContent = document.getElementById('coolingCapacity').value + ' ' + document.getElementById('capacityUnit').value;
+        }
+
+        document.querySelectorAll('#temperatureRange, #coolingCapacity, #capacityUnit').forEach(el => {
+            el.addEventListener('change', updatePreview);
+        });
+
+        async function getRecommendations() {
+            if (!selectedScenario) {
+                alert('请先选择应用场景');
+                return;
+            }
+
+            const data = {
+                scenario: selectedScenario,
+                temperatureRange: document.getElementById('temperatureRange').value,
+                coolingCapacity: parseFloat(document.getElementById('coolingCapacity').value),
+                capacityUnit: document.getElementById('capacityUnit').value,
+                volume: parseFloat(document.getElementById('volume').value),
+                volumeUnit: document.getElementById('volumeUnit').value,
+                ambientTemp: document.getElementById('ambientTemp').value,
+                options: {
+                    energySaving: document.getElementById('energySaving').checked,
+                    lowNoise: document.getElementById('lowNoise').checked,
+                    smartControl: document.getElementById('smartControl').checked,
+                    remoteMonitoring: document.getElementById('remoteMonitoring').checked
+                }
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/diy/recommend`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                
+                if (result.code === 200) {
+                    recommendations = result.data.products;
+                    renderProductSections();
+                    goToStep(2);
+                    
+                    if (result.data.suggestions && result.data.suggestions.length > 0) {
+                        document.getElementById('suggestionText').textContent = result.data.suggestions[0];
+                        document.getElementById('suggestions').classList.remove('hidden');
+                    }
+                }
+            } catch (e) {
+                alert('获取推荐失败，请稍后重试');
+            }
+        }
+
+        function renderProductSections() {
+            const sections = [
+                { key: 'compressor', title: '压缩机', icon: 'fa-cog', required: true },
+                { key: 'condenser', title: '冷凝器', icon: 'fa-wind', required: true },
+                { key: 'evaporator', title: '蒸发器', icon: 'fa-temperature-low', required: true },
+                { key: 'controller', title: '控制器', icon: 'fa-sliders-h', required: false }
+            ];
+
+            const html = sections.map(section => {
+                const products = recommendations[section.key] || [];
+                return `
+                    <div class="mb-8">
+                        <h4 class="font-semibold text-gray-700 mb-4 flex items-center">
+                            <i class="fas ${section.icon} text-blue-600 mr-2"></i>
+                            ${section.title} ${section.required ? '<span class="text-red-500 text-sm">(必选)</span>' : ''}
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            ${products.map((p, i) => `
+                                <div class="product-card border-2 rounded-lg p-4 cursor-pointer ${i === 0 ? 'selected' : ''}" 
+                                     data-type="${section.key}" data-id="${p.id}" onclick="selectProduct('${section.key}', ${p.id}, this)">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div class="flex-1">
+                                            <h5 class="font-semibold text-gray-900">${p.name}</h5>
+                                            <p class="text-sm text-gray-500 mt-1">${p.brand || ''}</p>
+                                        </div>
+                                        ${i === 0 ? `<span class="bg-green-100 text-green-700 text-xs px-2 py-1 rounded-full"><i class="fas fa-check-circle mr-1"></i>最佳匹配</span>` : ''}
+                                    </div>
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-gray-900 font-bold text-lg">¥${p.price.toLocaleString()}</span>
+                                        <span class="text-xs text-gray-500">匹配度 ${p.matchScore}%</span>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('productSections').innerHTML = html;
+
+            sections.forEach(section => {
+                const products = recommendations[section.key] || [];
+                if (products.length > 0) {
+                    selectedProducts[section.key] = products[0];
+                }
+            });
+
+            updateSelectedList();
+        }
+
+        function selectProduct(type, id, el) {
+            el.parentElement.querySelectorAll('.product-card').forEach(card => card.classList.remove('selected'));
+            el.classList.add('selected');
+            
+            selectedProducts[type] = recommendations[type].find(p => p.id === id);
+            updateSelectedList();
+        }
+
+        function updateSelectedList() {
+            const list = Object.values(selectedProducts).filter(Boolean);
+            totalPrice = list.reduce((sum, p) => sum + p.price, 0);
+
+            document.getElementById('selectedCount').textContent = list.length;
+            document.getElementById('previewSubtotal').textContent = `¥${totalPrice.toLocaleString()}`;
+            document.getElementById('previewTotal').textContent = `¥${(totalPrice + 800).toLocaleString()}`;
+
+            const html = list.map(p => `
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex-1">
+                        <p class="text-sm font-medium">${p.name}</p>
+                        <p class="text-xs text-gray-500">${p.brand || ''}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-blue-600">¥${p.price.toLocaleString()}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('selectedProducts').innerHTML = html || '<div class="p-4 border-2 border-dashed border-gray-300 rounded-lg text-center text-sm text-gray-500">请选择配件</div>';
+        }
+
+        async function validateCompatibility() {
+            const productIds = Object.values(selectedProducts).filter(Boolean).map(p => p.id);
+            if (productIds.length < 2) return { compatible: true, warnings: [], errors: [] };
+
+            try {
+                const res = await fetch(`${API_BASE}/diy/validate-compatibility`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productIds })
+                });
+                return await res.json();
+            } catch (e) {
+                return { compatible: true, warnings: [], errors: [] };
+            }
+        }
+
+        function goToStep(step) {
+            // If going to step 2 (select products) and we have a solution selected, load recommendations first
+            if (step === 2 && selectedSolutionId && selectedSolutionProducts.length > 0) {
+                getRecommendations().then(() => {
+                    // After loading recommendations, pre-select products from solution
+                    selectedSolutionProducts.forEach(sp => {
+                        if (sp.product) {
+                            const categoryId = sp.product.categoryId;
+                            if (recommendations[categoryId]) {
+                                selectedProducts[categoryId] = sp.product;
+                            }
+                        }
+                    });
+                    updateSelectedList();
+                });
+            }
+            
+            if (step === 3) {
+                renderConfirmation();
+                validateCompatibility().then(result => {
+                    const el = document.getElementById('compatibilityResult');
+                    if (result.data?.compatible) {
+                        el.innerHTML = `
+                            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded">
+                                <div class="flex items-center">
+                                    <i class="fas fa-check-circle text-green-500 mr-2"></i>
+                                    <span class="font-semibold text-green-700">配件兼容性检测通过</span>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        el.innerHTML = `
+                            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded">
+                                <div class="flex items-center">
+                                    <i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>
+                                    <span class="font-semibold text-red-700">检测到兼容性问题</span>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+            }
+
+            currentStep = step;
+            
+            document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`step${step}Content`).classList.remove('hidden');
+
+            for (let i = 0; i <= 4; i++) {
+                const stepEl = document.getElementById(`step${i}`);
+                const textEl = document.getElementById(`step${i}Text`);
+                if (!stepEl || !textEl) continue;
+                
+                if (i < step) {
+                    stepEl.className = 'step-completed w-10 h-10 rounded-full flex items-center justify-center font-bold cursor-pointer';
+                    textEl.className = 'text-sm font-semibold mt-2 text-green-600';
+                } else if (i === step) {
+                    stepEl.className = 'step-active w-10 h-10 rounded-full flex items-center justify-center font-bold cursor-pointer';
+                    textEl.className = 'text-sm font-semibold mt-2 text-blue-600';
+                } else {
+                    stepEl.className = 'step-inactive w-10 h-10 rounded-full flex items-center justify-center font-bold cursor-pointer';
+                    textEl.className = 'text-sm font-semibold mt-2 text-gray-400';
+                }
+            }
+        }
+
+        function renderConfirmation() {
+            const list = Object.values(selectedProducts).filter(Boolean);
+            const html = `
+                <div class="space-y-4">
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="font-semibold mb-3">需求配置</h4>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div><span class="text-gray-500">应用场景：</span>${document.getElementById('previewScenario').textContent}</div>
+                            <div><span class="text-gray-500">温度范围：</span>${document.getElementById('temperatureRange').value}°C</div>
+                            <div><span class="text-gray-500">制冷量：</span>${document.getElementById('coolingCapacity').value} ${document.getElementById('capacityUnit').value}</div>
+                            <div><span class="text-gray-500">容积：</span>${document.getElementById('volume').value} ${document.getElementById('volumeUnit').value}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <h4 class="font-semibold mb-3">已选配件 (${list.length}件)</h4>
+                        ${list.map(p => `
+                            <div class="flex justify-between py-2 border-b last:border-0">
+                                <span>${p.name}</span>
+                                <span class="font-semibold">¥${p.price.toLocaleString()}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    
+                    <div class="bg-blue-50 rounded-lg p-4">
+                        <div class="flex justify-between text-lg font-bold">
+                            <span>方案总价</span>
+                            <span class="text-blue-600">¥${(totalPrice + 800).toLocaleString()}</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">含安装费 ¥800</p>
+                    </div>
+                </div>
+            `;
+            document.getElementById('confirmationSummary').innerHTML = html;
+        }
+
+        function resetForm() {
+            document.querySelectorAll('.scenario-card').forEach(card => card.classList.remove('selected'));
+            selectedScenario = null;
+            document.getElementById('previewScenario').textContent = '未选择';
+        }
+
+        async function saveProject() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('请先登录');
+                window.location.href = 'login.html?redirect=' + encodeURIComponent(window.location.href);
+                return;
+            }
+
+            const data = {
+                projectName: `制冷方案 - ${new Date().toLocaleDateString()}`,
+                solutionId: selectedSolutionId,
+                scenario: selectedScenario,
+                temperatureRange: document.getElementById('temperatureRange').value,
+                coolingCapacity: parseFloat(document.getElementById('coolingCapacity').value),
+                capacityUnit: document.getElementById('capacityUnit').value,
+                volume: parseFloat(document.getElementById('volume').value),
+                volumeUnit: document.getElementById('volumeUnit').value,
+                ambientTemp: document.getElementById('ambientTemp').value,
+                selectedProducts: Object.values(selectedProducts).filter(Boolean).map(p => ({
+                    productId: p.id,
+                    quantity: 1
+                }))
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/diy/projects`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                if (result.code === 200) {
+                    alert('方案保存成功！');
+                }
+            } catch (e) {
+                alert('保存失败');
+            }
+        }
+
+        function shareProject() {
+            alert('分享功能开发中...');
+        }
+
+        function createOrder() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('请先登录');
+                return;
+            }
+            window.location.href = 'cart.html';
+        }
+    </script>
+</body>
+</html>

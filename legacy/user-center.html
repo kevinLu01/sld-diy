@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户中心 - 生利达冷冻空调配件商城</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+        body { font-family: 'Noto Sans SC', sans-serif; }
+        .sidebar-item { transition: all 0.2s; }
+        .sidebar-item:hover, .sidebar-item.active { background: #eff6ff; color: #0066cc; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="index.html" class="flex items-center">
+                    <i class="fas fa-snowflake text-3xl text-blue-600"></i>
+                    <span class="ml-2 text-xl font-bold">生利达</span>
+                </a>
+                <div class="flex items-center space-x-6">
+                    <a href="products.html" class="text-gray-700 hover:text-blue-600">产品中心</a>
+                    <a href="diy-tool.html" class="text-gray-700 hover:text-blue-600">DIY配套</a>
+                    <a href="cart.html" class="text-gray-700 hover:text-blue-600 relative">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                    </a>
+                    <div class="relative group">
+                        <button class="flex items-center space-x-2">
+                            <img id="userAvatar" src="https://placehold.co/40x40" class="w-8 h-8 rounded-full">
+                            <span id="userName" class="font-medium">用户</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-2 hidden group-hover:block">
+                            <a href="user-center.html" class="block px-4 py-2 hover:bg-gray-100">个人中心</a>
+                            <a href="user-orders.html" class="block px-4 py-2 hover:bg-gray-100">我的订单</a>
+                            <a href="user-projects.html" class="block px-4 py-2 hover:bg-gray-100">我的方案</a>
+                            <hr class="my-2">
+                            <a href="#" onclick="logout()" class="block px-4 py-2 text-red-600 hover:bg-gray-100">退出登录</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex gap-8">
+            <aside class="w-64 flex-shrink-0">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden sticky top-24">
+                    <div class="p-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-center">
+                        <img id="profileAvatar" src="https://placehold.co/100x100" class="w-20 h-20 rounded-full mx-auto mb-3 border-4 border-white/30">
+                        <h3 id="profileName" class="font-bold text-lg">用户名</h3>
+                        <p id="profileEmail" class="text-blue-200 text-sm">user@email.com</p>
+                    </div>
+                    <div class="p-4">
+                        <a href="user-center.html" class="sidebar-item active flex items-center px-4 py-3 rounded-lg">
+                            <i class="fas fa-user mr-3 w-5"></i>个人资料
+                        </a>
+                        <a href="user-orders.html" class="sidebar-item flex items-center px-4 py-3 rounded-lg">
+                            <i class="fas fa-shopping-bag mr-3 w-5"></i>我的订单
+                        </a>
+                        <a href="user-projects.html" class="sidebar-item flex items-center px-4 py-3 rounded-lg">
+                            <i class="fas fa-tools mr-3 w-5"></i>我的方案
+                        </a>
+                        <a href="user-favorites.html" class="sidebar-item flex items-center px-4 py-3 rounded-lg">
+                            <i class="fas fa-heart mr-3 w-5"></i>我的收藏
+                        </a>
+                        <a href="#" class="sidebar-item flex items-center px-4 py-3 rounded-lg">
+                            <i class="fas fa-map-marker-alt mr-3 w-5"></i>收货地址
+                        </a>
+                        <a href="#" class="sidebar-item flex items-center px-4 py-3 rounded-lg">
+                            <i class="fas fa-cog mr-3 w-5"></i>账户设置
+                        </a>
+                        <hr class="my-2">
+                        <a href="#" onclick="logout()" class="sidebar-item flex items-center px-4 py-3 rounded-lg text-red-600">
+                            <i class="fas fa-sign-out-alt mr-3 w-5"></i>退出登录
+                        </a>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="flex-1">
+                <div class="bg-white rounded-xl shadow-lg p-8">
+                    <h2 class="text-2xl font-bold mb-6">个人资料</h2>
+                    
+                    <form id="profileForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">用户名</label>
+                                <input type="text" name="username" id="formUsername" disabled class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-gray-50">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">邮箱</label>
+                                <input type="email" name="email" id="formEmail" disabled class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-gray-50">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">手机号</label>
+                                <input type="tel" name="phone" id="formPhone" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="请输入手机号">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">用户类型</label>
+                                <input type="text" id="formUserType" disabled class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-gray-50">
+                            </div>
+                        </div>
+
+                        <div class="pt-4">
+                            <button type="submit" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700">
+                                保存修改
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="mt-8 bg-white rounded-xl shadow-lg p-8">
+                    <h2 class="text-xl font-bold mb-6">账户统计</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <div class="text-center p-4 bg-blue-50 rounded-xl">
+                            <div id="statOrders" class="text-3xl font-bold text-blue-600">0</div>
+                            <div class="text-gray-600 mt-1">订单数</div>
+                        </div>
+                        <div class="text-center p-4 bg-green-50 rounded-xl">
+                            <div id="statProjects" class="text-3xl font-bold text-green-600">0</div>
+                            <div class="text-gray-600 mt-1">DIY方案</div>
+                        </div>
+                        <div class="text-center p-4 bg-red-50 rounded-xl">
+                            <div id="statFavorites" class="text-3xl font-bold text-red-600">0</div>
+                            <div class="text-gray-600 mt-1">收藏数</div>
+                        </div>
+                        <div class="text-center p-4 bg-purple-50 rounded-xl">
+                            <div id="statSpent" class="text-3xl font-bold text-purple-600">¥0</div>
+                            <div class="text-gray-600 mt-1">累计消费</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 bg-white rounded-xl shadow-lg p-8">
+                    <h2 class="text-xl font-bold mb-6">最近订单</h2>
+                    <div id="recentOrders" class="space-y-4">
+                        <div class="text-center py-8 text-gray-500">暂无订单</div>
+                    </div>
+                    <a href="user-orders.html" class="block text-center mt-4 text-blue-600 hover:text-blue-700">查看全部订单 →</a>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api/v1';
+        let currentUser = null;
+
+        async function checkAuth() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                if (data.code !== 200) {
+                    localStorage.removeItem('token');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                currentUser = data.data;
+                renderProfile();
+                loadStats();
+                loadRecentOrders();
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function renderProfile() {
+            document.getElementById('userName').textContent = currentUser.username;
+            document.getElementById('userAvatar').src = currentUser.avatar || 'https://placehold.co/40x40';
+            document.getElementById('profileAvatar').src = currentUser.avatar || 'https://placehold.co/100x100';
+            document.getElementById('profileName').textContent = currentUser.username;
+            document.getElementById('profileEmail').textContent = currentUser.email;
+
+            document.getElementById('formUsername').value = currentUser.username;
+            document.getElementById('formEmail').value = currentUser.email;
+            document.getElementById('formPhone').value = currentUser.phone || '';
+            document.getElementById('formUserType').value = currentUser.userType === 'business' ? '企业用户' : '个人用户';
+        }
+
+        async function loadStats() {
+            const token = localStorage.getItem('token');
+            try {
+                const ordersRes = await fetch(`${API_BASE}/users/orders?limit=100`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const ordersData = await ordersRes.json();
+                const orders = ordersData.data?.items || [];
+                const totalSpent = orders.reduce((sum, o) => sum + Number(o.finalAmount), 0);
+
+                document.getElementById('statOrders').textContent = orders.length;
+                document.getElementById('statSpent').textContent = `¥${totalSpent.toLocaleString()}`;
+
+                const favsRes = await fetch(`${API_BASE}/users/favorites`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const favsData = await favsRes.json();
+                document.getElementById('statFavorites').textContent = favsData.data?.length || 0;
+
+                document.getElementById('statProjects').textContent = '0';
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function loadRecentOrders() {
+            const token = localStorage.getItem('token');
+            try {
+                const res = await fetch(`${API_BASE}/users/orders?limit=3`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                const orders = data.data?.items || [];
+
+                if (orders.length === 0) {
+                    document.getElementById('recentOrders').innerHTML = '<div class="text-center py-8 text-gray-500">暂无订单</div>';
+                    return;
+                }
+
+                const html = orders.map(order => `
+                    <div class="border rounded-lg p-4 flex items-center justify-between">
+                        <div>
+                            <div class="font-semibold">${order.orderNo}</div>
+                            <div class="text-sm text-gray-500">${new Date(order.createdAt).toLocaleDateString()}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-red-500">¥${Number(order.finalAmount).toLocaleString()}</div>
+                            <span class="text-xs px-2 py-1 rounded ${getStatusClass(order.status)}">${getStatusText(order.status)}</span>
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('recentOrders').innerHTML = html;
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        function getStatusClass(status) {
+            const classes = {
+                pending: 'bg-yellow-100 text-yellow-700',
+                paid: 'bg-blue-100 text-blue-700',
+                processing: 'bg-purple-100 text-purple-700',
+                shipped: 'bg-indigo-100 text-indigo-700',
+                completed: 'bg-green-100 text-green-700',
+                cancelled: 'bg-gray-100 text-gray-700'
+            };
+            return classes[status] || 'bg-gray-100 text-gray-700';
+        }
+
+        function getStatusText(status) {
+            const texts = {
+                pending: '待付款',
+                paid: '已付款',
+                processing: '处理中',
+                shipped: '已发货',
+                completed: '已完成',
+                cancelled: '已取消'
+            };
+            return texts[status] || status;
+        }
+
+        document.getElementById('profileForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const token = localStorage.getItem('token');
+            const formData = new FormData(this);
+
+            try {
+                await fetch(`${API_BASE}/users/profile`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ phone: formData.get('phone') })
+                });
+                alert('保存成功');
+            } catch (e) {
+                alert('保存失败');
+            }
+        });
+
+        function logout() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        checkAuth();
+    </script>
+</body>
+</html>

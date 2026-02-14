@@ -1,0 +1,398 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique
+  email        String   @unique
+  passwordHash String
+  phone        String?
+  avatar       String?
+  userType     String   @default("personal")
+  status       String   @default("active")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  businessInfo  BusinessInfo?
+  orders        Order[]
+  diyProjects   DiyProject[]
+  carts         Cart[]
+  favorites     Favorite[]
+  reviews       Review[]
+  serviceReqs   ServiceRequest[]
+  solutions     Solution[]
+}
+
+model BusinessInfo {
+  id              Int       @id @default(autoincrement())
+  userId          Int       @unique
+  user            User      @relation(fields: [userId], references: [id])
+  companyName     String
+  businessLicense String?
+  industry        String?
+  address         String?
+  contactPerson   String?
+  verified        Boolean   @default(false)
+  verifiedAt      DateTime?
+  createdAt       DateTime  @default(now())
+}
+
+model Category {
+  id          Int        @id @default(autoincrement())
+  name        String
+  parentId    Int?
+  parent      Category?  @relation("SubCategories", fields: [parentId], references: [id])
+  children    Category[] @relation("SubCategories")
+  slug        String     @unique
+  description String?
+  icon        String?
+  sortOrder   Int        @default(0)
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  
+  products Product[]
+  diyRecommendations DiyRecommendation[]
+}
+
+model Brand {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  logo        String?
+  description String?
+  country     String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  
+  products Product[]
+}
+
+model Product {
+  id            Int      @id @default(autoincrement())
+  sku           String   @unique
+  name          String
+  brandId       Int?
+  brand         Brand?   @relation(fields: [brandId], references: [id])
+  categoryId    Int
+  category      Category @relation(fields: [categoryId], references: [id])
+  description   String?
+  price         Float
+  originalPrice Float?
+  costPrice     Float?
+  stockQuantity Int      @default(0)
+  unit          String   @default("件")
+  images        String
+  videoUrl      String?
+  model3dUrl    String?
+  status        String   @default("active")
+  viewCount     Int      @default(0)
+  salesCount    Int      @default(0)
+  rating        Float?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  specifications ProductSpec[]
+  attributes     ProductAttr[]
+  compatiblesA   Compatibility[] @relation("CompatA")
+  compatiblesB   Compatibility[] @relation("CompatB")
+  orderItems     OrderItem[]
+  cartItems      CartItem[]
+  favorites      Favorite[]
+  reviews        Review[]
+  diyItems       DiyProjectItem[]
+  solutionProducts SolutionProduct[]
+}
+
+model ProductSpec {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  specKey   String
+  specValue String
+  unit      String?
+  sortOrder Int      @default(0)
+}
+
+model ProductAttr {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  attrName  String
+  attrValue String
+  unit      String?
+  sortOrder Int      @default(0)
+}
+
+model Compatibility {
+  id               Int      @id @default(autoincrement())
+  productAId       Int
+  productA         Product  @relation("CompatA", fields: [productAId], references: [id])
+  productBId       Int
+  productB         Product  @relation("CompatB", fields: [productBId], references: [id])
+  compatibilityType String @default("compatible")
+  notes            String?
+  createdAt        DateTime @default(now())
+
+  @@unique([productAId, productBId])
+}
+
+model Solution {
+  id               Int      @id @default(autoincrement())
+  title            String
+  industry         String?
+  scenario         String?
+  description      String?
+  coverImage       String?
+  images           String
+  temperatureRange String?
+  capacityRange    String?
+  features         String
+  totalPrice       Float?
+  installationGuide String?
+  viewCount        Int      @default(0)
+  usageCount       Int      @default(0)
+  rating           Float?
+  status           String   @default("published")
+  createdBy        Int?
+  creator          User?    @relation(fields: [createdBy], references: [id])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  products SolutionProduct[]
+  cases    SolutionCase[]
+  diyProjects DiyProject[]
+}
+
+model SolutionProduct {
+  id         Int      @id @default(autoincrement())
+  solutionId Int
+  solution   Solution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
+  productId  Int
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity   Int      @default(1)
+  notes      String?
+  isRequired Boolean  @default(true)
+  sortOrder  Int      @default(0)
+}
+
+model SolutionCase {
+  id             Int      @id @default(autoincrement())
+  solutionId     Int
+  solution       Solution @relation(fields: [solutionId], references: [id], onDelete: Cascade)
+  projectName    String
+  clientName     String?
+  location       String?
+  completionDate DateTime?
+  description    String?
+  images         String
+  results        String?
+  createdAt      DateTime @default(now())
+}
+
+model DiyProject {
+  id               Int      @id @default(autoincrement())
+  userId           Int?
+  user             User?    @relation(fields: [userId], references: [id])
+  solutionId       Int?
+  solution         Solution? @relation(fields: [solutionId], references: [id])
+  projectName      String
+  scenario         String?
+  temperatureRange String?
+  coolingCapacity  Float?
+  capacityUnit     String?
+  volume           Float?
+  volumeUnit       String?
+  ambientTemp      String?
+  options          String?
+  totalPrice       Float?
+  status           String   @default("draft")
+  shared           Boolean  @default(false)
+  shareToken       String?  @unique
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  items  DiyProjectItem[]
+  orders Order[]
+}
+
+model DiyProjectItem {
+  id        Int         @id @default(autoincrement())
+  projectId Int
+  project   DiyProject  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  productId Int
+  product   Product     @relation(fields: [productId], references: [id])
+  quantity  Int         @default(1)
+  notes     String?
+  sortOrder Int         @default(0)
+}
+
+model Cart {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  items CartItem[]
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  cartId    Int
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+
+  @@unique([cartId, productId])
+}
+
+model Favorite {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  productId Int
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+}
+
+model Order {
+  id              Int      @id @default(autoincrement())
+  orderNo         String   @unique
+  userId          Int
+  user            User     @relation(fields: [userId], references: [id])
+  diyProjectId    Int?
+  diyProject      DiyProject? @relation(fields: [diyProjectId], references: [id])
+  totalAmount     Float
+  discountAmount  Float    @default(0)
+  shippingFee     Float    @default(0)
+  installationFee Float    @default(0)
+  finalAmount     Float
+  status          String   @default("pending")
+  paymentMethod   String?
+  paymentTime     DateTime?
+  shippingInfo    String?
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  items       OrderItem[]
+  serviceReqs ServiceRequest[]
+}
+
+model OrderItem {
+  id          Int      @id @default(autoincrement())
+  orderId     Int
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId   Int
+  product     Product  @relation(fields: [productId], references: [id])
+  productName String
+  productSku  String
+  price       Float
+  quantity    Int
+  subtotal    Float
+}
+
+model Review {
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+  productId  Int
+  product    Product  @relation(fields: [productId], references: [id])
+  rating     Int
+  content    String?
+  images     String
+  isAnonymous Boolean @default(false)
+  status     String   @default("published")
+  createdAt  DateTime @default(now())
+}
+
+model ServiceRequest {
+  id            Int      @id @default(autoincrement())
+  requestNo     String   @unique
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  orderId       Int?
+  order         Order?   @relation(fields: [orderId], references: [id])
+  serviceType   String
+  priority      String   @default("normal")
+  description   String?
+  contactInfo   String?
+  scheduledTime DateTime?
+  assignedTo    Int?
+  status        String   @default("pending")
+  resolution    String?
+  rating        Int?
+  feedback      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model KnowledgeArticle {
+  id           Int      @id @default(autoincrement())
+  title        String
+  category     String?
+  content      String
+  tags         String
+  coverImage   String?
+  attachments  String?
+  viewCount    Int      @default(0)
+  helpfulCount Int      @default(0)
+  status       String   @default("published")
+  author       String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Banner {
+  id        Int      @id @default(autoincrement())
+  title     String
+  image     String
+  link      String?
+  position  String   @default("home")
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model DiyConfig {
+  id          Int      @id @default(autoincrement())
+  category    String   @default("scenario")
+  key         String
+  label       String
+  value       String?
+  icon        String?
+  description String?
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([category, key])
+}
+
+model DiyRecommendation {
+  id            Int      @id @default(autoincrement())
+  scenario      String
+  productType   String
+  categoryId    Int
+  category      Category @relation(fields: [categoryId], references: [id])
+  priority      Int      @default(0)
+  isRequired    Boolean  @default(false)
+  minQuantity   Int      @default(1)
+  maxQuantity   Int      @default(1)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([scenario, productType])
+}

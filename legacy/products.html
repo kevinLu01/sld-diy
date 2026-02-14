@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>产品中心 - 生利达冷冻空调配件商城</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap');
+        body { font-family: 'Noto Sans SC', sans-serif; }
+        .product-card { transition: all 0.3s ease; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        .filter-checkbox:checked + label { background: #0066cc; color: white; border-color: #0066cc; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="flex items-center">
+                        <i class="fas fa-snowflake text-4xl text-blue-600"></i>
+                        <div class="ml-3">
+                            <h1 class="text-2xl font-bold text-gray-900">生利达</h1>
+                            <p class="text-xs text-gray-500">冷冻设备专家</p>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="flex-1 max-w-2xl mx-8">
+                    <div class="relative">
+                        <input type="text" id="searchInput" placeholder="搜索产品型号、名称..." 
+                               class="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none">
+                        <button onclick="handleSearch()" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-6">
+                    <a href="diy-tool.html" class="text-gray-700 hover:text-blue-600 flex items-center">
+                        <i class="fas fa-tools mr-2"></i>DIY配套
+                    </a>
+                    <a href="cart.html" class="text-gray-700 hover:text-blue-600 relative">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                    </a>
+                    <button onclick="showLoginModal()" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700">
+                        登录/注册
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="flex items-center text-sm text-gray-500 mb-6">
+            <a href="index.html" class="hover:text-blue-600">首页</a>
+            <i class="fas fa-chevron-right mx-2 text-xs"></i>
+            <span class="text-gray-900">产品中心</span>
+        </div>
+
+        <div class="flex gap-8">
+            <aside class="w-64 flex-shrink-0">
+                <div class="bg-white rounded-xl shadow-lg p-6 sticky top-24">
+                    <h3 class="font-bold text-lg mb-4">产品分类</h3>
+                    <div id="categoryList" class="space-y-2">
+                        <div class="text-gray-500">加载中...</div>
+                    </div>
+
+                    <hr class="my-6">
+
+                    <h3 class="font-bold text-lg mb-4">价格筛选</h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="price" value="" checked class="mr-2" onchange="applyFilters()">
+                            <span>全部</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="price" value="0-1000" class="mr-2" onchange="applyFilters()">
+                            <span>¥1000以下</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="price" value="1000-3000" class="mr-2" onchange="applyFilters()">
+                            <span>¥1000-3000</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="price" value="3000-5000" class="mr-2" onchange="applyFilters()">
+                            <span>¥3000-5000</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer">
+                            <input type="radio" name="price" value="5000-" class="mr-2" onchange="applyFilters()">
+                            <span>¥5000以上</span>
+                        </label>
+                    </div>
+
+                    <hr class="my-6">
+
+                    <h3 class="font-bold text-lg mb-4">品牌筛选</h3>
+                    <div id="brandList" class="space-y-2">
+                        <div class="text-gray-500">加载中...</div>
+                    </div>
+                </div>
+            </aside>
+
+            <main class="flex-1">
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <span class="text-gray-600">排序:</span>
+                            <button onclick="setSort('sales')" class="sort-btn px-4 py-2 rounded-lg hover:bg-gray-100" data-sort="sales">销量</button>
+                            <button onclick="setSort('price')" class="sort-btn px-4 py-2 rounded-lg hover:bg-gray-100" data-sort="price">价格↑</button>
+                            <button onclick="setSort('-price')" class="sort-btn px-4 py-2 rounded-lg hover:bg-gray-100" data-sort="-price">价格↓</button>
+                            <button onclick="setSort('new')" class="sort-btn px-4 py-2 rounded-lg hover:bg-gray-100 active bg-blue-100 text-blue-600" data-sort="new">最新</button>
+                        </div>
+                        <div class="text-gray-500">
+                            共 <span id="totalProducts" class="font-bold text-blue-600">0</span> 件产品
+                        </div>
+                    </div>
+                </div>
+
+                <div id="productList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="col-span-3 text-center py-12 text-gray-500">
+                        <i class="fas fa-spinner fa-spin text-4xl mb-4"></i>
+                        <p>加载中...</p>
+                    </div>
+                </div>
+
+                <div id="pagination" class="mt-8 flex justify-center space-x-2"></div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api/v1';
+        let currentCategory = '';
+        let currentSort = 'new';
+        let currentPrice = '';
+        let currentBrand = '';
+        let currentPage = 1;
+
+        async function loadCategories() {
+            try {
+                const res = await fetch(`${API_BASE}/categories`);
+                const data = await res.json();
+                const html = data.data.map(cat => `
+                    <div class="cursor-pointer py-2 px-3 rounded-lg hover:bg-blue-50 ${currentCategory === cat.slug ? 'bg-blue-100 text-blue-600 font-semibold' : ''}" 
+                         onclick="setCategory('${cat.slug}')">
+                        <i class="${cat.icon} mr-2"></i>${cat.name}
+                        <span class="text-xs text-gray-400 ml-1">(${cat.count})</span>
+                    </div>
+                `).join('');
+                document.getElementById('categoryList').innerHTML = html;
+            } catch (e) {
+                document.getElementById('categoryList').innerHTML = '<div class="text-red-500">加载失败</div>';
+            }
+        }
+
+        async function loadProducts() {
+            const params = new URLSearchParams();
+            if (currentCategory) params.append('category', currentCategory);
+            if (currentSort && currentSort !== 'new') params.append('sort', currentSort);
+            if (currentPrice) {
+                const [min, max] = currentPrice.split('-');
+                if (min) params.append('priceMin', min);
+                if (max) params.append('priceMax', max);
+            }
+            if (currentBrand) params.append('brand', currentBrand);
+            params.append('page', currentPage);
+            params.append('limit', 12);
+
+            try {
+                const res = await fetch(`${API_BASE}/products?${params}`);
+                const data = await res.json();
+                
+                document.getElementById('totalProducts').textContent = data.data.total;
+                
+                if (data.data.items.length === 0) {
+                    document.getElementById('productList').innerHTML = `
+                        <div class="col-span-3 text-center py-12 text-gray-500">
+                            <i class="fas fa-box-open text-6xl mb-4"></i>
+                            <p>暂无相关产品</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const html = data.data.items.map(p => `
+                    <div class="product-card bg-white rounded-xl shadow-lg overflow-hidden cursor-pointer" onclick="goToProduct(${p.id})">
+                        <div class="relative">
+                            <img src="${p.images[0] || 'https://placehold.co/400x400/e5e7eb/9ca3af?text=No+Image'}" 
+                                 alt="${p.name}" class="w-full h-48 object-cover">
+                            ${p.originalPrice ? `<span class="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">优惠</span>` : ''}
+                        </div>
+                        <div class="p-4">
+                            <div class="text-sm text-gray-500 mb-1">${p.brand || ''}</div>
+                            <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">${p.name}</h3>
+                            <div class="text-xs text-gray-400 mb-2">${p.sku}</div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <span class="text-xl font-bold text-red-500">¥${p.price.toLocaleString()}</span>
+                                    ${p.originalPrice ? `<span class="text-sm text-gray-400 line-through ml-2">¥${p.originalPrice.toLocaleString()}</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between mt-3 text-xs text-gray-500">
+                                <span><i class="fas fa-fire text-orange-500 mr-1"></i>已售 ${p.salesCount}</span>
+                                <span><i class="fas fa-star text-yellow-500 mr-1"></i>${p.rating}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.getElementById('productList').innerHTML = html;
+                renderPagination(data.data.total, data.data.page, data.data.limit);
+            } catch (e) {
+                document.getElementById('productList').innerHTML = `
+                    <div class="col-span-3 text-center py-12 text-red-500">
+                        <i class="fas fa-exclamation-circle text-4xl mb-4"></i>
+                        <p>加载失败，请稍后重试</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderPagination(total, page, limit) {
+            const totalPages = Math.ceil(total / limit);
+            if (totalPages <= 1) {
+                document.getElementById('pagination').innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            if (page > 1) {
+                html += `<button onclick="goToPage(${page - 1})" class="px-4 py-2 rounded-lg border hover:bg-gray-100"><i class="fas fa-chevron-left"></i></button>`;
+            }
+            
+            for (let i = Math.max(1, page - 2); i <= Math.min(totalPages, page + 2); i++) {
+                html += `<button onclick="goToPage(${i})" class="px-4 py-2 rounded-lg ${i === page ? 'bg-blue-600 text-white' : 'border hover:bg-gray-100'}">${i}</button>`;
+            }
+            
+            if (page < totalPages) {
+                html += `<button onclick="goToPage(${page + 1})" class="px-4 py-2 rounded-lg border hover:bg-gray-100"><i class="fas fa-chevron-right"></i></button>`;
+            }
+            
+            document.getElementById('pagination').innerHTML = html;
+        }
+
+        function setCategory(cat) {
+            currentCategory = currentCategory === cat ? '' : cat;
+            currentPage = 1;
+            loadCategories();
+            loadProducts();
+        }
+
+        function setSort(sort) {
+            currentSort = sort;
+            document.querySelectorAll('.sort-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-blue-100', 'text-blue-600');
+            });
+            document.querySelector(`[data-sort="${sort}"]`).classList.add('active', 'bg-blue-100', 'text-blue-600');
+            loadProducts();
+        }
+
+        function applyFilters() {
+            currentPrice = document.querySelector('input[name="price"]:checked').value;
+            currentPage = 1;
+            loadProducts();
+        }
+
+        function goToPage(page) {
+            currentPage = page;
+            loadProducts();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goToProduct(id) {
+            window.location.href = `product-detail.html?id=${id}`;
+        }
+
+        function handleSearch() {
+            const q = document.getElementById('searchInput').value.trim();
+            if (q) {
+                window.location.href = `products.html?search=${encodeURIComponent(q)}`;
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') handleSearch();
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('category')) currentCategory = urlParams.get('category');
+        if (urlParams.get('search')) document.getElementById('searchInput').value = urlParams.get('search');
+
+        loadCategories();
+        loadProducts();
+    </script>
+</body>
+</html>
