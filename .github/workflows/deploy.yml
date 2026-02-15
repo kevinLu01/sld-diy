@@ -59,6 +59,9 @@ jobs:
             cd frontend
             npm install
             npm run build
+
+            # 复制 legacy 目录到 dist
+            cp -r ../legacy dist/
             cd ..
 
             # 重启Docker服务（只重启backend，利用volume自动更新代码）
