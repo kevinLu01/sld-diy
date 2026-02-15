@@ -76,14 +76,22 @@ jobs:
             # 显示backend日志（最后20行）
             sudo docker-compose logs --tail=20 backend
 
-      # 6. 健康检查
+      # 6. 健康检查（在服务器上执行）
       - name: 🏥 Health Check
-        run: |
-          sleep 30
-          echo "检查前端服务..."
-          curl -f http://${{ secrets.SERVER_HOST }}:9000/ || echo "⚠️ Frontend check failed"
-          echo "检查后端服务..."
-          curl -f http://${{ secrets.SERVER_HOST }}:3001/api/v1/health || echo "⚠️ Backend check failed"
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SERVER_PORT }}
+          script: |
+            echo "检查后端服务..."
+            curl -f http://localhost:3001/api/v1/health || exit 1
+            echo "✅ 后端服务健康"
+
+            echo "检查前端服务..."
+            curl -f http://localhost:9000/ || exit 1
+            echo "✅ 前端服务健康"
 
       # 7. 通知部署结果
       - name: 📢 Deployment Notification
