@@ -8,12 +8,19 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-sld_secure_password}
       MYSQL_DATABASE: sld_diy
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
       - "3306:3306"
     networks:
       - sld-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-sld_secure_password}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # 后端服务
   backend:
@@ -24,12 +31,13 @@ services:
     ports:
       - "3001:3001"
     environment:
-      DATABASE_URL: mysql://root:${MYSQL_ROOT_PASSWORD:-sld_secure_password}@mysql:3306/sld_diy
+      DATABASE_URL: mysql://root:${MYSQL_ROOT_PASSWORD:-sld_secure_password}@mysql:3306/sld_diy?schema=public&connection_limit=5&socket_timeout=10
       JWT_SECRET: ${JWT_SECRET:-change-this-secret-key-in-production}
       PORT: 3001
       NODE_ENV: production
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - sld-network
 
