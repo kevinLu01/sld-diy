@@ -38,12 +38,13 @@ jobs:
 
       # 5. 部署到服务器
       - name: 🚀 Deploy to Server
-        uses: appleboy/ssh-action@master
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
+          debug: true
           script: |
             # 添加 git 安全目录
             git config --global --add safe.directory /var/www/sld-diy
