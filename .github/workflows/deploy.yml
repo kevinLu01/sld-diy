@@ -45,6 +45,9 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
+            # 添加 git 安全目录
+            git config --global --add safe.directory /var/www/sld-diy
+            
             # 进入项目目录
             cd /var/www/sld-diy
             
