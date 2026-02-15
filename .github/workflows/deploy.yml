@@ -86,7 +86,7 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             echo "检查后端服务..."
-            curl -f http://localhost:3001/api/v1/health || exit 1
+            curl -f http://localhost:9001/api/v1/health || exit 1
             echo "✅ 后端服务健康"
 
             echo "检查前端服务..."
@@ -100,7 +100,7 @@ jobs:
           if [ ${{ job.status }} == 'success' ]; then
             echo "✅ 部署成功！"
             echo "🌐 前端访问地址: http://${{ secrets.SERVER_HOST }}:9000"
-            echo "🔧 后端API地址: http://${{ secrets.SERVER_HOST }}:3001"
+            echo "🔧 后端API地址: http://${{ secrets.SERVER_HOST }}:9001"
           else
             echo "❌ 部署失败！请检查日志"
           fi
