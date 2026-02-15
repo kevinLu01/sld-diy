@@ -1,8 +1,10 @@
-# 后端Dockerfile
-FROM node:18-alpine
+# 后端Dockerfile - 使用Debian镜像（包含完整的OpenSSL支持）
+FROM node:18-slim
 
-# 安装OpenSSL 1.1（Prisma需要）
-RUN apk add --no-cache openssl1.1-compat
+# 安装OpenSSL和其他必要依赖
+RUN apt-get update && \
+    apt-get install -y openssl libssl-dev ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
