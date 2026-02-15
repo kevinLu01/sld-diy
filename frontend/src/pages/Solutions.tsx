@@ -277,12 +277,15 @@ const SolutionsPage: React.FC = () => {
                           </div>
                         )}
 
-                        {solution.features && solution.features.length > 0 && (
+                        {solution.features && (
                           <div>
                             <Space wrap size={4}>
-                              {solution.features.slice(0, 3).map((feature: string, idx: number) => (
+                              {(typeof solution.features === 'string'
+                                ? solution.features.split(',').slice(0, 3)
+                                : solution.features.slice(0, 3)
+                              ).map((feature: string, idx: number) => (
                                 <Tag key={idx} color="green" icon={<CheckCircleOutlined />}>
-                                  {feature}
+                                  {feature.trim()}
                                 </Tag>
                               ))}
                             </Space>
