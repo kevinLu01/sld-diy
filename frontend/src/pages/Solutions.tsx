@@ -34,10 +34,16 @@ const SolutionsPage: React.FC = () => {
     search: '',
   });
 
-  const { data: solutionsData, isLoading } = useQuery({
+  const { data: solutionsData, isLoading, error } = useQuery({
     queryKey: ['solutions', filters],
     queryFn: () => diyService.getSolutions(filters),
+    retry: 2,
   });
+
+  // 调试日志
+  console.log('Solutions Page - Loading:', isLoading);
+  console.log('Solutions Page - Data:', solutionsData);
+  console.log('Solutions Page - Error:', error);
 
   const industries = [
     { value: 'retail', label: '零售商超', icon: '🏪' },
@@ -60,6 +66,32 @@ const SolutionsPage: React.FC = () => {
   const handleSearch = (value: string) => {
     setFilters({ ...filters, search: value });
   };
+
+  // 错误处理
+  if (error) {
+    return (
+      <div style={{ background: '#f5f5f5', minHeight: '100vh', padding: '24px 0' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px' }}>
+          <Card>
+            <Empty
+              description={
+                <div>
+                  <p>加载解决方案失败</p>
+                  <p style={{ color: '#999', fontSize: 12 }}>
+                    {error instanceof Error ? error.message : '未知错误'}
+                  </p>
+                </div>
+              }
+            >
+              <Button type="primary" onClick={() => window.location.reload()}>
+                重新加载
+              </Button>
+            </Empty>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ background: '#f5f5f5', minHeight: '100vh', padding: '24px 0' }}>
