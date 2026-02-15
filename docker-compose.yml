@@ -38,8 +38,8 @@ services:
     image: nginx:alpine
     restart: always
     ports:
-      - "8080:80"  # 改用8080端口
-      - "8443:443"
+      - "9000:80"  # 使用9000端口
+      - "9443:443"
     volumes:
       - ./frontend/dist:/usr/share/nginx/html:ro
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
