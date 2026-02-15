@@ -11,6 +11,11 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// 健康检查路由（兼容多个路径）
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 app.get('/api/v1/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
