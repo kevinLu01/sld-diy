@@ -55,26 +55,26 @@ jobs:
             # 拉取最新代码
             git pull origin main
 
-            # 构建前端（在服务器上构建，避免 SCP 认证问题）
+            # 构建前端（在服务器上构建）
             cd frontend
             npm install
             npm run build
             cd ..
 
             # 重启Docker服务（只重启backend，利用volume自动更新代码）
-            docker-compose restart backend
+            sudo docker-compose restart backend
 
             # 等待服务启动
             sleep 20
 
             # 运行数据库迁移（如果有schema变更）
-            docker-compose exec -T backend npx prisma migrate deploy || echo "No migrations to run"
+            sudo docker-compose exec -T backend npx prisma migrate deploy || echo "No migrations to run"
 
             # 检查服务状态
-            docker-compose ps
+            sudo docker-compose ps
 
             # 显示backend日志（最后20行）
-            docker-compose logs --tail=20 backend
+            sudo docker-compose logs --tail=20 backend
 
       # 6. 健康检查
       - name: 🏥 Health Check
