@@ -1,6 +1,9 @@
 # 后端Dockerfile
 FROM node:18-alpine
 
+# 安装OpenSSL 1.1（Prisma需要）
+RUN apk add --no-cache openssl1.1-compat
+
 WORKDIR /app
 
 # 复制package文件
