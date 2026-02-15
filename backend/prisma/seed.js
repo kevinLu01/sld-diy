@@ -126,11 +126,20 @@ async function main() {
   // 3. 创建测试用户
   console.log('👤 创建测试用户...');
   const hashedPassword = await bcrypt.hash('123456', 10);
-  
-  await prisma.user.upsert({
-    where: { email: 'test@sldbd.com' },
-    update: {},
-    create: {
+
+  // 先删除可能存在的测试用户（避免唯一约束冲突）
+  await prisma.user.deleteMany({
+    where: {
+      OR: [
+        { email: 'test@sldbd.com' },
+        { username: 'testuser' },
+      ],
+    },
+  });
+
+  // 创建新的测试用户
+  await prisma.user.create({
+    data: {
       username: 'testuser',
       email: 'test@sldbd.com',
       passwordHash: hashedPassword,
