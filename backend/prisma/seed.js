@@ -32,59 +32,92 @@ async function main() {
       id: 1,
       sku: 'COMP-ZB26KQE',
       name: '谷轮涡旋压缩机 ZB系列',
-      description: '高效节能，静音运行，适用于中小型冷库。型号：ZB26KQE，功率：2.5HP，电压：380V，制冷剂：R404A',
+      description: '高效节能，静音运行，适用于中小型冷库',
       price: 3500.00,
       categoryId: 1,
       stockQuantity: 50,
       images: JSON.stringify(['https://via.placeholder.com/400x300/2196F3/FFFFFF?text=ZB+Compressor']),
+      specifications: [
+        { specKey: '型号', specValue: 'ZB26KQE', sortOrder: 1 },
+        { specKey: '功率', specValue: '2.5', unit: 'HP', sortOrder: 2 },
+        { specKey: '电压', specValue: '380', unit: 'V', sortOrder: 3 },
+        { specKey: '制冷剂', specValue: 'R404A', sortOrder: 4 },
+      ],
     },
     {
       id: 2,
       sku: 'COMP-4HE25Y',
       name: '比泽尔半封闭压缩机',
-      description: '德国品质，性能稳定。型号：4HE-25Y，功率：25HP，电压：380V',
+      description: '德国品质，性能稳定',
       price: 8500.00,
       categoryId: 1,
       stockQuantity: 30,
       images: JSON.stringify(['https://via.placeholder.com/400x300/FF9800/FFFFFF?text=Bitzer']),
+      specifications: [
+        { specKey: '型号', specValue: '4HE-25Y', sortOrder: 1 },
+        { specKey: '功率', specValue: '25', unit: 'HP', sortOrder: 2 },
+        { specKey: '电压', specValue: '380', unit: 'V', sortOrder: 3 },
+      ],
     },
     {
       id: 3,
       sku: 'COND-FNH40',
       name: '风冷冷凝器 FNH系列',
-      description: '高效散热，节能环保。型号：FNH-40，面积：40㎡，风量：8000m³/h',
+      description: '高效散热，节能环保',
       price: 2200.00,
       categoryId: 2,
       stockQuantity: 80,
       images: JSON.stringify(['https://via.placeholder.com/400x300/9C27B0/FFFFFF?text=FNH']),
+      specifications: [
+        { specKey: '型号', specValue: 'FNH-40', sortOrder: 1 },
+        { specKey: '散热面积', specValue: '40', unit: '㎡', sortOrder: 2 },
+        { specKey: '风量', specValue: '8000', unit: 'm³/h', sortOrder: 3 },
+      ],
     },
     {
       id: 4,
       sku: 'EVAP-DD30',
       name: '冷风机蒸发器 DD系列',
-      description: '快速制冷，温度均匀。型号：DD-30，温度范围：-18℃~0℃，融霜方式：电热融霜',
+      description: '快速制冷，温度均匀',
       price: 1800.00,
       categoryId: 3,
       stockQuantity: 60,
       images: JSON.stringify(['https://via.placeholder.com/400x300/F44336/FFFFFF?text=DD']),
+      specifications: [
+        { specKey: '型号', specValue: 'DD-30', sortOrder: 1 },
+        { specKey: '温度范围', specValue: '-18℃~0℃', sortOrder: 2 },
+        { specKey: '融霜方式', specValue: '电热融霜', sortOrder: 3 },
+      ],
     },
     {
       id: 5,
       sku: 'CTRL-EK3030',
       name: '数显温控器 EK-3030',
-      description: '精准控温，操作简单。型号：EK-3030，温度范围：-50℃~150℃，精度：±0.5℃',
+      description: '精准控温，操作简单',
       price: 280.00,
       categoryId: 4,
       stockQuantity: 200,
       images: JSON.stringify(['https://via.placeholder.com/400x300/FF5722/FFFFFF?text=EK-3030']),
+      specifications: [
+        { specKey: '型号', specValue: 'EK-3030', sortOrder: 1 },
+        { specKey: '温度范围', specValue: '-50℃~150℃', sortOrder: 2 },
+        { specKey: '精度', specValue: '±0.5', unit: '℃', sortOrder: 3 },
+      ],
     },
   ];
 
   for (const prod of products) {
+    const { specifications, ...productData } = prod;
+
     await prisma.product.upsert({
       where: { id: prod.id },
       update: {},
-      create: prod,
+      create: {
+        ...productData,
+        specifications: {
+          create: specifications,
+        },
+      },
     });
   }
 
