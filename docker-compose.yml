@@ -108,7 +108,6 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d:ro
       - ./nginx/ssl:/etc/nginx/ssl:ro
     depends_on:
-      - backend
       - backend-java
     networks:
       - sld-network
