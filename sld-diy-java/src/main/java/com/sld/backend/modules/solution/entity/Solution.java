@@ -10,66 +10,101 @@ import java.time.LocalDateTime;
  * 解决方案实体
  */
 @Data
-@TableName("t_solution")
+@TableName("Solution")
 public class Solution {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    /**
+     * 标题
+     */
     private String title;
 
+    /**
+     * 行业
+     */
     private String industry;
 
+    /**
+     * 场景
+     */
     private String scenario;
 
+    /**
+     * 描述
+     */
     private String description;
 
-    @TableField("cover_image")
+    /**
+     * 封面图
+     */
     private String coverImage;
 
+    /**
+     * 图片列表（JSON数组）
+     */
     private String images;
 
-    @TableField("temperature_range")
+    /**
+     * 温度范围
+     */
     private String temperatureRange;
 
-    @TableField("capacity_range")
+    /**
+     * 容量范围
+     */
     private String capacityRange;
 
+    /**
+     * 特性（JSON数组）
+     */
     private String features;
 
-    @TableField("total_price")
+    /**
+     * 总价
+     */
     private BigDecimal totalPrice;
 
-    @TableField("installation_guide")
+    /**
+     * 安装指导
+     */
     private String installationGuide;
 
-    @TableField("view_count")
+    /**
+     * 浏览次数
+     */
     private Integer viewCount;
 
-    @TableField("usage_count")
+    /**
+     * 使用次数
+     */
     private Integer usageCount;
 
+    /**
+     * 评分
+     */
     private BigDecimal rating;
 
-    // status 在数据库中是 INT 类型，1=已发布
-    private Integer status;
+    /**
+     * 状态 (published/draft)
+     */
+    private String status;
 
-    @TableField("create_time")
-    private LocalDateTime createTime;
+    /**
+     * 创建者ID
+     */
+    private Long createdBy;
 
-    @TableField("update_time")
-    private LocalDateTime updateTime;
+    /**
+     * 创建时间
+     */
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createdAt;
 
-    @TableField(exist = false)
-    private String technicalDocs;
-
-    @TableField(exist = false)
-    private String cases;
-
-    @TableField("sort_order")
-    private Integer sortOrder;
-
-    @TableField("deleted")
-    @TableLogic
-    private Integer deleted;
+    /**
+     * 更新时间
+     */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updatedAt;
 }

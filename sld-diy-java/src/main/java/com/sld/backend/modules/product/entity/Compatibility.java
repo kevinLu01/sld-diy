@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 产品兼容性实体
  */
 @Data
-@TableName("t_compatibility")
+@TableName("Compatibility")
 public class Compatibility {
 
     @TableId(type = IdType.AUTO)
@@ -38,7 +38,7 @@ public class Compatibility {
     /**
      * 创建时间
      */
-    @TableField(value = "createdAt", fill = FieldFill.INSERT)
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
     /**

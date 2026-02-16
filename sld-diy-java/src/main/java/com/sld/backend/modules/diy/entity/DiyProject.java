@@ -10,76 +10,96 @@ import java.time.LocalDateTime;
  * DIY 方案实体
  */
 @Data
-@TableName("t_diy_project")
+@TableName("DiyProject")
 public class DiyProject {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    @TableField("user_id")
+    /**
+     * 用户ID
+     */
     private Long userId;
 
+    /**
+     * 解决方案ID
+     */
     private Long solutionId;
 
-    @TableField("project_name")
+    /**
+     * 项目名称
+     */
     private String projectName;
 
+    /**
+     * 场景
+     */
     private String scenario;
 
+    /**
+     * 温度范围
+     */
     private String temperatureRange;
 
-    private BigDecimal coolingCapacity;
+    /**
+     * 制冷量
+     */
+    private Double coolingCapacity;
 
+    /**
+     * 容量单位
+     */
     private String capacityUnit;
 
-    private BigDecimal volume;
+    /**
+     * 体积
+     */
+    private Double volume;
 
+    /**
+     * 体积单位
+     */
     private String volumeUnit;
 
+    /**
+     * 环境温度
+     */
     private String ambientTemp;
 
+    /**
+     * 选项（JSON）
+     */
     private String options;
 
-    @TableField("total_price")
-    private BigDecimal totalPrice;
+    /**
+     * 总价
+     */
+    private Double totalPrice;
 
+    /**
+     * 状态 (draft/saved)
+     */
     private String status;
 
+    /**
+     * 是否分享
+     */
     private Boolean shared;
 
-    @TableField("share_token")
+    /**
+     * 分享Token
+     */
     private String shareToken;
 
-    @TableField(value = "create_time", fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
+    /**
+     * 创建时间
+     */
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createdAt;
 
-    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
-
-    @TableLogic
-    @TableField("deleted")
-    private Integer deleted;
-
-    // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
-
-    @TableField(exist = false)
-    private String requirements;
-
-    @TableField(value = "estimated_installation_fee", exist = false)
-    private BigDecimal estimatedInstallationFee;
-
-    @TableField(value = "energy_efficiency", exist = false)
-    private String energyEfficiency;
-
-    @TableField(value = "estimated_power_consumption", exist = false)
-    private String estimatedPowerConsumption;
-
-    @TableField(exist = false)
-    private String suggestions;
-
-    @TableField(value = "view_count", exist = false)
-    private Integer viewCount;
-
-    @TableField(value = "usage_count", exist = false)
-    private Integer usageCount;
+    /**
+     * 更新时间
+     */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updatedAt;
 }

@@ -9,38 +9,50 @@ import java.time.LocalDateTime;
  * 分类实体
  */
 @Data
-@TableName("t_category")
+@TableName("Category")
 public class Category {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    /**
+     * 分类名称
+     */
     private String name;
 
-    private String slug;
-
-    private String icon;
-
-    @TableField("parent_id")
+    /**
+     * 父分类ID
+     */
     private Long parentId;
 
-    @TableField("sort_order")
-    private Integer sortOrder;
+    /**
+     * Slug（URL友好名称）
+     */
+    private String slug;
 
+    /**
+     * 描述
+     */
     private String description;
 
-    // status: 1=启用, 0=禁用
-    private Integer status;
+    /**
+     * 图标
+     */
+    private String icon;
 
-    @TableField("create_time")
-    private LocalDateTime createTime;
+    /**
+     * 排序
+     */
+    private Integer sortOrder;
 
-    @TableField("update_time")
-    private LocalDateTime updateTime;
+    /**
+     * 是否启用
+     */
+    private Boolean isActive;
 
-    private Integer count;
-
-    @TableField("deleted")
-    @TableLogic
-    private Integer deleted;
+    /**
+     * 创建时间
+     */
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createdAt;
 }

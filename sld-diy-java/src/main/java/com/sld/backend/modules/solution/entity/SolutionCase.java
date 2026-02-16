@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 解决方案案例实体
  */
 @Data
-@TableName("t_solution_case")
+@TableName("SolutionCase")
 public class SolutionCase {
 
     @TableId(type = IdType.AUTO)
@@ -19,19 +19,16 @@ public class SolutionCase {
     /**
      * 解决方案ID
      */
-    @TableField("solution_id")
     private Long solutionId;
 
     /**
      * 项目名称
      */
-    @TableField("project_name")
     private String projectName;
 
     /**
      * 客户名称
      */
-    @TableField("client_name")
     private String clientName;
 
     /**
@@ -42,7 +39,6 @@ public class SolutionCase {
     /**
      * 完工日期
      */
-    @TableField("completion_date")
     private LocalDate completionDate;
 
     /**
@@ -63,16 +59,6 @@ public class SolutionCase {
     /**
      * 创建时间
      */
-    @TableField(value = "create_time", fill = FieldFill.INSERT)
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
-
-    /**
-     * 更新时间
-     */
-    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
-
-    @TableLogic
-    @TableField("deleted")
-    private Integer deleted;
 }

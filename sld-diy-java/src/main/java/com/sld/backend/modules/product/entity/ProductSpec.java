@@ -7,7 +7,7 @@ import lombok.Data;
  * 产品规格实体
  */
 @Data
-@TableName("t_product_spec")
+@TableName("ProductSpec")
 public class ProductSpec {
 
     @TableId(type = IdType.AUTO)
@@ -16,19 +16,16 @@ public class ProductSpec {
     /**
      * 产品ID
      */
-    @TableField("product_id")
     private Long productId;
 
     /**
      * 规格键
      */
-    @TableField("spec_key")
     private String specKey;
 
     /**
      * 规格值
      */
-    @TableField("spec_value")
     private String specValue;
 
     /**
@@ -40,8 +37,4 @@ public class ProductSpec {
      * 排序
      */
     private Integer sortOrder;
-
-    @TableLogic
-    @TableField("deleted")
-    private Integer deleted;
 }

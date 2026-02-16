@@ -51,8 +51,7 @@ public class SolutionServiceImpl implements SolutionService {
     @Override
     public PageResult<SolutionVO> listSolutions(String industry, String scenario, String temperatureRange, Long page, Long limit) {
         LambdaQueryWrapper<Solution> wrapper = new LambdaQueryWrapper<>();
-        // status = 1 表示已发布
-        wrapper.eq(Solution::getStatus, 1);
+        wrapper.eq(Solution::getStatus, "published");
 
         if (industry != null && !industry.isEmpty()) {
             wrapper.eq(Solution::getIndustry, industry);
@@ -151,7 +150,7 @@ public class SolutionServiceImpl implements SolutionService {
             if (product == null) continue;
             
             // 检查库存
-            if (product.getStock() < sp.getQuantity()) {
+            if (product.getStockQuantity() < sp.getQuantity()) {
                 throw new BusinessException(ErrorCode.INSUFFICIENT_STOCK, 
                     product.getName() + " 库存不足");
             }
@@ -169,7 +168,7 @@ public class SolutionServiceImpl implements SolutionService {
             orderItems.add(item);
             
             // 扣减库存
-            product.setStock(product.getStock() - sp.getQuantity());
+            product.setStockQuantity(product.getStockQuantity() - sp.getQuantity());
             productMapper.updateById(product);
         }
         

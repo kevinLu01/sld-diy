@@ -1,16 +1,16 @@
 package com.sld.backend.modules.cart.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.sld.backend.modules.product.entity.Product;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * 购物车实体
+ * 购物车项实体
  */
 @Data
-@TableName("t_cart_item")
+@TableName("CartItem")
 public class CartItem {
 
     @TableId(type = IdType.AUTO)
@@ -19,38 +19,27 @@ public class CartItem {
     /**
      * 购物车ID
      */
-    @TableField("cart_id")
     private Long cartId;
 
-    @TableField("product_id")
+    /**
+     * 产品ID
+     */
     private Long productId;
 
+    /**
+     * 数量
+     */
     private Integer quantity;
 
-    @TableField(value = "create_time", fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
+    /**
+     * 创建时间
+     */
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createdAt;
 
-    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
-
-    @TableLogic
-    @TableField("deleted")
-    private Integer deleted;
-
-    // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
-
-    @TableField(value = "user_id", exist = false)
-    private Long userId;
-
+    /**
+     * 产品信息（非数据库字段）
+     */
     @TableField(exist = false)
-    private BigDecimal price;
-
-    @TableField(exist = false)
-    private String sku;
-
-    @TableField(value = "product_name", exist = false)
-    private String productName;
-
-    @TableField(value = "product_image", exist = false)
-    private String productImage;
+    private Product product;
 }

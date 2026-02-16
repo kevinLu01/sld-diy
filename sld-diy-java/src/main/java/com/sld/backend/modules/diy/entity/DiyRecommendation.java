@@ -1,73 +1,76 @@
 package com.sld.backend.modules.diy.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.sld.backend.modules.product.entity.Category;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
  * DIY 推荐配置实体
  */
 @Data
-@TableName("t_diy_recommendation")
+@TableName("DiyRecommendation")
 public class DiyRecommendation {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    /**
+     * 场景
+     */
     private String scenario;
 
-    @TableField("product_type")
+    /**
+     * 产品类型
+     */
     private String productType;
 
-    @TableField("category_id")
+    /**
+     * 分类ID
+     */
     private Long categoryId;
 
+    /**
+     * 优先级
+     */
     private Integer priority;
 
-    @TableField("is_required")
+    /**
+     * 是否必选
+     */
     private Boolean isRequired;
 
+    /**
+     * 最小数量
+     */
     private Integer minQuantity;
 
+    /**
+     * 最大数量
+     */
     private Integer maxQuantity;
 
+    /**
+     * 是否启用
+     */
     private Boolean isActive;
 
-    @TableField(value = "create_time", fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
+    /**
+     * 创建时间
+     */
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createdAt;
 
-    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
+    /**
+     * 更新时间
+     */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updatedAt;
 
-    @TableLogic
-    @TableField("deleted")
-    private Integer deleted;
-
-    // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
-
-    @TableField(value = "cooling_capacity_min", exist = false)
-    private BigDecimal coolingCapacityMin;
-
-    @TableField(value = "cooling_capacity_max", exist = false)
-    private BigDecimal coolingCapacityMax;
-
-    @TableField(value = "temperature_range", exist = false)
-    private String temperatureRange;
-
-    @TableField(value = "product_ids", exist = false)
-    private String productIds;
-
-    @TableField(value = "total_price", exist = false)
-    private BigDecimal totalPrice;
-
-    @TableField(value = "energy_efficiency", exist = false)
-    private String energyEfficiency;
-
+    /**
+     * 分类信息（非数据库字段）
+     */
     @TableField(exist = false)
-    private String description;
-
-    @TableField(exist = false)
-    private Integer status;
+    private Category category;
 }

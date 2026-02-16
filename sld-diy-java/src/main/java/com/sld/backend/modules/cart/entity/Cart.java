@@ -10,7 +10,7 @@ import java.util.List;
  * 购物车实体
  */
 @Data
-@TableName("t_cart")
+@TableName("Cart")
 public class Cart {
 
     @TableId(type = IdType.AUTO)
@@ -24,11 +24,14 @@ public class Cart {
     /**
      * 创建时间
      */
-    @TableField(value = "createdAt", fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createdAt;
 
-    @TableField(value = "updatedAt", fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
+    /**
+     * 更新时间
+     */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updatedAt;
 
     /**
      * 购物车项列表（非数据库字段）

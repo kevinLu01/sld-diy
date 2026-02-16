@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * DIY 配置实体
  */
 @Data
-@TableName("t_diy_config")
+@TableName("DiyConfig")
 public class DiyConfig {
 
     @TableId(type = IdType.AUTO)
@@ -20,31 +20,50 @@ public class DiyConfig {
      */
     private String category;
 
-    @TableField("config_key")
-    private String configKey;
+    /**
+     * 配置键
+     */
+    private String key;
 
+    /**
+     * 标签
+     */
     private String label;
 
-    @TableField("config_value")
-    private String configValue;
+    /**
+     * 配置值
+     */
+    private String value;
 
+    /**
+     * 图标
+     */
     private String icon;
 
+    /**
+     * 描述
+     */
     private String description;
 
-    @TableField("sort_order")
+    /**
+     * 排序
+     */
     private Integer sortOrder;
 
-    @TableField("is_active")
+    /**
+     * 是否启用
+     */
     private Boolean isActive;
 
-    @TableField("create_time")
-    private LocalDateTime createTime;
+    /**
+     * 创建时间
+     */
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createdAt;
 
-    @TableField("update_time")
-    private LocalDateTime updateTime;
-
-    @TableField("deleted")
-    @TableLogic
-    private Integer deleted;
+    /**
+     * 更新时间
+     */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updatedAt;
 }

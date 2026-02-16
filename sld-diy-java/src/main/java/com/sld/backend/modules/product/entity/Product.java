@@ -10,60 +10,106 @@ import java.time.LocalDateTime;
  * 产品实体
  */
 @Data
-@TableName("t_product")
+@TableName("Product")
 public class Product {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    /**
+     * SKU
+     */
     private String sku;
 
+    /**
+     * 产品名称
+     */
     private String name;
 
-    @TableField("brand_id")
+    /**
+     * 品牌ID
+     */
     private Long brandId;
 
-    @TableField("category_id")
+    /**
+     * 分类ID
+     */
     private Long categoryId;
 
+    /**
+     * 描述
+     */
     private String description;
 
+    /**
+     * 价格
+     */
     private BigDecimal price;
 
-    @TableField("original_price")
+    /**
+     * 原价
+     */
     private BigDecimal originalPrice;
 
-    private Integer stock;
+    /**
+     * 成本价
+     */
+    private BigDecimal costPrice;
 
+    /**
+     * 库存数量
+     */
+    private Integer stockQuantity;
+
+    /**
+     * 单位
+     */
+    private String unit;
+
+    /**
+     * 图片（JSON数组）
+     */
     private String images;
 
-    private String video;
+    /**
+     * 视频URL
+     */
+    private String videoUrl;
 
-    private String model3d;
+    /**
+     * 3D模型URL
+     */
+    private String model3dUrl;
 
+    /**
+     * 状态 (active/inactive)
+     */
     private String status;
 
-    @TableField("sales_count")
+    /**
+     * 浏览次数
+     */
+    private Integer viewCount;
+
+    /**
+     * 销量
+     */
     private Integer salesCount;
 
+    /**
+     * 评分
+     */
     private BigDecimal rating;
 
-    @TableField("review_count")
-    private Integer reviewCount;
+    /**
+     * 创建时间
+     */
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createdAt;
 
-    @TableField("create_time")
-    private LocalDateTime createTime;
-
-    @TableField("update_time")
-    private LocalDateTime updateTime;
-
-    @TableField(exist = false)
-    private String specifications;
-
-    @TableField("sort_order")
-    private Integer sortOrder;
-
-    @TableField("deleted")
-    @TableLogic
-    private Integer deleted;
+    /**
+     * 更新时间
+     */
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updatedAt;
 }
