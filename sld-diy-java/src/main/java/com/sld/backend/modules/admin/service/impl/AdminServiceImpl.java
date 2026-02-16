@@ -2,6 +2,8 @@ package com.sld.backend.modules.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.sld.backend.common.enums.OrderStatus;
+import com.sld.backend.common.enums.UserStatus;
 import com.sld.backend.common.exception.BusinessException;
 import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.modules.admin.dto.request.*;
@@ -214,7 +216,10 @@ public class AdminServiceImpl implements AdminService {
     public Page<Map<String, Object>> getOrders(Long page, Long limit, String status, String search) {
         LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<>();
         if (status != null && !status.isEmpty()) {
-            wrapper.eq(Order::getStatus, status);
+            OrderStatus orderStatus = parseOrderStatus(status);
+            if (orderStatus != null) {
+                wrapper.eq(Order::getStatus, orderStatus);
+            }
         }
         wrapper.orderByDesc(Order::getCreateTime);
 
@@ -242,10 +247,11 @@ public class AdminServiceImpl implements AdminService {
         if (order == null) {
             throw new BusinessException(ErrorCode.ORDER_NOT_FOUND);
         }
-        if (status == null || status.isEmpty()) {
+        OrderStatus orderStatus = parseOrderStatus(status);
+        if (orderStatus == null) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "无效的订单状态: " + status);
         }
-        order.setStatus(status);
+        order.setStatus(orderStatus);
         order.setUpdateTime(LocalDateTime.now());
         orderMapper.updateById(order);
         return convertOrderToMap(order);
@@ -382,8 +388,23 @@ public class AdminServiceImpl implements AdminService {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND);
         }
         // 更新状态
+        UserStatus userStatus = parseUserStatus(status);
+        if (userStatus == null) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "无效的用户状态: " + status);
+        }
+        user.setStatus(userStatus);
+        user.setUpdateTime(LocalDateTime.now());
         userMapper.updateById(user);
         return convertUserToMap(user);
+    }
+    
+    private UserStatus parseUserStatus(String status) {
+        for (UserStatus s : UserStatus.values()) {
+            if (s.getCode().equals(status)) {
+                return s;
+            }
+        }
+        return null;
     }
 
     // ==================== DIY配置管理 ====================
@@ -524,7 +545,7 @@ public class AdminServiceImpl implements AdminService {
         map.put("id", article.getId());
         map.put("title", article.getTitle());
         map.put("category", article.getCategory());
-        map.put("status", article.getStatus());
+        map.put("status", article.getPublishStatus());
         map.put("createTime", article.getCreateTime());
         return map;
     }
@@ -547,6 +568,15 @@ public class AdminServiceImpl implements AdminService {
         map.put("label", config.getLabel());
         map.put("isActive", config.getIsActive());
         return map;
+    }
+
+    private OrderStatus parseOrderStatus(String status) {
+        for (OrderStatus s : OrderStatus.values()) {
+            if (s.getCode().equals(status)) {
+                return s;
+            }
+        }
+        return null;
     }
 
     private Map<String, Object> convertDiyRecommendationToMap(DiyRecommendation rec) {

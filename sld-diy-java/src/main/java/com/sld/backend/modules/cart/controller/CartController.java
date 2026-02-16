@@ -44,9 +44,10 @@ public class CartController {
     @Operation(summary = "更新购物车项数量")
     public Result<CartItemVO> updateItem(
         @PathVariable Long id,
+        @Parameter(description = "用户ID") @RequestHeader("X-User-Id") Long userId,
         @RequestParam Integer quantity
     ) {
-        return Result.success(cartService.updateItem(id, quantity));
+        return Result.success(cartService.updateItem(userId, id, quantity));
     }
 
     @DeleteMapping("/items/{id}")

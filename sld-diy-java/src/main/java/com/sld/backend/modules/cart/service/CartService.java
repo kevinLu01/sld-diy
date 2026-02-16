@@ -22,7 +22,7 @@ public interface CartService {
     /**
      * 更新购物车项数量
      */
-    CartItemVO updateItem(Long id, Integer quantity);
+    CartItemVO updateItem(Long userId, Long id, Integer quantity);
 
     /**
      * 删除购物车项

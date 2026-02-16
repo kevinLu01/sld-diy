@@ -1,6 +1,7 @@
 package com.sld.backend.modules.cart.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.sld.backend.common.enums.ProductStatus;
 import com.sld.backend.common.exception.BusinessException;
 import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.modules.cart.dto.response.CartItemVO;
@@ -64,7 +65,7 @@ class CartServiceTest {
         testProduct.setSalesCount(50);
         testProduct.setRating(new BigDecimal("4.5"));
         testProduct.setReviewCount(10);
-        testProduct.setStatus("on_shelf");
+        testProduct.setStatus(ProductStatus.ON_SHELF);
         testProduct.setCreateTime(LocalDateTime.now());
 
         // 初始化测试购物车项
@@ -197,7 +198,7 @@ class CartServiceTest {
         when(cartItemMapper.updateById(any(CartItem.class))).thenReturn(1);
 
         // Act
-        CartItemVO result = cartService.updateItem(1L, 5);
+        CartItemVO result = cartService.updateItem(1L, 1L, 5);
 
         // Assert
         assertThat(result).isNotNull();
@@ -217,7 +218,7 @@ class CartServiceTest {
         // Act & Assert
         BusinessException exception = org.junit.jupiter.api.Assertions.assertThrows(
             BusinessException.class,
-            () -> cartService.updateItem(999L, 5)
+            () -> cartService.updateItem(1L, 999L, 5)
         );
 
         assertThat(exception.getCode()).isEqualTo(ErrorCode.CART_ITEM_NOT_FOUND.getCode());
@@ -283,13 +284,31 @@ class CartServiceTest {
         when(cartItemMapper.deleteById(1L)).thenReturn(1);
 
         // Act
-        CartItemVO result = cartService.updateItem(1L, 0);
+        CartItemVO result = cartService.updateItem(1L, 1L, 0);
 
         // Assert - 当数量<=0时，实现会删除该项并返回null
         assertThat(result).isNull();
 
         verify(cartItemMapper).selectById(1L);
         verify(cartItemMapper).deleteById(1L);
+        verify(cartItemMapper, never()).updateById(any(CartItem.class));
+    }
+
+    @Test
+    @DisplayName("更新购物车项数量 - 无权修改其他用户的购物车项")
+    void testUpdateItem_Forbidden() {
+        // Arrange - testCartItem belongs to userId 1L
+        when(cartItemMapper.selectById(1L)).thenReturn(testCartItem);
+
+        // Act & Assert - try to update with different userId
+        BusinessException exception = org.junit.jupiter.api.Assertions.assertThrows(
+            BusinessException.class,
+            () -> cartService.updateItem(999L, 1L, 5)
+        );
+
+        assertThat(exception.getCode()).isEqualTo(ErrorCode.FORBIDDEN.getCode());
+
+        verify(cartItemMapper).selectById(1L);
         verify(cartItemMapper, never()).updateById(any(CartItem.class));
     }
 

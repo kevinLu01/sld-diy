@@ -82,10 +82,14 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public CartItemVO updateItem(Long id, Integer quantity) {
+    public CartItemVO updateItem(Long userId, Long id, Integer quantity) {
         CartItem item = cartItemMapper.selectById(id);
         if (item == null) {
             throw new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND);
+        }
+        // 验证权限：只能修改自己的购物车项
+        if (!item.getUserId().equals(userId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN, "无权修改此购物车项");
         }
         
         if (quantity <= 0) {
