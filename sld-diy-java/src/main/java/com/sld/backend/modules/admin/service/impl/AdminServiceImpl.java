@@ -2,7 +2,6 @@ package com.sld.backend.modules.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.sld.backend.common.enums.OrderStatus;
 import com.sld.backend.common.exception.BusinessException;
 import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.modules.admin.dto.request.*;
@@ -215,10 +214,7 @@ public class AdminServiceImpl implements AdminService {
     public Page<Map<String, Object>> getOrders(Long page, Long limit, String status, String search) {
         LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<>();
         if (status != null && !status.isEmpty()) {
-            OrderStatus orderStatus = parseOrderStatus(status);
-            if (orderStatus != null) {
-                wrapper.eq(Order::getStatus, orderStatus);
-            }
+            wrapper.eq(Order::getStatus, status);
         }
         wrapper.orderByDesc(Order::getCreateTime);
 
@@ -246,11 +242,10 @@ public class AdminServiceImpl implements AdminService {
         if (order == null) {
             throw new BusinessException(ErrorCode.ORDER_NOT_FOUND);
         }
-        OrderStatus orderStatus = parseOrderStatus(status);
-        if (orderStatus == null) {
+        if (status == null || status.isEmpty()) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "无效的订单状态: " + status);
         }
-        order.setStatus(orderStatus);
+        order.setStatus(status);
         order.setUpdateTime(LocalDateTime.now());
         orderMapper.updateById(order);
         return convertOrderToMap(order);
@@ -529,7 +524,7 @@ public class AdminServiceImpl implements AdminService {
         map.put("id", article.getId());
         map.put("title", article.getTitle());
         map.put("category", article.getCategory());
-        map.put("status", article.getPublishStatus());
+        map.put("status", article.getStatus());
         map.put("createTime", article.getCreateTime());
         return map;
     }
@@ -552,15 +547,6 @@ public class AdminServiceImpl implements AdminService {
         map.put("label", config.getLabel());
         map.put("isActive", config.getIsActive());
         return map;
-    }
-
-    private OrderStatus parseOrderStatus(String status) {
-        for (OrderStatus s : OrderStatus.values()) {
-            if (s.getCode().equals(status)) {
-                return s;
-            }
-        }
-        return null;
     }
 
     private Map<String, Object> convertDiyRecommendationToMap(DiyRecommendation rec) {

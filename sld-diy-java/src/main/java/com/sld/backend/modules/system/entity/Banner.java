@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 轮播图实体
  */
 @Data
-@TableName("t_banner")
+@TableName("Banner")
 public class Banner {
 
     @TableId(type = IdType.AUTO)
@@ -48,6 +48,6 @@ public class Banner {
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "createdAt", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 }

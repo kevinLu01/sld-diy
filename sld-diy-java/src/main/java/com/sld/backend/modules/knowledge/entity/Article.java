@@ -9,97 +9,58 @@ import java.time.LocalDateTime;
  * 知识文章实体
  */
 @Data
-@TableName("t_article")
+@TableName("KnowledgeArticle")
 public class Article {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    /**
-     * 标题
-     */
     private String title;
 
-    /**
-     * 摘要
-     */
-    private String summary;
-
-    /**
-     * 内容
-     */
-    private String content;
-
-    /**
-     * 封面图
-     */
-    private String coverImage;
-
-    /**
-     * 分类
-     */
     private String category;
 
-    /**
-     * 标签（JSON数组）
-     */
+    private String content;
+
     private String tags;
 
-    /**
-     * 作者
-     */
-    private String author;
+    private String coverImage;
 
-    /**
-     * 来源
-     */
-    private String source;
+    private String attachments;
 
-    /**
-     * 浏览次数
-     */
     private Integer viewCount;
 
-    /**
-     * 点赞次数
-     */
-    private Integer likeCount;
-
-    /**
-     * 有用次数
-     */
     private Integer helpfulCount;
 
-    /**
-     * 排序
-     */
-    private Integer sortOrder;
+    private String status;
 
-    /**
-     * 发布状态
-     */
-    private Integer publishStatus;
+    private String author;
 
-    /**
-     * 发布时间
-     */
-    private LocalDateTime publishTime;
-
-    /**
-     * 逻辑删除
-     */
-    @TableLogic
-    private Integer deleted;
-
-    /**
-     * 创建时间
-     */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "createdAt", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "updatedAt", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+
+    // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
+
+    @TableField(exist = false)
+    private String summary;
+
+    @TableField(exist = false)
+    private String source;
+
+    @TableField(exist = false)
+    private Integer likeCount;
+
+    @TableField(exist = false)
+    private Integer sortOrder;
+
+    @TableField(exist = false)
+    private Integer publishStatus;
+
+    @TableField(exist = false)
+    private LocalDateTime publishTime;
+
+    @TableField(exist = false)
+    private Integer deleted;
 }

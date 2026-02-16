@@ -10,82 +10,52 @@ import java.time.LocalDateTime;
  * DIY 方案项实体
  */
 @Data
-@TableName("t_diy_project_item")
+@TableName("DiyProjectItem")
 public class DiyProjectItem {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    /**
-     * DIY方案ID
-     */
+    @TableField("projectId")
     private Long diyProjectId;
 
-    /**
-     * 产品ID
-     */
     private Long productId;
 
-    /**
-     * SKU
-     */
-    private String sku;
-
-    /**
-     * 产品名称
-     */
-    private String productName;
-
-    /**
-     * 产品图片
-     */
-    private String productImage;
-
-    /**
-     * 数量
-     */
     private Integer quantity;
 
-    /**
-     * 单价
-     */
-    private BigDecimal price;
-
-    /**
-     * 总价
-     */
-    private BigDecimal total;
-
-    /**
-     * 匹配分数
-     */
-    private Integer matchScore;
-
-    /**
-     * 匹配原因
-     */
-    private String matchReason;
-
-    /**
-     * 备注
-     */
     private String notes;
 
-    /**
-     * 逻辑删除
-     */
-    @TableLogic
+    private Integer sortOrder;
+
+    // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
+
+    @TableField(exist = false)
+    private String sku;
+
+    @TableField(exist = false)
+    private String productName;
+
+    @TableField(exist = false)
+    private String productImage;
+
+    @TableField(exist = false)
+    private BigDecimal price;
+
+    @TableField(exist = false)
+    private BigDecimal total;
+
+    @TableField(exist = false)
+    private Integer matchScore;
+
+    @TableField(exist = false)
+    private String matchReason;
+
+    @TableField(exist = false)
     private Integer deleted;
 
-    /**
-     * 创建时间
-     */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(exist = false)
     private LocalDateTime createTime;
 
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(exist = false)
     private LocalDateTime updateTime;
 }

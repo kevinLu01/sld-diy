@@ -40,12 +40,15 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // 公开放行的接口
                 .requestMatchers(
-                    "/api/v1/health",
+                    "/api/v1/health/**",
                     "/api/v1/auth/**",
-                    "/api/v1/categories",
-                    "/api/v1/products",
-                    "/api/v1/solutions",
+                    "/api/v1/categories/**",
+                    "/api/v1/products/**",
+                    "/api/v1/solutions/**",
                     "/api/v1/knowledge/**",
+                    "/api/v1/diy/**",
+                    "/api/v1/search/**",
+                    "/api/v1/banners/**",
                     "/swagger-ui/**",
                     "/swagger-ui.html",
                     "/v3/api-docs/**",

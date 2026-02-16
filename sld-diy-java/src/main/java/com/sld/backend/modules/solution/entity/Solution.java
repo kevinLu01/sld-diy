@@ -1,7 +1,6 @@
 package com.sld.backend.modules.solution.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.sld.backend.common.enums.SolutionIndustry;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -11,117 +10,61 @@ import java.time.LocalDateTime;
  * 解决方案实体
  */
 @Data
-@TableName("t_solution")
+@TableName("Solution")
 public class Solution {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    /**
-     * 标题
-     */
     private String title;
 
-    /**
-     * 行业
-     */
-    private SolutionIndustry industry;
+    private String industry;
 
-    /**
-     * 场景
-     */
     private String scenario;
 
-    /**
-     * 封面图
-     */
-    private String coverImage;
-
-    /**
-     * 图片列表（JSON数组）
-     */
-    private String images;
-
-    /**
-     * 温度范围
-     */
-    private String temperatureRange;
-
-    /**
-     * 容量范围
-     */
-    private String capacityRange;
-
-    /**
-     * 特性（JSON数组）
-     */
-    private String features;
-
-    /**
-     * 描述
-     */
     private String description;
 
-    /**
-     * 总价
-     */
+    private String coverImage;
+
+    private String images;
+
+    private String temperatureRange;
+
+    private String capacityRange;
+
+    private String features;
+
     private BigDecimal totalPrice;
 
-    /**
-     * 安装指导
-     */
     private String installationGuide;
 
-    /**
-     * 技术文档（JSON数组）
-     */
-    private String technicalDocs;
-
-    /**
-     * 案例列表（JSON数组）
-     */
-    private String cases;
-
-    /**
-     * 使用次数
-     */
-    private Integer usageCount;
-
-    /**
-     * 浏览次数
-     */
     private Integer viewCount;
 
-    /**
-     * 评分
-     */
+    private Integer usageCount;
+
     private BigDecimal rating;
 
-    /**
-     * 排序
-     */
-    private Integer sortOrder;
+    private String status;
 
-    /**
-     * 状态
-     */
-    private Integer status;
+    private Integer createdBy;
 
-    /**
-     * 逻辑删除
-     */
-    @TableLogic
-    private Integer deleted;
-
-    /**
-     * 创建时间
-     */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "createdAt", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "updatedAt", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+
+    // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
+
+    @TableField(exist = false)
+    private String technicalDocs;
+
+    @TableField(exist = false)
+    private String cases;
+
+    @TableField(exist = false)
+    private Integer sortOrder;
+
+    @TableField(exist = false)
+    private Integer deleted;
 }

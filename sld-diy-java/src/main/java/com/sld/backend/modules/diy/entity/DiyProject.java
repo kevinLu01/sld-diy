@@ -1,7 +1,6 @@
 package com.sld.backend.modules.diy.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.sld.backend.common.enums.DiyScenario;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -11,97 +10,71 @@ import java.time.LocalDateTime;
  * DIY 方案实体
  */
 @Data
-@TableName("t_diy_project")
+@TableName("DiyProject")
 public class DiyProject {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    /**
-     * 用户ID
-     */
     private Long userId;
 
-    /**
-     * 项目名称
-     */
+    private Long solutionId;
+
     private String projectName;
 
-    /**
-     * 场景
-     */
-    private DiyScenario scenario;
+    private String scenario;
 
-    /**
-     * 需求（JSON）
-     */
-    private String requirements;
+    private String temperatureRange;
 
-    /**
-     * 总价
-     */
+    private BigDecimal coolingCapacity;
+
+    private String capacityUnit;
+
+    private BigDecimal volume;
+
+    private String volumeUnit;
+
+    private String ambientTemp;
+
+    private String options;
+
     private BigDecimal totalPrice;
 
-    /**
-     * 预估安装费
-     */
-    private BigDecimal estimatedInstallationFee;
+    private String status;
 
-    /**
-     * 能效等级
-     */
-    private String energyEfficiency;
-
-    /**
-     * 预估能耗
-     */
-    private String estimatedPowerConsumption;
-
-    /**
-     * 建议（JSON数组）
-     */
-    private String suggestions;
-
-    /**
-     * 是否分享
-     */
     private Boolean shared;
 
-    /**
-     * 分享Token
-     */
     private String shareToken;
 
-    /**
-     * 浏览次数
-     */
-    private Integer viewCount;
-
-    /**
-     * 使用次数
-     */
-    private Integer usageCount;
-
-    /**
-     * 状态
-     */
-    private Integer status;
-
-    /**
-     * 逻辑删除
-     */
-    @TableLogic
-    private Integer deleted;
-
-    /**
-     * 创建时间
-     */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "createdAt", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "updatedAt", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+
+    // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
+
+    @TableField(exist = false)
+    private String requirements;
+
+    @TableField(exist = false)
+    private BigDecimal estimatedInstallationFee;
+
+    @TableField(exist = false)
+    private String energyEfficiency;
+
+    @TableField(exist = false)
+    private String estimatedPowerConsumption;
+
+    @TableField(exist = false)
+    private String suggestions;
+
+    @TableField(exist = false)
+    private Integer viewCount;
+
+    @TableField(exist = false)
+    private Integer usageCount;
+
+    @TableField(exist = false)
+    private Integer deleted;
 }

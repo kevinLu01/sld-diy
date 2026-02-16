@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 用户收藏实体
  */
 @Data
-@TableName("t_favorite")
+@TableName("Favorite")
 public class Favorite {
 
     @TableId(type = IdType.AUTO)
@@ -28,7 +28,7 @@ public class Favorite {
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "createdAt", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
     /**

@@ -3,8 +3,6 @@ package com.sld.backend.modules.diy.service.impl;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.sld.backend.common.enums.DiyScenario;
-import com.sld.backend.common.enums.ProductStatus;
 import com.sld.backend.common.exception.BusinessException;
 import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.modules.diy.dto.request.DiyRecommendRequest;
@@ -77,7 +75,7 @@ public class DiyServiceImpl implements DiyService {
             List<Product> products = productMapper.selectList(
                 new LambdaQueryWrapper<Product>()
                     .eq(Product::getCategoryId, rec.getCategoryId())
-                    .eq(Product::getStatus, ProductStatus.ON_SHELF)
+                    .eq(Product::getStatus, "on_shelf")
                     .last("LIMIT 5")
             );
 
@@ -162,22 +160,14 @@ public class DiyServiceImpl implements DiyService {
         DiyProject project = new DiyProject();
         project.setUserId(userId);
         project.setProjectName(request.getProjectName());
-        // Convert scenario string to DiyScenario enum
-        if (request.getScenario() != null) {
-            for (DiyScenario s : DiyScenario.values()) {
-                if (s.getCode().equals(request.getScenario())) {
-                    project.setScenario(s);
-                    break;
-                }
-            }
-        }
+        project.setScenario(request.getScenario());
         // Store requirements as JSON string
         if (request.getRequirements() != null) {
             project.setRequirements(JSONUtil.toJsonStr(request.getRequirements()));
         }
         project.setTotalPrice(request.getTotalPrice());
         project.setEstimatedInstallationFee(request.getEstimatedInstallationFee());
-        project.setStatus(0); // 0 = draft
+        project.setStatus("draft");
         project.setShared(request.getShared() != null ? request.getShared() : false);
         project.setViewCount(0);
         project.setUsageCount(0);
@@ -260,7 +250,7 @@ public class DiyServiceImpl implements DiyService {
         return DiyProjectVO.builder()
             .id(project.getId())
             .projectName(project.getProjectName())
-            .scenario(project.getScenario() != null ? project.getScenario().getCode() : null)
+            .scenario(project.getScenario())
             .totalPrice(project.getTotalPrice())
             .estimatedInstallationFee(project.getEstimatedInstallationFee())
             .energyEfficiency(project.getEnergyEfficiency())

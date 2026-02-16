@@ -1,7 +1,6 @@
 package com.sld.backend.modules.order.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.sld.backend.common.enums.OrderStatus;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -11,142 +10,85 @@ import java.time.LocalDateTime;
  * 订单实体
  */
 @Data
-@TableName("t_order")
+@TableName("`Order`")
 public class Order {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    /**
-     * 订单号
-     */
     private String orderNo;
 
-    /**
-     * 用户ID
-     */
     private Long userId;
 
-    /**
-     * 用户名
-     */
-    private String username;
-
-    /**
-     * 订单金额
-     */
-    private BigDecimal totalAmount;
-
-    /**
-     * 运费
-     */
-    private BigDecimal shippingFee;
-
-    /**
-     * 安装费
-     */
-    private BigDecimal installationFee;
-
-    /**
-     * 优惠金额
-     */
-    private BigDecimal discountAmount;
-
-    /**
-     * 实付金额
-     */
-    private BigDecimal finalAmount;
-
-    /**
-     * 订单状态
-     */
-    private OrderStatus status;
-
-    /**
-     * DIY方案ID
-     */
     private Long diyProjectId;
 
-    /**
-     * 收货人
-     */
-    private String recipient;
+    private BigDecimal totalAmount;
 
-    /**
-     * 手机号
-     */
-    private String phone;
+    private BigDecimal discountAmount;
 
-    /**
-     * 省份
-     */
-    private String province;
+    private BigDecimal shippingFee;
 
-    /**
-     * 城市
-     */
-    private String city;
+    private BigDecimal installationFee;
 
-    /**
-     * 区县
-     */
-    private String district;
+    private BigDecimal finalAmount;
 
-    /**
-     * 详细地址
-     */
-    private String address;
+    private String status;
 
-    /**
-     * 邮编
-     */
-    private String postalCode;
+    private String paymentMethod;
 
-    /**
-     * 备注
-     */
+    private LocalDateTime paymentTime;
+
+    private String shippingInfo;
+
     private String notes;
 
-    /**
-     * 是否需要安装
-     */
-    private Boolean needInstallation;
-
-    /**
-     * 支付时间
-     */
-    private LocalDateTime payTime;
-
-    /**
-     * 发货时间
-     */
-    private LocalDateTime shipTime;
-
-    /**
-     * 签收时间
-     */
-    private LocalDateTime deliverTime;
-
-    /**
-     * 取消时间
-     */
-    private LocalDateTime cancelTime;
-
-    /**
-     * 逻辑删除
-     */
-    @TableLogic
-    private Integer deleted;
-
-    /**
-     * 创建时间
-     */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "createdAt", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "updatedAt", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+
+    // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
+
+    @TableField(exist = false)
+    private String username;
+
+    @TableField(exist = false)
+    private String recipient;
+
+    @TableField(exist = false)
+    private String phone;
+
+    @TableField(exist = false)
+    private String province;
+
+    @TableField(exist = false)
+    private String city;
+
+    @TableField(exist = false)
+    private String district;
+
+    @TableField(exist = false)
+    private String address;
+
+    @TableField(exist = false)
+    private String postalCode;
+
+    @TableField(exist = false)
+    private Boolean needInstallation;
+
+    @TableField(exist = false)
+    private LocalDateTime payTime;
+
+    @TableField(exist = false)
+    private LocalDateTime shipTime;
+
+    @TableField(exist = false)
+    private LocalDateTime deliverTime;
+
+    @TableField(exist = false)
+    private LocalDateTime cancelTime;
+
+    @TableField(exist = false)
+    private Integer deleted;
 }

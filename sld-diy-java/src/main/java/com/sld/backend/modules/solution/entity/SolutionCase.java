@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 解决方案案例实体
  */
 @Data
-@TableName("t_solution_case")
+@TableName("SolutionCase")
 public class SolutionCase {
 
     @TableId(type = IdType.AUTO)
@@ -59,6 +59,6 @@ public class SolutionCase {
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "createdAt", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 }

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 服务请求实体
  */
 @Data
-@TableName("t_service_request")
+@TableName("ServiceRequest")
 public class ServiceRequest {
 
     @TableId(type = IdType.AUTO)
@@ -83,12 +83,9 @@ public class ServiceRequest {
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "createdAt", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "updatedAt", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 }

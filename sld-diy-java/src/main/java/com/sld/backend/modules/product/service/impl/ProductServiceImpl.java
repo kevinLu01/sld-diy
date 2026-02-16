@@ -4,7 +4,6 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.sld.backend.common.enums.ProductStatus;
 import com.sld.backend.common.exception.BusinessException;
 import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.modules.product.dto.response.*;
@@ -36,7 +35,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductVO> listProducts(Long categoryId, String brand, String search, Long page, Long limit, String sort) {
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Product::getStatus, ProductStatus.ON_SHELF);
+        wrapper.eq(Product::getStatus, "on_shelf");
 
         if (categoryId != null) {
             wrapper.eq(Product::getCategoryId, categoryId);
@@ -108,7 +107,7 @@ public class ProductServiceImpl implements ProductService {
             .salesCount(product.getSalesCount())
             .rating(product.getRating())
             .reviewCount(product.getReviewCount())
-            .status(product.getStatus() != null ? product.getStatus().getCode() : null)
+            .status(product.getStatus())
             .build();
 
         // 设置兼容产品
@@ -182,7 +181,7 @@ public class ProductServiceImpl implements ProductService {
             .images(parseImages(product.getImages()))
             .salesCount(product.getSalesCount())
             .rating(product.getRating())
-            .status(product.getStatus() != null ? product.getStatus().getCode() : null)
+            .status(product.getStatus())
             .specifications(product.getSpecifications())
             .build();
     }

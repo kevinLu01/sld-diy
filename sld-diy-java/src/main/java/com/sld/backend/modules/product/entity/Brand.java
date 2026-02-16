@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 品牌实体
  */
 @Data
-@TableName("t_brand")
+@TableName("Brand")
 public class Brand {
 
     @TableId(type = IdType.AUTO)
@@ -36,35 +36,35 @@ public class Brand {
     private String description;
 
     /**
-     * 官网
+     * 国家
      */
-    private String website;
+    private String country;
 
     /**
-     * 产品数量
+     * 是否启用
      */
-    private Integer productCount;
-
-    /**
-     * 状态
-     */
-    private Integer status;
-
-    /**
-     * 逻辑删除
-     */
-    @TableLogic
-    private Integer deleted;
+    private Boolean isActive;
 
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "createdAt", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
+
+    @TableField(exist = false)
+    private String website;
+
+    @TableField(exist = false)
+    private Integer productCount;
+
+    @TableField(exist = false)
+    private Integer status;
+
+    @TableField(exist = false)
+    private Integer deleted;
+
+    @TableField(exist = false)
     private LocalDateTime updateTime;
 }

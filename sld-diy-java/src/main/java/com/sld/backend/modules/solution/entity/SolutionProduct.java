@@ -10,57 +10,38 @@ import java.time.LocalDateTime;
  * 解决方案产品关联实体
  */
 @Data
-@TableName("t_solution_product")
+@TableName("SolutionProduct")
 public class SolutionProduct {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    /**
-     * 解决方案ID
-     */
     private Long solutionId;
 
-    /**
-     * 产品ID
-     */
     private Long productId;
 
-    /**
-     * 数量
-     */
     private Integer quantity;
 
-    /**
-     * 单价
-     */
-    private BigDecimal price;
-
-    /**
-     * 总价
-     */
-    private BigDecimal total;
-
-    /**
-     * 备注
-     */
     private String notes;
 
-    /**
-     * 逻辑删除
-     */
-    @TableLogic
+    private Boolean isRequired;
+
+    private Integer sortOrder;
+
+    // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
+
+    @TableField(exist = false)
+    private BigDecimal price;
+
+    @TableField(exist = false)
+    private BigDecimal total;
+
+    @TableField(exist = false)
     private Integer deleted;
 
-    /**
-     * 创建时间
-     */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(exist = false)
     private LocalDateTime createTime;
 
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(exist = false)
     private LocalDateTime updateTime;
 }

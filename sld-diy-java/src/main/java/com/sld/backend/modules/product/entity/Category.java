@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 分类实体
  */
 @Data
-@TableName("t_category")
+@TableName("Category")
 public class Category {
 
     @TableId(type = IdType.AUTO)
@@ -41,35 +41,32 @@ public class Category {
     private Integer sortOrder;
 
     /**
-     * 产品数量
-     */
-    private Integer count;
-
-    /**
      * 描述
      */
     private String description;
 
     /**
-     * 状态
+     * 是否启用
      */
-    private Integer status;
-
-    /**
-     * 逻辑删除
-     */
-    @TableLogic
-    private Integer deleted;
+    private Boolean isActive;
 
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "createdAt", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
+
+    @TableField(exist = false)
+    private Integer count;
+
+    @TableField(exist = false)
+    private Integer status;
+
+    @TableField(exist = false)
+    private Integer deleted;
+
+    @TableField(exist = false)
     private LocalDateTime updateTime;
 }

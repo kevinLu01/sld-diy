@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 企业认证信息实体
  */
 @Data
-@TableName("t_business_info")
+@TableName("BusinessInfo")
 public class BusinessInfo {
 
     @TableId(type = IdType.AUTO)
@@ -31,11 +31,6 @@ public class BusinessInfo {
     private String businessLicense;
 
     /**
-     * 统一社会信用代码
-     */
-    private String creditCode;
-
-    /**
      * 所属行业
      */
     private String industry;
@@ -50,30 +45,21 @@ public class BusinessInfo {
      */
     private String contactPerson;
 
-    /**
-     * 联系电话
-     */
-    private String contactPhone;
-
-    /**
-     * 是否已认证
-     */
     private Boolean verified;
 
-    /**
-     * 认证时间
-     */
     private LocalDateTime verifiedAt;
 
-    /**
-     * 创建时间
-     */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "createdAt", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
+
+    @TableField(exist = false)
+    private String creditCode;
+
+    @TableField(exist = false)
+    private String contactPhone;
+
+    @TableField(exist = false)
     private LocalDateTime updateTime;
 }

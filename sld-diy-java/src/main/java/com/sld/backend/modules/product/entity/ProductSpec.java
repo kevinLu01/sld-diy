@@ -7,7 +7,7 @@ import lombok.Data;
  * 产品规格实体
  */
 @Data
-@TableName("t_product_spec")
+@TableName("ProductSpec")
 public class ProductSpec {
 
     @TableId(type = IdType.AUTO)

@@ -5,7 +5,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sld.backend.common.exception.BusinessException;
 import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.common.result.PageResult;
-import com.sld.backend.common.enums.OrderStatus;
 import com.sld.backend.modules.order.dto.response.OrderVO;
 import com.sld.backend.modules.order.entity.Order;
 import com.sld.backend.modules.order.entity.OrderItem;
@@ -138,7 +137,7 @@ public class SolutionServiceImpl implements SolutionService {
         Order order = new Order();
         order.setOrderNo(generateOrderNo());
         order.setUserId(userId);
-        order.setStatus(OrderStatus.PENDING);
+        order.setStatus("pending");
         order.setCreateTime(LocalDateTime.now());
         order.setUpdateTime(LocalDateTime.now());
         
@@ -207,7 +206,7 @@ public class SolutionServiceImpl implements SolutionService {
         vo.setOrderNo(order.getOrderNo());
         vo.setTotalAmount(order.getTotalAmount());
         vo.setFinalAmount(order.getFinalAmount());
-        vo.setStatus(order.getStatus() != null ? order.getStatus().getCode() : null);
+        vo.setStatus(order.getStatus());
         vo.setCreateTime(order.getCreateTime());
         return vo;
     }

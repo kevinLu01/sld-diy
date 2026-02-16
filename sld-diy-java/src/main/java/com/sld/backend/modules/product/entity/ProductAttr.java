@@ -7,7 +7,7 @@ import lombok.Data;
  * 产品属性实体
  */
 @Data
-@TableName("t_product_attr")
+@TableName("ProductAttr")
 public class ProductAttr {
 
     @TableId(type = IdType.AUTO)

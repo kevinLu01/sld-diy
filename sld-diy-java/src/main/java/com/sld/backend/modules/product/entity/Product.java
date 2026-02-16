@@ -1,7 +1,6 @@
 package com.sld.backend.modules.product.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.sld.backend.common.enums.ProductStatus;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -11,112 +10,66 @@ import java.time.LocalDateTime;
  * 产品实体
  */
 @Data
-@TableName("t_product")
+@TableName("Product")
 public class Product {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
-    /**
-     * SKU
-     */
     private String sku;
 
-    /**
-     * 产品名称
-     */
     private String name;
 
-    /**
-     * 品牌ID
-     */
     private Long brandId;
 
-    /**
-     * 分类ID
-     */
     private Long categoryId;
 
-    /**
-     * 价格
-     */
-    private BigDecimal price;
-
-    /**
-     * 原价
-     */
-    private BigDecimal originalPrice;
-
-    /**
-     * 库存
-     */
-    private Integer stock;
-
-    /**
-     * 图片（JSON数组）
-     */
-    private String images;
-
-    /**
-     * 视频
-     */
-    private String video;
-
-    /**
-     * 3D模型
-     */
-    private String model3d;
-
-    /**
-     * 规格（JSON）
-     */
-    private String specifications;
-
-    /**
-     * 描述
-     */
     private String description;
 
-    /**
-     * 销量
-     */
+    private BigDecimal price;
+
+    private BigDecimal originalPrice;
+
+    private BigDecimal costPrice;
+
+    @TableField("stockQuantity")
+    private Integer stock;
+
+    private String unit;
+
+    private String images;
+
+    @TableField("videoUrl")
+    private String video;
+
+    @TableField("model3dUrl")
+    private String model3d;
+
+    private String status;
+
+    private Integer viewCount;
+
     private Integer salesCount;
 
-    /**
-     * 评分
-     */
     private BigDecimal rating;
 
-    /**
-     * 评价数
-     */
-    private Integer reviewCount;
-
-    /**
-     * 状态
-     */
-    private ProductStatus status;
-
-    /**
-     * 排序
-     */
-    private Integer sortOrder;
-
-    /**
-     * 逻辑删除
-     */
-    @TableLogic
-    private Integer deleted;
-
-    /**
-     * 创建时间
-     */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "createdAt", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "updatedAt", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+
+    // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
+
+    @TableField(exist = false)
+    private String specifications;
+
+    @TableField(exist = false)
+    private Integer reviewCount;
+
+    @TableField(exist = false)
+    private Integer sortOrder;
+
+    @TableField(exist = false)
+    private Integer deleted;
 }

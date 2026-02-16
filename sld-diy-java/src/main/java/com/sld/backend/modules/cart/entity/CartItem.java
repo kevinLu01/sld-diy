@@ -10,62 +10,44 @@ import java.time.LocalDateTime;
  * 购物车实体
  */
 @Data
-@TableName("t_cart_item")
+@TableName("CartItem")
 public class CartItem {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
     /**
-     * 用户ID
+     * 购物车ID
      */
-    private Long userId;
+    private Long cartId;
 
-    /**
-     * 产品ID
-     */
     private Long productId;
 
-    /**
-     * 数量
-     */
     private Integer quantity;
 
-    /**
-     * 加入时价格
-     */
-    private BigDecimal price;
-
-    /**
-     * SKU
-     */
-    private String sku;
-
-    /**
-     * 产品名称
-     */
-    private String productName;
-
-    /**
-     * 产品图片
-     */
-    private String productImage;
-
-    /**
-     * 逻辑删除
-     */
-    @TableLogic
-    private Integer deleted;
-
-    /**
-     * 创建时间
-     */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "createdAt", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    /**
-     * 更新时间
-     */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
+
+    @TableField(exist = false)
+    private Long userId;
+
+    @TableField(exist = false)
+    private BigDecimal price;
+
+    @TableField(exist = false)
+    private String sku;
+
+    @TableField(exist = false)
+    private String productName;
+
+    @TableField(exist = false)
+    private String productImage;
+
+    @TableField(exist = false)
+    private Integer deleted;
+
+    @TableField(exist = false)
     private LocalDateTime updateTime;
 }

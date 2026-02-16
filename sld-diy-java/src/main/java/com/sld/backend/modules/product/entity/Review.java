@@ -10,7 +10,7 @@ import java.util.List;
  * 产品评价实体
  */
 @Data
-@TableName("t_review")
+@TableName("Review")
 public class Review {
 
     @TableId(type = IdType.AUTO)
@@ -54,7 +54,7 @@ public class Review {
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "createdAt", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
     /**

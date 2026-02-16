@@ -2,7 +2,6 @@ package com.sld.backend.modules.order.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.sld.backend.common.enums.OrderStatus;
 import com.sld.backend.common.exception.BusinessException;
 import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.common.result.PageResult;
@@ -74,7 +73,7 @@ public class OrderServiceImpl implements OrderService {
         order.setInstallationFee(BigDecimal.ZERO);
         order.setDiscountAmount(BigDecimal.ZERO);
         order.setFinalAmount(totalAmount);
-        order.setStatus(OrderStatus.PENDING);
+        order.setStatus("pending");
         order.setDiyProjectId(request.getDiyProjectId());
         order.setRecipient(request.getRecipient());
         order.setPhone(request.getPhone());
@@ -105,12 +104,7 @@ public class OrderServiceImpl implements OrderService {
         LambdaQueryWrapper<Order> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Order::getUserId, userId);
         if (status != null && !status.isEmpty()) {
-            for (OrderStatus s : OrderStatus.values()) {
-                if (s.getCode().equals(status)) {
-                    wrapper.eq(Order::getStatus, s);
-                    break;
-                }
-            }
+            wrapper.eq(Order::getStatus, status);
         }
         wrapper.orderByDesc(Order::getCreateTime);
 
@@ -154,10 +148,10 @@ public class OrderServiceImpl implements OrderService {
         if (order == null) {
             throw new BusinessException(ErrorCode.ORDER_NOT_FOUND);
         }
-        if (order.getStatus() != OrderStatus.PENDING) {
+        if (!"pending".equals(order.getStatus())) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "只能取消待支付订单");
         }
-        order.setStatus(OrderStatus.CANCELLED);
+        order.setStatus("cancelled");
         order.setCancelTime(LocalDateTime.now());
         order.setUpdateTime(LocalDateTime.now());
         orderMapper.updateById(order);
@@ -192,7 +186,7 @@ public class OrderServiceImpl implements OrderService {
             .installationFee(order.getInstallationFee())
             .discountAmount(order.getDiscountAmount())
             .finalAmount(order.getFinalAmount())
-            .status(order.getStatus() != null ? order.getStatus().getCode() : null)
+            .status(order.getStatus())
             .recipient(order.getRecipient())
             .phone(order.getPhone())
             .fullAddress(fullAddress)
