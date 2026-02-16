@@ -1,7 +1,6 @@
 package com.sld.backend.modules.cart.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.sld.backend.common.enums.ProductStatus;
 import com.sld.backend.common.exception.BusinessException;
 import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.modules.cart.dto.response.CartItemVO;
@@ -65,7 +64,7 @@ class CartServiceTest {
         testProduct.setSalesCount(50);
         testProduct.setRating(new BigDecimal("4.5"));
         testProduct.setReviewCount(10);
-        testProduct.setStatus(ProductStatus.ON_SHELF);
+        testProduct.setStatus("on_shelf");
         testProduct.setCreateTime(LocalDateTime.now());
 
         // 初始化测试购物车项

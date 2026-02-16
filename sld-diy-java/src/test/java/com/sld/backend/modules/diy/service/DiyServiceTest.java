@@ -1,7 +1,6 @@
 package com.sld.backend.modules.diy.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.sld.backend.common.enums.DiyScenario;
 import com.sld.backend.common.exception.BusinessException;
 import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.modules.diy.dto.request.DiyRecommendRequest;
@@ -74,9 +73,9 @@ class DiyServiceTest {
         testProject.setId(1L);
         testProject.setUserId(1L);
         testProject.setProjectName("My DIY Project");
-        testProject.setScenario(DiyScenario.COLD_STORAGE);
+        testProject.setScenario("cold_storage");
         testProject.setTotalPrice(new BigDecimal("5000.00"));
-        testProject.setStatus(0);
+        testProject.setStatus("0");
         testProject.setShared(false);
         testProject.setViewCount(0);
         testProject.setUsageCount(0);

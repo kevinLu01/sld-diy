@@ -2,7 +2,6 @@ package com.sld.backend.modules.order.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.sld.backend.common.enums.OrderStatus;
 import com.sld.backend.common.exception.BusinessException;
 import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.common.result.PageResult;
@@ -67,7 +66,7 @@ class OrderServiceTest {
         testOrder.setInstallationFee(new BigDecimal("0.00"));
         testOrder.setDiscountAmount(new BigDecimal("0.00"));
         testOrder.setFinalAmount(new BigDecimal("5010.00"));
-        testOrder.setStatus(OrderStatus.PENDING);
+        testOrder.setStatus("pending");
         testOrder.setRecipient("张三");
         testOrder.setPhone("13800138000");
         testOrder.setProvince("广东省");
