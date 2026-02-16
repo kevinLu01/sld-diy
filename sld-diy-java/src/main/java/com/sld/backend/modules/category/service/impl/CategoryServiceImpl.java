@@ -31,7 +31,7 @@ public class CategoryServiceImpl implements CategoryService {
         } else {
             wrapper.eq(Category::getParentId, parentId);
         }
-        wrapper.eq(Category::getStatus, 1)
+        wrapper.eq(Category::getIsActive, true)
             .orderByAsc(Category::getSortOrder);
 
         return categoryMapper.selectList(wrapper).stream()
@@ -42,7 +42,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<CategoryVO> getCategoryTree() {
         LambdaQueryWrapper<Category> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Category::getStatus, 1)
+        wrapper.eq(Category::getIsActive, true)
             .orderByAsc(Category::getSortOrder);
 
         List<Category> allCategories = categoryMapper.selectList(wrapper);
@@ -60,7 +60,7 @@ public class CategoryServiceImpl implements CategoryService {
         List<Category> children = categoryMapper.selectList(
             new LambdaQueryWrapper<Category>()
                 .eq(Category::getParentId, id)
-                .eq(Category::getStatus, 1)
+                .eq(Category::getIsActive, true)
                 .orderByAsc(Category::getSortOrder)
         );
         vo.setChildren(children.stream().map(this::toVO).collect(Collectors.toList()));
