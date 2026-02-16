@@ -35,7 +35,9 @@ jobs:
         working-directory: ./sld-diy-java
         run: |
           echo "开始构建 Java 后端..."
-          mvn clean package -DskipTests -B
+          echo "Java version:" && java -version
+          echo "Maven version:" && mvn -version
+          mvn clean package -DskipTests -B -e
           echo "✅ 构建完成"
 
       - name: 🧪 Run Tests
@@ -63,6 +65,7 @@ jobs:
   deploy:
     name: Deploy to Server
     needs: build-and-test
+    if: ${{ always() && !cancelled() }}
     runs-on: ubuntu-latest
 
     steps:
