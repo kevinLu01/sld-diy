@@ -1,0 +1,28 @@
+package com.sld.backend.modules.diy.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.sld.backend.modules.diy.entity.DiyConfig;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
+
+/**
+ * DIY配置 Mapper
+ */
+@Mapper
+public interface DiyConfigMapper extends BaseMapper<DiyConfig> {
+
+    /**
+     * 根据分类获取配置列表
+     */
+    @Select("SELECT * FROM t_diy_config WHERE category = #{category} AND is_active = 1 ORDER BY sort_order")
+    List<DiyConfig> selectByCategory(@Param("category") String category);
+
+    /**
+     * 获取所有启用的配置
+     */
+    @Select("SELECT * FROM t_diy_config WHERE is_active = 1 ORDER BY category, sort_order")
+    List<DiyConfig> selectAllActive();
+}

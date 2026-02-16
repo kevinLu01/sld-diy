@@ -15,6 +15,7 @@ build/
 # IDE
 .vscode/
 .idea/
+*.iml
 *.swp
 *.swo
 
@@ -28,3 +29,7 @@ Thumbs.db
 
 # Misc
 .cache/
+
+# Java / Maven
+sld-diy-java/target/
+*.class

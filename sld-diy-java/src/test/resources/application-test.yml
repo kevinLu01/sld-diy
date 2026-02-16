@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: sld-diy-backend-test
+
+  # 数据源配置 - 使用H2内存数据库
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  # SQL初始化 - 执行schema.sql创建表结构
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
+  # H2数据库控制台
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # Redis配置 - 使用嵌入式Redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 15
+
+# MyBatis Plus配置
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# 日志配置
+logging:
+  level:
+    com.sld.backend: DEBUG
+    com.baomidou.mybatisplus: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# JWT配置
+jwt:
+  secret: test-secret-key-for-unit-testing-only-do-not-use-in-production
+  expiration: 86400000
+
+# Knife4j配置
+knife4j:
+  enable: false

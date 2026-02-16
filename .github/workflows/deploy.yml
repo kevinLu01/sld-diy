@@ -65,19 +65,19 @@ jobs:
             cd ..
 
             # 重启Docker服务（只重启backend，利用volume自动更新代码）
-            sudo docker-compose restart backend
+            sudo docker compose restart backend
 
             # 等待服务启动
             sleep 20
 
             # 运行数据库迁移（如果有schema变更）
-            sudo docker-compose exec -T backend npx prisma migrate deploy || echo "No migrations to run"
+            sudo docker compose exec -T backend npx prisma migrate deploy || echo "No migrations to run"
 
             # 检查服务状态
-            sudo docker-compose ps
+            sudo docker compose ps
 
             # 显示backend日志（最后20行）
-            sudo docker-compose logs --tail=20 backend
+            sudo docker compose logs --tail=20 backend
 
       # 6. 健康检查（在服务器上执行）
       - name: 🏥 Health Check
@@ -100,7 +100,7 @@ jobs:
       - name: 📢 Deployment Notification
         if: always()
         run: |
-          if [ ${{ job.status }} == 'success' ]; then
+          if [ "${{ job.status }}" == "success" ]; then
             echo "✅ 部署成功！"
             echo "🌐 前端访问地址: http://${{ secrets.SERVER_HOST }}:9000"
             echo "🔧 后端API地址: http://${{ secrets.SERVER_HOST }}:9001"
