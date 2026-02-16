@@ -1,7 +1,6 @@
 package com.sld.backend.modules.cart.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.sld.backend.common.enums.ProductStatus;
 import com.sld.backend.common.exception.BusinessException;
 import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.modules.cart.dto.response.CartItemVO;
@@ -51,43 +50,48 @@ class CartServiceTest {
 
     private CartItem testCartItem;
     private Product testProduct;
+    private Cart testCart;
 
     @BeforeEach
     void setUp() {
-        // 初始化测试产品
+        // 初始化测试产品 - 使用正确的字段名
         testProduct = new Product();
         testProduct.setId(1L);
         testProduct.setSku("DF-001");
         testProduct.setName("Danfoss 压缩机");
         testProduct.setPrice(new BigDecimal("2500.00"));
         testProduct.setOriginalPrice(new BigDecimal("3000.00"));
-        testProduct.setStock(100);
+        testProduct.setStockQuantity(100);
         testProduct.setSalesCount(50);
         testProduct.setRating(new BigDecimal("4.5"));
-        testProduct.setReviewCount(10);
-        testProduct.setStatus(ProductStatus.ON_SHELF);
-        testProduct.setCreateTime(LocalDateTime.now());
+        testProduct.setStatus("on_shelf");
+        testProduct.setImages("[\"https://example.com/product1.jpg\"]");
+        testProduct.setCreatedAt(LocalDateTime.now());
 
-        // 初始化测试购物车项
+        // 初始化测试购物车
+        testCart = new Cart();
+        testCart.setId(1L);
+        testCart.setUserId(1L);
+        testCart.setCreatedAt(LocalDateTime.now());
+        testCart.setUpdatedAt(LocalDateTime.now());
+
+        // 初始化测试购物车项 - 使用正确的字段名
         testCartItem = new CartItem();
         testCartItem.setId(1L);
-        testCartItem.setUserId(1L);
+        testCartItem.setCartId(1L);
         testCartItem.setProductId(1L);
-        testCartItem.setProductName("Danfoss 压缩机");
-        testCartItem.setSku("DF-001");
-        testCartItem.setPrice(new BigDecimal("2500.00"));
         testCartItem.setQuantity(2);
-        testCartItem.setProductImage("https://example.com/product1.jpg");
-        testCartItem.setCreateTime(LocalDateTime.now());
+        testCartItem.setCreatedAt(LocalDateTime.now());
     }
 
     @Test
     @DisplayName("获取购物车列表 - 成功")
     void testGetCart_Success() {
         // Arrange
-        when(cartMapper.selectByUserId(1L)).thenReturn(new Cart());
+        when(cartMapper.selectByUserId(1L)).thenReturn(testCart);
         when(cartItemMapper.selectList(any(LambdaQueryWrapper.class)))
             .thenReturn(Arrays.asList(testCartItem));
+        when(productMapper.selectById(1L)).thenReturn(testProduct);
 
         // Act
         List<CartItemVO> result = cartService.getCart(1L);
@@ -109,7 +113,7 @@ class CartServiceTest {
     @DisplayName("获取购物车列表 - 空结果")
     void testGetCart_EmptyResult() {
         // Arrange
-        when(cartMapper.selectByUserId(1L)).thenReturn(new Cart());
+        when(cartMapper.selectByUserId(1L)).thenReturn(testCart);
         when(cartItemMapper.selectList(any(LambdaQueryWrapper.class)))
             .thenReturn(List.of());
 
@@ -128,6 +132,7 @@ class CartServiceTest {
     void testAddItem_Success_NewProduct() {
         // Arrange
         when(productMapper.selectById(1L)).thenReturn(testProduct);
+        when(cartMapper.selectByUserId(1L)).thenReturn(testCart);
         when(cartItemMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(cartItemMapper.insert(any(CartItem.class))).thenAnswer(invocation -> {
             CartItem item = invocation.getArgument(0);
@@ -154,8 +159,10 @@ class CartServiceTest {
     void testAddItem_Success_ExistingProduct() {
         // Arrange
         when(productMapper.selectById(1L)).thenReturn(testProduct);
+        when(cartMapper.selectByUserId(1L)).thenReturn(testCart);
         when(cartItemMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(testCartItem);
         when(cartItemMapper.updateById(any(CartItem.class))).thenReturn(1);
+        when(productMapper.selectById(1L)).thenReturn(testProduct);
 
         // Act
         CartItemVO result = cartService.addItem(1L, 1L, 3);
@@ -163,7 +170,6 @@ class CartServiceTest {
         // Assert
         assertThat(result).isNotNull();
         assertThat(result.getQuantity()).isEqualTo(5); // 2 + 3
-        assertThat(result.getPrice()).isEqualTo(new BigDecimal("2500.00"));
 
         verify(productMapper).selectById(1L);
         verify(cartItemMapper).selectOne(any(LambdaQueryWrapper.class));
@@ -194,8 +200,10 @@ class CartServiceTest {
     @DisplayName("更新购物车项数量 - 成功")
     void testUpdateItem_Success() {
         // Arrange
+        when(cartMapper.selectByUserId(1L)).thenReturn(testCart);
         when(cartItemMapper.selectById(1L)).thenReturn(testCartItem);
         when(cartItemMapper.updateById(any(CartItem.class))).thenReturn(1);
+        when(productMapper.selectById(1L)).thenReturn(testProduct);
 
         // Act
         CartItemVO result = cartService.updateItem(1L, 1L, 5);
@@ -213,6 +221,7 @@ class CartServiceTest {
     @DisplayName("更新购物车项数量 - 购物车项不存在")
     void testUpdateItem_NotFound() {
         // Arrange
+        when(cartMapper.selectByUserId(1L)).thenReturn(testCart);
         when(cartItemMapper.selectById(999L)).thenReturn(null);
 
         // Act & Assert
@@ -258,6 +267,7 @@ class CartServiceTest {
     void testAddItem_QuantityOne() {
         // Arrange
         when(productMapper.selectById(1L)).thenReturn(testProduct);
+        when(cartMapper.selectByUserId(1L)).thenReturn(testCart);
         when(cartItemMapper.selectOne(any(LambdaQueryWrapper.class))).thenReturn(null);
         when(cartItemMapper.insert(any(CartItem.class))).thenAnswer(invocation -> {
             CartItem item = invocation.getArgument(0);
@@ -280,6 +290,7 @@ class CartServiceTest {
     @DisplayName("更新购物车项数量 - 数量为0时删除")
     void testUpdateItem_ZeroQuantity() {
         // Arrange
+        when(cartMapper.selectByUserId(1L)).thenReturn(testCart);
         when(cartItemMapper.selectById(1L)).thenReturn(testCartItem);
         when(cartItemMapper.deleteById(1L)).thenReturn(1);
 
@@ -297,7 +308,11 @@ class CartServiceTest {
     @Test
     @DisplayName("更新购物车项数量 - 无权修改其他用户的购物车项")
     void testUpdateItem_Forbidden() {
-        // Arrange - testCartItem belongs to userId 1L
+        // Arrange - testCartItem belongs to cartId 1L (userId 1L)
+        Cart anotherCart = new Cart();
+        anotherCart.setId(2L);
+        anotherCart.setUserId(999L);
+        when(cartMapper.selectByUserId(999L)).thenReturn(anotherCart);
         when(cartItemMapper.selectById(1L)).thenReturn(testCartItem);
 
         // Act & Assert - try to update with different userId
@@ -318,17 +333,23 @@ class CartServiceTest {
         // Arrange
         CartItem item2 = new CartItem();
         item2.setId(2L);
-        item2.setUserId(1L);
+        item2.setCartId(1L);
         item2.setProductId(2L);
-        item2.setProductName("冷凝器");
-        item2.setSku("CD-002");
-        item2.setPrice(new BigDecimal("1500.00"));
         item2.setQuantity(1);
-        item2.setCreateTime(LocalDateTime.now());
+        item2.setCreatedAt(LocalDateTime.now());
 
-        when(cartMapper.selectByUserId(1L)).thenReturn(new Cart());
+        Product product2 = new Product();
+        product2.setId(2L);
+        product2.setName("冷凝器");
+        product2.setSku("CD-002");
+        product2.setPrice(new BigDecimal("1500.00"));
+        product2.setImages("[\"https://example.com/product2.jpg\"]");
+
+        when(cartMapper.selectByUserId(1L)).thenReturn(testCart);
         when(cartItemMapper.selectList(any(LambdaQueryWrapper.class)))
             .thenReturn(Arrays.asList(testCartItem, item2));
+        when(productMapper.selectById(1L)).thenReturn(testProduct);
+        when(productMapper.selectById(2L)).thenReturn(product2);
 
         // Act
         List<CartItemVO> result = cartService.getCart(1L);

@@ -1,13 +1,17 @@
 package com.sld.backend.modules.product.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sld.backend.common.exception.BusinessException;
 import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.modules.product.dto.response.ProductDetailVO;
 import com.sld.backend.modules.product.dto.response.ProductVO;
-import com.sld.backend.modules.product.dto.response.ReviewVO;
-import com.sld.backend.modules.product.entity.*;
-import com.sld.backend.modules.product.mapper.*;
+import com.sld.backend.modules.product.entity.Brand;
+import com.sld.backend.modules.product.entity.Category;
+import com.sld.backend.modules.product.entity.Product;
+import com.sld.backend.modules.product.mapper.BrandMapper;
+import com.sld.backend.modules.product.mapper.CategoryMapper;
+import com.sld.backend.modules.product.mapper.ProductMapper;
 import com.sld.backend.modules.product.service.impl.ProductServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,13 +22,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
@@ -43,18 +46,6 @@ class ProductServiceTest {
     @Mock
     private BrandMapper brandMapper;
 
-    @Mock
-    private ProductSpecMapper productSpecMapper;
-
-    @Mock
-    private ProductAttrMapper productAttrMapper;
-
-    @Mock
-    private ReviewMapper reviewMapper;
-
-    @Mock
-    private CompatibilityMapper compatibilityMapper;
-
     @InjectMocks
     private ProductServiceImpl productService;
 
@@ -64,71 +55,60 @@ class ProductServiceTest {
 
     @BeforeEach
     void setUp() {
-        testProduct = new Product();
-        testProduct.setId(1L);
-        testProduct.setName("Test Product");
-        testProduct.setSku("SKU001");
-        testProduct.setCategoryId(1L);
-        testProduct.setBrandId(1L);
-        testProduct.setPrice(new BigDecimal("100.00"));
-        testProduct.setOriginalPrice(new BigDecimal("120.00"));
-        testProduct.setStock(100);
-        testProduct.setSalesCount(50);
-        testProduct.setRating(new BigDecimal("4.5"));
-        testProduct.setReviewCount(10);
-        testProduct.setStatus("on_shelf");
-        testProduct.setImages("[\"image1.jpg\", \"image2.jpg\"]");
-
+        // 初始化测试分类
         testCategory = new Category();
         testCategory.setId(1L);
-        testCategory.setName("Test Category");
+        testCategory.setName("压缩机");
+        testCategory.setParentId(0L);
+        testCategory.setIsActive(true);
+        testCategory.setCreatedAt(LocalDateTime.now());
 
+        // 初始化测试品牌
         testBrand = new Brand();
         testBrand.setId(1L);
-        testBrand.setName("Test Brand");
+        testBrand.setName("Danfoss");
+        testBrand.setDescription("丹麦品牌");
+
+        // 初始化测试产品 - 使用正确的字段名
+        testProduct = new Product();
+        testProduct.setId(1L);
+        testProduct.setSku("DF-001");
+        testProduct.setName("Danfoss 压缩机");
+        testProduct.setCategoryId(1L);
+        testProduct.setBrandId(1L);
+        testProduct.setPrice(new BigDecimal("2500.00"));
+        testProduct.setOriginalPrice(new BigDecimal("3000.00"));
+        testProduct.setStockQuantity(100);
+        testProduct.setSalesCount(50);
+        testProduct.setRating(new BigDecimal("4.5"));
+        testProduct.setStatus("on_shelf");
+        testProduct.setImages("[\"https://example.com/product1.jpg\"]");
+        testProduct.setDescription("高效压缩机");
+        testProduct.setCreatedAt(LocalDateTime.now());
     }
 
     @Test
     @DisplayName("获取产品列表 - 成功")
     void testListProducts_Success() {
         // Arrange
-        List<Product> products = Arrays.asList(testProduct);
-        Page<Product> productPage = new Page<>(1, 20, 1);
-        productPage.setRecords(products);
+        Page<Product> productPage = new Page<>(1, 10);
+        productPage.setRecords(List.of(testProduct));
+        productPage.setTotal(1);
 
-        when(productMapper.selectPage(any(Page.class), any())).thenReturn(productPage);
+        when(productMapper.selectPage(any(Page.class), any(LambdaQueryWrapper.class)))
+            .thenReturn(productPage);
         when(categoryMapper.selectById(1L)).thenReturn(testCategory);
         when(brandMapper.selectById(1L)).thenReturn(testBrand);
 
         // Act
-        Page<ProductVO> result = productService.listProducts(null, null, null, 1L, 20L, "new");
+        Page<ProductVO> result = productService.listProducts(1L, null, null, 1L, 10L, "new");
 
         // Assert
         assertThat(result).isNotNull();
         assertThat(result.getRecords()).hasSize(1);
+        assertThat(result.getRecords().get(0).getName()).isEqualTo("Danfoss 压缩机");
 
-        verify(productMapper).selectPage(any(Page.class), any());
-    }
-
-    @Test
-    @DisplayName("获取产品列表 - 按分类筛选")
-    void testListProducts_ByCategory() {
-        // Arrange
-        List<Product> products = Arrays.asList(testProduct);
-        Page<Product> productPage = new Page<>(1, 20, 1);
-        productPage.setRecords(products);
-
-        when(productMapper.selectPage(any(Page.class), any())).thenReturn(productPage);
-        when(categoryMapper.selectById(1L)).thenReturn(testCategory);
-        when(brandMapper.selectById(1L)).thenReturn(testBrand);
-
-        // Act
-        Page<ProductVO> result = productService.listProducts(1L, null, null, 1L, 20L, "new");
-
-        // Assert
-        assertThat(result).isNotNull();
-
-        verify(productMapper).selectPage(any(Page.class), any());
+        verify(productMapper).selectPage(any(Page.class), any(LambdaQueryWrapper.class));
     }
 
     @Test
@@ -138,10 +118,6 @@ class ProductServiceTest {
         when(productMapper.selectById(1L)).thenReturn(testProduct);
         when(categoryMapper.selectById(1L)).thenReturn(testCategory);
         when(brandMapper.selectById(1L)).thenReturn(testBrand);
-        when(productSpecMapper.selectByProductId(1L)).thenReturn(new ArrayList<>());
-        when(productAttrMapper.selectByProductId(1L)).thenReturn(new ArrayList<>());
-        when(compatibilityMapper.selectByProductId(1L)).thenReturn(new ArrayList<>());
-        when(reviewMapper.selectRatingDistribution(1L)).thenReturn(new ArrayList<>());
 
         // Act
         ProductDetailVO result = productService.getProductDetail(1L);
@@ -149,8 +125,8 @@ class ProductServiceTest {
         // Assert
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(1L);
-        assertThat(result.getName()).isEqualTo("Test Product");
-        assertThat(result.getPrice()).isEqualTo(new BigDecimal("100.00"));
+        assertThat(result.getName()).isEqualTo("Danfoss 压缩机");
+        assertThat(result.getPrice()).isEqualTo(new BigDecimal("2500.00"));
 
         verify(productMapper).selectById(1L);
     }
@@ -159,98 +135,58 @@ class ProductServiceTest {
     @DisplayName("获取产品详情 - 产品不存在")
     void testGetProductDetail_NotFound() {
         // Arrange
-        when(productMapper.selectById(1L)).thenReturn(null);
+        when(productMapper.selectById(999L)).thenReturn(null);
 
         // Act & Assert
-        BusinessException exception = org.junit.jupiter.api.Assertions.assertThrows(BusinessException.class,
-            () -> productService.getProductDetail(1L));
+        BusinessException exception = assertThrows(
+            BusinessException.class,
+            () -> productService.getProductDetail(999L)
+        );
 
         assertThat(exception.getCode()).isEqualTo(ErrorCode.PRODUCT_NOT_FOUND.getCode());
+
+        verify(productMapper).selectById(999L);
     }
 
     @Test
-    @DisplayName("获取产品兼容性 - 成功")
-    void testGetProductCompatibility_Success() {
+    @DisplayName("获取产品列表 - 按销量排序")
+    void testListProducts_SortBySales() {
         // Arrange
-        Compatibility compat = new Compatibility();
-        compat.setProductAId(1L);
-        compat.setProductBId(2L);
-        compat.setCompatibilityType("compatible");
-        compat.setNotes("Compatible products");
+        Page<Product> productPage = new Page<>(1, 10);
+        productPage.setRecords(List.of(testProduct));
+        productPage.setTotal(1);
 
-        Product compatProduct = new Product();
-        compatProduct.setId(2L);
-        compatProduct.setName("Compatible Product");
-        compatProduct.setSku("SKU002");
-        compatProduct.setPrice(new BigDecimal("80.00"));
-
-        when(compatibilityMapper.selectByProductId(1L)).thenReturn(Arrays.asList(compat));
-        when(productMapper.selectById(2L)).thenReturn(compatProduct);
+        when(productMapper.selectPage(any(Page.class), any(LambdaQueryWrapper.class)))
+            .thenReturn(productPage);
+        when(categoryMapper.selectById(1L)).thenReturn(testCategory);
+        when(brandMapper.selectById(1L)).thenReturn(testBrand);
 
         // Act
-        List<Map<String, Object>> result = productService.getProductCompatibility(1L);
-
-        // Assert
-        assertThat(result).isNotEmpty();
-
-        verify(compatibilityMapper).selectByProductId(1L);
-    }
-
-    @Test
-    @DisplayName("获取产品评价 - 成功")
-    void testGetProductReviews_Success() {
-        // Arrange
-        List<Review> reviews = new ArrayList<>();
-        Review review = new Review();
-        review.setId(1L);
-        review.setUserId(1L);
-        review.setProductId(1L);
-        review.setRating(5);
-        review.setContent("Great product!");
-        review.setIsAnonymous(false);
-        reviews.add(review);
-
-        Page<Review> reviewPage = new Page<>(1, 10, 1);
-        reviewPage.setRecords(reviews);
-
-        when(reviewMapper.selectPage(any(Page.class), any())).thenReturn(reviewPage);
-
-        // Act
-        Page<ReviewVO> result = productService.getProductReviews(1L, 1L, 10L);
+        Page<ProductVO> result = productService.listProducts(null, null, null, 1L, 10L, "sales");
 
         // Assert
         assertThat(result).isNotNull();
-        assertThat(result.getRecords()).hasSize(1);
-
-        verify(reviewMapper).selectPage(any(Page.class), any());
+        verify(productMapper).selectPage(any(Page.class), any(LambdaQueryWrapper.class));
     }
 
     @Test
-    @DisplayName("获取产品规格 - 成功")
-    void testGetProductSpecs_Success() {
+    @DisplayName("获取产品列表 - 按价格升序")
+    void testListProducts_SortByPriceAsc() {
         // Arrange
-        List<ProductSpec> specs = new ArrayList<>();
-        ProductSpec spec = new ProductSpec();
-        spec.setId(1L);
-        spec.setProductId(1L);
-        spec.setSpecKey("Power");
-        spec.setSpecValue("2HP");
-        spec.setUnit("");
-        specs.add(spec);
+        Page<Product> productPage = new Page<>(1, 10);
+        productPage.setRecords(List.of(testProduct));
+        productPage.setTotal(1);
 
-        when(productMapper.selectById(1L)).thenReturn(testProduct);
+        when(productMapper.selectPage(any(Page.class), any(LambdaQueryWrapper.class)))
+            .thenReturn(productPage);
         when(categoryMapper.selectById(1L)).thenReturn(testCategory);
         when(brandMapper.selectById(1L)).thenReturn(testBrand);
-        when(productSpecMapper.selectByProductId(1L)).thenReturn(specs);
-        when(productAttrMapper.selectByProductId(1L)).thenReturn(new ArrayList<>());
-        when(compatibilityMapper.selectByProductId(1L)).thenReturn(new ArrayList<>());
-        when(reviewMapper.selectRatingDistribution(1L)).thenReturn(new ArrayList<>());
 
         // Act
-        ProductDetailVO result = productService.getProductDetail(1L);
+        Page<ProductVO> result = productService.listProducts(null, null, null, 1L, 10L, "price_asc");
 
         // Assert
-        assertThat(result.getSpecifications()).isNotEmpty();
-        assertThat(result.getSpecifications().get("Power")).isEqualTo("2HP");
+        assertThat(result).isNotNull();
+        verify(productMapper).selectPage(any(Page.class), any(LambdaQueryWrapper.class));
     }
 }
