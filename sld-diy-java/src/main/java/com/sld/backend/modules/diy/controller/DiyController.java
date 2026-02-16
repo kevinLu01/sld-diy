@@ -9,6 +9,8 @@ import com.sld.backend.modules.diy.dto.response.DiyProjectVO;
 import com.sld.backend.modules.diy.dto.response.DiyRecommendResponse;
 import com.sld.backend.modules.diy.dto.response.DiyShareResponse;
 import com.sld.backend.modules.diy.service.DiyService;
+import com.sld.backend.modules.solution.dto.response.SolutionVO;
+import com.sld.backend.modules.solution.service.SolutionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,11 +31,24 @@ import java.util.Map;
 public class DiyController {
 
     private final DiyService diyService;
+    private final SolutionService solutionService;
 
     @GetMapping("/config")
     @Operation(summary = "获取DIY配置")
     public Result<Map<String, Object>> getDiyConfig() {
         return Result.success(diyService.getDiyConfig());
+    }
+
+    @GetMapping("/solutions")
+    @Operation(summary = "获取解决方案列表")
+    public Result<PageResult<SolutionVO>> listSolutions(
+        @Parameter(description = "行业") @RequestParam(required = false) String industry,
+        @Parameter(description = "场景") @RequestParam(required = false) String scenario,
+        @Parameter(description = "温度范围") @RequestParam(required = false) String temperatureRange,
+        @RequestParam(defaultValue = "1") Long page,
+        @RequestParam(defaultValue = "10") Long limit
+    ) {
+        return Result.success(solutionService.listSolutions(industry, scenario, temperatureRange, page, limit));
     }
 
     @PostMapping("/recommend")
