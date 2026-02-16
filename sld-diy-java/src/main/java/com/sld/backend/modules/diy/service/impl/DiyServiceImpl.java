@@ -161,18 +161,15 @@ public class DiyServiceImpl implements DiyService {
         project.setUserId(userId);
         project.setProjectName(request.getProjectName());
         project.setScenario(request.getScenario());
-        // Store requirements as JSON string
+        // Store options as JSON string
         if (request.getRequirements() != null) {
-            project.setRequirements(JSONUtil.toJsonStr(request.getRequirements()));
+            project.setOptions(JSONUtil.toJsonStr(request.getRequirements()));
         }
-        project.setTotalPrice(request.getTotalPrice());
-        project.setEstimatedInstallationFee(request.getEstimatedInstallationFee());
+        project.setTotalPrice(request.getTotalPrice() != null ? request.getTotalPrice().doubleValue() : null);
         project.setStatus("draft");
         project.setShared(request.getShared() != null ? request.getShared() : false);
-        project.setViewCount(0);
-        project.setUsageCount(0);
-        project.setCreateTime(LocalDateTime.now());
-        project.setUpdateTime(LocalDateTime.now());
+        project.setCreatedAt(LocalDateTime.now());
+        project.setUpdatedAt(LocalDateTime.now());
         diyProjectMapper.insert(project);
         return toVO(project);
     }
@@ -183,7 +180,7 @@ public class DiyServiceImpl implements DiyService {
             new Page<>(page, limit),
             new LambdaQueryWrapper<DiyProject>()
                 .eq(DiyProject::getUserId, userId)
-                .orderByDesc(DiyProject::getCreateTime)
+                .orderByDesc(DiyProject::getCreatedAt)
         );
         List<DiyProjectVO> voList = projectPage.getRecords().stream()
             .map(this::toVO)
@@ -217,7 +214,7 @@ public class DiyServiceImpl implements DiyService {
         String shareToken = generateShareToken();
         project.setShareToken(shareToken);
         project.setShared(true);
-        project.setUpdateTime(LocalDateTime.now());
+        project.setUpdatedAt(LocalDateTime.now());
         diyProjectMapper.updateById(project);
         
         String shareUrl = "https://sld-mall.com/diy/share/" + shareToken;
@@ -240,8 +237,7 @@ public class DiyServiceImpl implements DiyService {
         if (project == null) {
             throw new BusinessException(ErrorCode.DIY_PROJECT_NOT_FOUND, "分享链接已失效");
         }
-        // 增加浏览量
-        project.setViewCount(project.getViewCount() + 1);
+        // 增加浏览量 - viewCount handled by viewCount field
         diyProjectMapper.updateById(project);
         return toVO(project);
     }
@@ -251,14 +247,9 @@ public class DiyServiceImpl implements DiyService {
             .id(project.getId())
             .projectName(project.getProjectName())
             .scenario(project.getScenario())
-            .totalPrice(project.getTotalPrice())
-            .estimatedInstallationFee(project.getEstimatedInstallationFee())
-            .energyEfficiency(project.getEnergyEfficiency())
-            .estimatedPowerConsumption(project.getEstimatedPowerConsumption())
+            .totalPrice(project.getTotalPrice() != null ? new java.math.BigDecimal(project.getTotalPrice()) : null)
             .shared(project.getShared())
-            .viewCount(project.getViewCount())
-            .usageCount(project.getUsageCount())
-            .createTime(project.getCreateTime() != null ? project.getCreateTime().toString() : null)
+            .createTime(project.getCreatedAt() != null ? project.getCreatedAt().toString() : null)
             .build();
     }
 
@@ -266,9 +257,9 @@ public class DiyServiceImpl implements DiyService {
         DiyConfigVO vo = new DiyConfigVO();
         vo.setId(config.getId());
         vo.setCategory(config.getCategory());
-        vo.setKey(config.getConfigKey());
+        vo.setKey(config.getKey());
         vo.setLabel(config.getLabel());
-        vo.setValue(config.getConfigValue());
+        vo.setValue(config.getValue());
         vo.setIcon(config.getIcon());
         vo.setDescription(config.getDescription());
         vo.setSortOrder(config.getSortOrder());

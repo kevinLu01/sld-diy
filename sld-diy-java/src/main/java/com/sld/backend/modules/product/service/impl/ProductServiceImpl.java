@@ -60,7 +60,7 @@ public class ProductServiceImpl implements ProductService {
                 break;
             case "new":
             default:
-                wrapper.orderByDesc(Product::getCreateTime);
+                wrapper.orderByDesc(Product::getCreatedAt);
                 break;
         }
 
@@ -98,15 +98,15 @@ public class ProductServiceImpl implements ProductService {
             .categoryName(category != null ? category.getName() : null)
             .price(product.getPrice())
             .originalPrice(product.getOriginalPrice())
-            .stock(product.getStock())
+            .stock(product.getStockQuantity())
             .images(parseImages(product.getImages()))
-            .video(product.getVideo())
-            .model3d(product.getModel3d())
+            .video(product.getVideoUrl())
+            .model3d(product.getModel3dUrl())
             .specifications(new LinkedHashMap<>(parseSpecifications(specs)))
             .description(product.getDescription())
             .salesCount(product.getSalesCount())
             .rating(product.getRating())
-            .reviewCount(product.getReviewCount())
+            .reviewCount(0)
             .status(product.getStatus())
             .build();
 
@@ -114,7 +114,7 @@ public class ProductServiceImpl implements ProductService {
         vo.setCompatibleProducts(getCompatibleProductVOs(id));
         
         // 设置评价统计
-        vo.setReviews(getReviewStats(id, product.getRating(), product.getReviewCount()));
+        vo.setReviews(getReviewStats(id, product.getRating(), 0));
 
         return vo;
     }
@@ -177,12 +177,12 @@ public class ProductServiceImpl implements ProductService {
             .categoryName(category != null ? category.getName() : null)
             .price(product.getPrice())
             .originalPrice(product.getOriginalPrice())
-            .stock(product.getStock())
+            .stock(product.getStockQuantity())
             .images(parseImages(product.getImages()))
             .salesCount(product.getSalesCount())
             .rating(product.getRating())
             .status(product.getStatus())
-            .specifications(product.getSpecifications())
+            .specifications(null)
             .build();
     }
 

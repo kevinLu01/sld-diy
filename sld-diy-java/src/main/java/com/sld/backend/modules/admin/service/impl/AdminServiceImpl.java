@@ -92,7 +92,7 @@ public class AdminServiceImpl implements AdminService {
         if (categoryId != null) {
             wrapper.eq(Product::getCategoryId, categoryId);
         }
-        wrapper.orderByDesc(Product::getCreateTime);
+        wrapper.orderByDesc(Product::getCreatedAt);
 
         Page<Product> productPage = productMapper.selectPage(new Page<>(page, limit), wrapper);
         List<Map<String, Object>> list = productPage.getRecords().stream()
@@ -116,8 +116,8 @@ public class AdminServiceImpl implements AdminService {
     public Map<String, Object> createProduct(CreateProductRequest request) {
         Product product = new Product();
         BeanUtils.copyProperties(request, product);
-        product.setCreateTime(LocalDateTime.now());
-        product.setUpdateTime(LocalDateTime.now());
+        product.setCreatedAt(LocalDateTime.now());
+        product.setUpdatedAt(LocalDateTime.now());
         productMapper.insert(product);
         return convertProductToMap(product);
     }
@@ -129,7 +129,7 @@ public class AdminServiceImpl implements AdminService {
             throw new BusinessException(ErrorCode.PRODUCT_NOT_FOUND);
         }
         BeanUtils.copyProperties(request, product);
-        product.setUpdateTime(LocalDateTime.now());
+        product.setUpdatedAt(LocalDateTime.now());
         productMapper.updateById(product);
         return convertProductToMap(product);
     }
@@ -284,8 +284,8 @@ public class AdminServiceImpl implements AdminService {
         BeanUtils.copyProperties(request, solution);
         solution.setViewCount(0);
         solution.setUsageCount(0);
-        solution.setCreateTime(LocalDateTime.now());
-        solution.setUpdateTime(LocalDateTime.now());
+        solution.setCreatedAt(LocalDateTime.now());
+        solution.setUpdatedAt(LocalDateTime.now());
         solutionMapper.insert(solution);
         return convertSolutionToMap(solution);
     }
@@ -297,7 +297,7 @@ public class AdminServiceImpl implements AdminService {
             throw new BusinessException(ErrorCode.SOLUTION_NOT_FOUND);
         }
         BeanUtils.copyProperties(request, solution);
-        solution.setUpdateTime(LocalDateTime.now());
+        solution.setUpdatedAt(LocalDateTime.now());
         solutionMapper.updateById(solution);
         return convertSolutionToMap(solution);
     }
@@ -427,8 +427,8 @@ public class AdminServiceImpl implements AdminService {
     public Map<String, Object> createDiyConfig(CreateDiyConfigRequest request) {
         DiyConfig config = new DiyConfig();
         BeanUtils.copyProperties(request, config);
-        config.setConfigKey(request.getKey());
-        config.setConfigValue(request.getValue());
+        config.setKey(request.getKey());
+        config.setValue(request.getValue());
         config.setIsActive(true);
         diyConfigMapper.insert(config);
         return convertDiyConfigToMap(config);
@@ -498,9 +498,9 @@ public class AdminServiceImpl implements AdminService {
         map.put("name", product.getName());
         map.put("sku", product.getSku());
         map.put("price", product.getPrice());
-        map.put("stock", product.getStock());
+        map.put("stock", product.getStockQuantity());
         map.put("status", product.getStatus());
-        map.put("createTime", product.getCreateTime());
+        map.put("createTime", product.getCreatedAt());
         return map;
     }
 
@@ -536,7 +536,7 @@ public class AdminServiceImpl implements AdminService {
         map.put("title", solution.getTitle());
         map.put("industry", solution.getIndustry());
         map.put("status", solution.getStatus());
-        map.put("createTime", solution.getCreateTime());
+        map.put("createTime", solution.getCreatedAt());
         return map;
     }
 
@@ -564,7 +564,7 @@ public class AdminServiceImpl implements AdminService {
         Map<String, Object> map = new HashMap<>();
         map.put("id", config.getId());
         map.put("category", config.getCategory());
-        map.put("key", config.getConfigKey());
+        map.put("key", config.getKey());
         map.put("label", config.getLabel());
         map.put("isActive", config.getIsActive());
         return map;
