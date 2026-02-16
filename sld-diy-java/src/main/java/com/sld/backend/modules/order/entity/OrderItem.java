@@ -10,19 +10,22 @@ import java.time.LocalDateTime;
  * 订单项实体
  */
 @Data
-@TableName("OrderItem")
+@TableName("t_order_item")
 public class OrderItem {
 
     @TableId(type = IdType.AUTO)
     private Long id;
 
+    @TableField("order_id")
     private Long orderId;
 
+    @TableField("product_id")
     private Long productId;
 
+    @TableField("product_name")
     private String productName;
 
-    @TableField("productSku")
+    @TableField("product_sku")
     private String sku;
 
     private BigDecimal price;
@@ -32,20 +35,21 @@ public class OrderItem {
     @TableField("subtotal")
     private BigDecimal total;
 
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
+    private LocalDateTime createTime;
+
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updateTime;
+
+    @TableLogic
+    @TableField("deleted")
+    private Integer deleted;
+
     // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
 
-    @TableField(exist = false)
+    @TableField(value = "product_image", exist = false)
     private String productImage;
 
     @TableField(exist = false)
     private String specifications;
-
-    @TableField(exist = false)
-    private Integer deleted;
-
-    @TableField(exist = false)
-    private LocalDateTime createTime;
-
-    @TableField(exist = false)
-    private LocalDateTime updateTime;
 }

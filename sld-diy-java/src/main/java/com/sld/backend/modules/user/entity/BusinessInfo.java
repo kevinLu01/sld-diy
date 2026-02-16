@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 企业认证信息实体
  */
 @Data
-@TableName("BusinessInfo")
+@TableName("t_business_info")
 public class BusinessInfo {
 
     @TableId(type = IdType.AUTO)

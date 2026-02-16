@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 品牌实体
  */
 @Data
-@TableName("Brand")
+@TableName("t_brand")
 public class Brand {
 
     @TableId(type = IdType.AUTO)
@@ -48,8 +48,18 @@ public class Brand {
     /**
      * 创建时间
      */
-    @TableField(value = "createdAt", fill = FieldFill.INSERT)
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
+
+    /**
+     * 更新时间
+     */
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updateTime;
+
+    @TableLogic
+    @TableField("deleted")
+    private Integer deleted;
 
     // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
 
@@ -61,10 +71,4 @@ public class Brand {
 
     @TableField(exist = false)
     private Integer status;
-
-    @TableField(exist = false)
-    private Integer deleted;
-
-    @TableField(exist = false)
-    private LocalDateTime updateTime;
 }

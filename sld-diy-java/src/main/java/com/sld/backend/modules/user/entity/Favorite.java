@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 用户收藏实体
  */
 @Data
-@TableName("Favorite")
+@TableName("t_favorite")
 public class Favorite {
 
     @TableId(type = IdType.AUTO)

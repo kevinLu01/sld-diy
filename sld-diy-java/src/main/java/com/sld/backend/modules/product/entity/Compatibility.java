@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 产品兼容性实体
  */
 @Data
-@TableName("Compatibility")
+@TableName("t_compatibility")
 public class Compatibility {
 
     @TableId(type = IdType.AUTO)

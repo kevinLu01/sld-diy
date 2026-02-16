@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 产品实体
  */
 @Data
-@TableName("Product")
+@TableName("t_product")
 public class Product {
 
     @TableId(type = IdType.AUTO)
@@ -20,56 +20,50 @@ public class Product {
 
     private String name;
 
+    @TableField("brand_id")
     private Long brandId;
 
+    @TableField("category_id")
     private Long categoryId;
 
     private String description;
 
     private BigDecimal price;
 
+    @TableField("original_price")
     private BigDecimal originalPrice;
 
-    private BigDecimal costPrice;
-
-    @TableField("stockQuantity")
     private Integer stock;
-
-    private String unit;
 
     private String images;
 
-    @TableField("videoUrl")
     private String video;
 
-    @TableField("model3dUrl")
     private String model3d;
 
     private String status;
 
-    private Integer viewCount;
-
+    @TableField("sales_count")
     private Integer salesCount;
 
     private BigDecimal rating;
 
-    @TableField(value = "createdAt", fill = FieldFill.INSERT)
+    @TableField("review_count")
+    private Integer reviewCount;
+
+    @TableField("create_time")
     private LocalDateTime createTime;
 
-    @TableField(value = "updatedAt", fill = FieldFill.INSERT_UPDATE)
+    @TableField("update_time")
     private LocalDateTime updateTime;
-
-    // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
 
     @TableField(exist = false)
     private String specifications;
 
-    @TableField(exist = false)
-    private Integer reviewCount;
-
-    @TableField(exist = false)
+    @TableField("sort_order")
     private Integer sortOrder;
 
-    @TableField(exist = false)
+    @TableField("deleted")
+    @TableLogic
     private Integer deleted;
 }

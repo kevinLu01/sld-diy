@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 解决方案实体
  */
 @Data
-@TableName("Solution")
+@TableName("t_solution")
 public class Solution {
 
     @TableId(type = IdType.AUTO)
@@ -24,37 +24,41 @@ public class Solution {
 
     private String description;
 
+    @TableField("cover_image")
     private String coverImage;
 
     private String images;
 
+    @TableField("temperature_range")
     private String temperatureRange;
 
+    @TableField("capacity_range")
     private String capacityRange;
 
     private String features;
 
+    @TableField("total_price")
     private BigDecimal totalPrice;
 
+    @TableField("installation_guide")
     private String installationGuide;
 
+    @TableField("view_count")
     private Integer viewCount;
 
+    @TableField("usage_count")
     private Integer usageCount;
 
     private BigDecimal rating;
 
-    private String status;
+    // status 在数据库中是 INT 类型，1=已发布
+    private Integer status;
 
-    private Integer createdBy;
-
-    @TableField(value = "createdAt", fill = FieldFill.INSERT)
+    @TableField("create_time")
     private LocalDateTime createTime;
 
-    @TableField(value = "updatedAt", fill = FieldFill.INSERT_UPDATE)
+    @TableField("update_time")
     private LocalDateTime updateTime;
-
-    // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
 
     @TableField(exist = false)
     private String technicalDocs;
@@ -62,9 +66,10 @@ public class Solution {
     @TableField(exist = false)
     private String cases;
 
-    @TableField(exist = false)
+    @TableField("sort_order")
     private Integer sortOrder;
 
-    @TableField(exist = false)
+    @TableField("deleted")
+    @TableLogic
     private Integer deleted;
 }

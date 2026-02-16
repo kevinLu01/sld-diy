@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * DIY 方案项实体
  */
 @Data
-@TableName("DiyProjectItem")
+@TableName("t_diy_project_item")
 public class DiyProjectItem {
 
     @TableId(type = IdType.AUTO)

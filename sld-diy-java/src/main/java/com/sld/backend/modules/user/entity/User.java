@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
  * 用户实体
  */
 @Data
-@TableName("User")
+@TableName("t_user")
 public class User {
 
     @TableId(type = IdType.AUTO)
@@ -21,46 +21,44 @@ public class User {
 
     private String email;
 
-    @TableField("passwordHash")
     private String password;
 
     private String phone;
 
     private String avatar;
 
+    @TableField("user_type")
     private UserType userType;
 
     private UserStatus status;
 
-    @TableField(value = "createdAt", fill = FieldFill.INSERT)
-    private LocalDateTime createTime;
-
-    @TableField(value = "updatedAt", fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateTime;
-
-    // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
-
-    @TableField(exist = false)
     private String nickname;
 
-    @TableField(exist = false)
+    @TableField("company_name")
     private String companyName;
 
-    @TableField(exist = false)
+    @TableField("business_license")
     private String businessLicense;
 
-    @TableField(exist = false)
+    @TableField("credit_code")
     private String creditCode;
 
-    @TableField(exist = false)
+    @TableField("verify_status")
     private String verifyStatus;
 
-    @TableField(exist = false)
+    @TableField("last_login_time")
     private LocalDateTime lastLoginTime;
 
-    @TableField(exist = false)
+    @TableField("last_login_ip")
     private String lastLoginIp;
 
-    @TableField(exist = false)
+    @TableField("deleted")
+    @TableLogic
     private Integer deleted;
+
+    @TableField("create_time")
+    private LocalDateTime createTime;
+
+    @TableField("update_time")
+    private LocalDateTime updateTime;
 }

@@ -10,7 +10,7 @@ import java.util.List;
  * 产品评价实体
  */
 @Data
-@TableName("Review")
+@TableName("t_review")
 public class Review {
 
     @TableId(type = IdType.AUTO)
@@ -19,11 +19,13 @@ public class Review {
     /**
      * 用户ID
      */
+    @TableField("user_id")
     private Long userId;
 
     /**
      * 产品ID
      */
+    @TableField("product_id")
     private Long productId;
 
     /**
@@ -44,6 +46,7 @@ public class Review {
     /**
      * 是否匿名
      */
+    @TableField("is_anonymous")
     private Boolean isAnonymous;
 
     /**
@@ -54,8 +57,18 @@ public class Review {
     /**
      * 创建时间
      */
-    @TableField(value = "createdAt", fill = FieldFill.INSERT)
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
+
+    /**
+     * 更新时间
+     */
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updateTime;
+
+    @TableLogic
+    @TableField("deleted")
+    private Integer deleted;
 
     /**
      * 用户信息（非数据库字段）

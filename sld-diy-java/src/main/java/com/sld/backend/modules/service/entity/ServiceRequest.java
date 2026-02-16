@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 服务请求实体
  */
 @Data
-@TableName("ServiceRequest")
+@TableName("t_service_request")
 public class ServiceRequest {
 
     @TableId(type = IdType.AUTO)

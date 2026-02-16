@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * DIY 推荐配置实体
  */
 @Data
-@TableName("DiyRecommendation")
+@TableName("t_diy_recommendation")
 public class DiyRecommendation {
 
     @TableId(type = IdType.AUTO)
@@ -18,12 +18,15 @@ public class DiyRecommendation {
 
     private String scenario;
 
+    @TableField("product_type")
     private String productType;
 
+    @TableField("category_id")
     private Long categoryId;
 
     private Integer priority;
 
+    @TableField("is_required")
     private Boolean isRequired;
 
     private Integer minQuantity;
@@ -32,30 +35,34 @@ public class DiyRecommendation {
 
     private Boolean isActive;
 
-    @TableField(value = "createdAt", fill = FieldFill.INSERT)
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    @TableField(value = "updatedAt", fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+
+    @TableLogic
+    @TableField("deleted")
+    private Integer deleted;
 
     // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
 
-    @TableField(exist = false)
+    @TableField(value = "cooling_capacity_min", exist = false)
     private BigDecimal coolingCapacityMin;
 
-    @TableField(exist = false)
+    @TableField(value = "cooling_capacity_max", exist = false)
     private BigDecimal coolingCapacityMax;
 
-    @TableField(exist = false)
+    @TableField(value = "temperature_range", exist = false)
     private String temperatureRange;
 
-    @TableField(exist = false)
+    @TableField(value = "product_ids", exist = false)
     private String productIds;
 
-    @TableField(exist = false)
+    @TableField(value = "total_price", exist = false)
     private BigDecimal totalPrice;
 
-    @TableField(exist = false)
+    @TableField(value = "energy_efficiency", exist = false)
     private String energyEfficiency;
 
     @TableField(exist = false)
@@ -63,7 +70,4 @@ public class DiyRecommendation {
 
     @TableField(exist = false)
     private Integer status;
-
-    @TableField(exist = false)
-    private Integer deleted;
 }

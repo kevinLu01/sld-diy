@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 解决方案产品关联实体
  */
 @Data
-@TableName("SolutionProduct")
+@TableName("t_solution_product")
 public class SolutionProduct {
 
     @TableId(type = IdType.AUTO)

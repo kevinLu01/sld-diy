@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 知识文章实体
  */
 @Data
-@TableName("KnowledgeArticle")
+@TableName("t_article")
 public class Article {
 
     @TableId(type = IdType.AUTO)

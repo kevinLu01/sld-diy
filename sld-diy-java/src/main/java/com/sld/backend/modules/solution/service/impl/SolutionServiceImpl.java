@@ -51,7 +51,8 @@ public class SolutionServiceImpl implements SolutionService {
     @Override
     public PageResult<SolutionVO> listSolutions(String industry, String scenario, String temperatureRange, Long page, Long limit) {
         LambdaQueryWrapper<Solution> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Solution::getStatus, "published");
+        // status = 1 表示已发布
+        wrapper.eq(Solution::getStatus, 1);
 
         if (industry != null && !industry.isEmpty()) {
             wrapper.eq(Solution::getIndustry, industry);

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 轮播图实体
  */
 @Data
-@TableName("Banner")
+@TableName("t_banner")
 public class Banner {
 
     @TableId(type = IdType.AUTO)

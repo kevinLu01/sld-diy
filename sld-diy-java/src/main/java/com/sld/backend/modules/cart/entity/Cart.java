@@ -10,7 +10,7 @@ import java.util.List;
  * 购物车实体
  */
 @Data
-@TableName("Cart")
+@TableName("t_cart")
 public class Cart {
 
     @TableId(type = IdType.AUTO)
