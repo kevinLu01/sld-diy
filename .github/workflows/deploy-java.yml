@@ -6,6 +6,8 @@ on:
       - main
     paths:
       - 'sld-diy-java/**'
+      - 'nginx/**'
+      - 'docker-compose.yml'
       - '.github/workflows/deploy-java.yml'
   workflow_dispatch:
     inputs:
@@ -98,9 +100,11 @@ jobs:
               docker commit $(docker ps -aq -f name=backend-java) sld-diy-backend-java:backup-$(date +%Y%m%d_%H%M%S) || true
             fi
 
-            # 使用 docker compose 重建并启动 Java 后端
+            # 使用 docker compose 重建并启动 Java 后端 + Nginx
             echo "🔨 构建并启动 Java 后端..."
             docker compose up -d --build backend-java
+            echo "🔄 重启 Nginx..."
+            docker compose up -d --force-recreate nginx
 
             # 等待服务启动
             echo "⏳ 等待服务启动..."
@@ -130,7 +134,7 @@ jobs:
 
             # 显示服务状态
             echo "📊 服务状态:"
-            docker compose ps backend-java
+            docker compose ps backend-java nginx
 
             echo "================================"
             echo "✅ Java 后端部署成功"
