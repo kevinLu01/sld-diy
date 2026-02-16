@@ -1,6 +1,7 @@
 package com.sld.backend.modules.order.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.sld.backend.common.enums.OrderStatus;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -40,7 +41,7 @@ public class Order {
     @TableField("final_amount")
     private BigDecimal finalAmount;
 
-    private String status;
+    private OrderStatus status;
 
     private String paymentMethod;
 

@@ -2,6 +2,7 @@ package com.sld.backend.modules.order.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.sld.backend.common.enums.OrderStatus;
 import com.sld.backend.common.exception.BusinessException;
 import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.common.result.PageResult;
@@ -73,7 +74,7 @@ public class OrderServiceImpl implements OrderService {
         order.setInstallationFee(BigDecimal.ZERO);
         order.setDiscountAmount(BigDecimal.ZERO);
         order.setFinalAmount(totalAmount);
-        order.setStatus("pending");
+        order.setStatus(OrderStatus.PENDING);
         order.setDiyProjectId(request.getDiyProjectId());
         order.setRecipient(request.getRecipient());
         order.setPhone(request.getPhone());
@@ -148,10 +149,10 @@ public class OrderServiceImpl implements OrderService {
         if (order == null) {
             throw new BusinessException(ErrorCode.ORDER_NOT_FOUND);
         }
-        if (!"pending".equals(order.getStatus())) {
+        if (order.getStatus() != OrderStatus.PENDING) {
             throw new BusinessException(ErrorCode.BAD_REQUEST, "只能取消待支付订单");
         }
-        order.setStatus("cancelled");
+        order.setStatus(OrderStatus.CANCELLED);
         order.setCancelTime(LocalDateTime.now());
         order.setUpdateTime(LocalDateTime.now());
         orderMapper.updateById(order);
@@ -186,7 +187,7 @@ public class OrderServiceImpl implements OrderService {
             .installationFee(order.getInstallationFee())
             .discountAmount(order.getDiscountAmount())
             .finalAmount(order.getFinalAmount())
-            .status(order.getStatus())
+            .status(order.getStatus() != null ? order.getStatus().getCode() : null)
             .recipient(order.getRecipient())
             .phone(order.getPhone())
             .fullAddress(fullAddress)
