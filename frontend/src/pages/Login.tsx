@@ -12,6 +12,9 @@ const LoginPage: React.FC = () => {
 
   const handleLogin = async (values: { account: string; password: string }) => {
     setLoading(true);
+    console.log('🔍 Login Form Values:', values); // 调试日志
+    console.log('🔍 Account:', values.account); // 调试日志
+    console.log('🔍 Password:', values.password); // 调试日志
     try {
       const response = await authService.login(values);
       const { user, token } = response.data;
@@ -22,6 +25,8 @@ const LoginPage: React.FC = () => {
       message.success('登录成功！');
       navigate('/');
     } catch (error: any) {
+      console.error('❌ Login Error:', error); // 调试日志
+      console.error('❌ Error Response:', error.response); // 调试日志
       message.error(error.response?.data?.message || '登录失败');
     } finally {
       setLoading(false);
