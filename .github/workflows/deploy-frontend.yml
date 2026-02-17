@@ -89,9 +89,9 @@ jobs:
             fi
             cd ..
 
-            # 重启Nginx容器以应用更新
-            echo "🔄 重启 Nginx 容器..."
-            sudo docker compose restart nginx
+            # 启动/更新 Nginx 容器以应用更新
+            echo "🔄 启动 Nginx 容器..."
+            sudo docker compose up -d nginx
 
             # 等待Nginx启动
             echo "⏳ 等待 Nginx 启动..."
@@ -118,8 +118,16 @@ jobs:
             cd /var/www/sld-diy
             
             # 检查Nginx是否运行
-            if ! sudo docker compose ps nginx | grep -q "running"; then
+            NGINX_CID=$(sudo docker compose ps -q nginx)
+            if [ -z "$NGINX_CID" ]; then
+              echo "❌ 未找到 Nginx 容器"
+              sudo docker compose ps
+              exit 1
+            fi
+
+            if [ "$(sudo docker inspect -f '{{.State.Running}}' "$NGINX_CID")" != "true" ]; then
               echo "❌ Nginx 容器未运行"
+              sudo docker compose logs --tail=100 nginx || true
               exit 1
             fi
             

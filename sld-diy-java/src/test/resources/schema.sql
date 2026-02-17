@@ -127,6 +127,7 @@ CREATE TABLE IF NOT EXISTS t_review (
     images TEXT,
     is_anonymous BOOLEAN DEFAULT FALSE,
     status VARCHAR(20) DEFAULT 'published',
+    deleted INT DEFAULT 0,
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -388,3 +389,77 @@ CREATE TABLE IF NOT EXISTS t_service_request (
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+
+-- ===== Compatibility schema for Prisma-style CamelCase tables =====
+CREATE TABLE IF NOT EXISTS Category (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(191) NOT NULL,
+    parent_id BIGINT,
+    slug VARCHAR(191),
+    description VARCHAR(500),
+    icon VARCHAR(191),
+    sort_order INT DEFAULT 0,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS Brand (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(191) NOT NULL,
+    slug VARCHAR(191),
+    logo VARCHAR(191),
+    description VARCHAR(500),
+    country VARCHAR(191),
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS Product (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    sku VARCHAR(191),
+    name VARCHAR(191) NOT NULL,
+    brand_id BIGINT,
+    category_id BIGINT,
+    description VARCHAR(1000),
+    price DECIMAL(10,2),
+    original_price DECIMAL(10,2),
+    cost_price DECIMAL(10,2),
+    stock_quantity INT DEFAULT 0,
+    unit VARCHAR(50),
+    images VARCHAR(2000),
+    video_url VARCHAR(500),
+    model3d_url VARCHAR(500),
+    status VARCHAR(50) DEFAULT 'on_shelf',
+    view_count INT DEFAULT 0,
+    sales_count INT DEFAULT 0,
+    rating DECIMAL(3,2),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS ProductSpec (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    product_id BIGINT,
+    spec_key VARCHAR(191),
+    spec_value VARCHAR(191),
+    unit VARCHAR(50),
+    sort_order INT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS ProductAttr (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    product_id BIGINT,
+    attr_name VARCHAR(191),
+    attr_value VARCHAR(191),
+    unit VARCHAR(50),
+    sort_order INT DEFAULT 0
+);
+
+CREATE TABLE IF NOT EXISTS Compatibility (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    product_a_id BIGINT,
+    product_b_id BIGINT,
+    compatibility_type VARCHAR(50),
+    notes VARCHAR(500),
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

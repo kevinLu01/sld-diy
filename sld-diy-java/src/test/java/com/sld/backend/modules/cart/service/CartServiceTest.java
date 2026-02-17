@@ -149,7 +149,7 @@ class CartServiceTest {
         assertThat(result.getQuantity()).isEqualTo(2);
         assertThat(result.getPrice()).isEqualTo(new BigDecimal("2500.00"));
 
-        verify(productMapper).selectById(1L);
+        verify(productMapper, atLeastOnce()).selectById(1L);
         verify(cartItemMapper).selectOne(any(LambdaQueryWrapper.class));
         verify(cartItemMapper).insert(any(CartItem.class));
     }
@@ -171,7 +171,7 @@ class CartServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getQuantity()).isEqualTo(5); // 2 + 3
 
-        verify(productMapper).selectById(1L);
+        verify(productMapper, atLeastOnce()).selectById(1L);
         verify(cartItemMapper).selectOne(any(LambdaQueryWrapper.class));
         verify(cartItemMapper).updateById(any(CartItem.class));
         verify(cartItemMapper, never()).insert(any(CartItem.class));
@@ -282,7 +282,7 @@ class CartServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getQuantity()).isEqualTo(1);
 
-        verify(productMapper).selectById(1L);
+        verify(productMapper, atLeastOnce()).selectById(1L);
         verify(cartItemMapper).insert(any(CartItem.class));
     }
 

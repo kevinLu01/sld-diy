@@ -23,10 +23,10 @@ class ProductControllerIntegrationTest extends TestBase {
     public void setUp() {
         super.setUp();
         // 插入测试分类和品牌
-        jdbcTemplate.execute("INSERT INTO t_category (id, name, slug, status) VALUES (1, '压缩机', 'compressor', 1)");
-        jdbcTemplate.execute("INSERT INTO t_brand (id, name, slug, status) VALUES (1, '大金', 'daikin', 1)");
+        jdbcTemplate.execute("INSERT INTO Category (id, name, slug, is_active) VALUES (1, '压缩机', 'compressor', true)");
+        jdbcTemplate.execute("INSERT INTO Brand (id, name, slug, is_active) VALUES (1, '大金', 'daikin', true)");
         // 插入测试产品
-        jdbcTemplate.execute("INSERT INTO t_product (id, sku, name, brand_id, category_id, price, stock, status) " +
+        jdbcTemplate.execute("INSERT INTO Product (id, sku, name, brand_id, category_id, price, stock_quantity, status) " +
                 "VALUES (1, 'TEST-001', '测试压缩机', 1, 1, 1000.00, 100, 'on_shelf')");
     }
 
@@ -38,7 +38,7 @@ class ProductControllerIntegrationTest extends TestBase {
                 .param("limit", "20"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.records").isArray());
+                .andExpect(jsonPath("$.data.items").isArray());
     }
 
     @Test

@@ -14,6 +14,8 @@ import com.sld.backend.modules.diy.entity.DiyRecommendation;
 import com.sld.backend.modules.diy.mapper.DiyConfigMapper;
 import com.sld.backend.modules.diy.mapper.DiyProjectMapper;
 import com.sld.backend.modules.diy.mapper.DiyRecommendationMapper;
+import com.sld.backend.modules.product.mapper.CompatibilityMapper;
+import com.sld.backend.modules.product.mapper.ProductMapper;
 import com.sld.backend.modules.diy.service.impl.DiyServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -47,6 +49,12 @@ class DiyServiceTest {
 
     @Mock
     private DiyRecommendationMapper diyRecommendationMapper;
+
+    @Mock
+    private ProductMapper productMapper;
+
+    @Mock
+    private CompatibilityMapper compatibilityMapper;
 
     @InjectMocks
     private DiyServiceImpl diyService;
@@ -197,6 +205,7 @@ class DiyServiceTest {
 
         when(diyRecommendationMapper.selectByScenario("cold_storage"))
             .thenReturn(List.of(recommendation));
+        when(productMapper.selectList(any())).thenReturn(List.of());
 
         // Act
         DiyRecommendResponse result = diyService.recommend(request);

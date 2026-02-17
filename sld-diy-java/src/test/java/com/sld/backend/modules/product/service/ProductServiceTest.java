@@ -11,7 +11,11 @@ import com.sld.backend.modules.product.entity.Category;
 import com.sld.backend.modules.product.entity.Product;
 import com.sld.backend.modules.product.mapper.BrandMapper;
 import com.sld.backend.modules.product.mapper.CategoryMapper;
+import com.sld.backend.modules.product.mapper.CompatibilityMapper;
 import com.sld.backend.modules.product.mapper.ProductMapper;
+import com.sld.backend.modules.product.mapper.ProductAttrMapper;
+import com.sld.backend.modules.product.mapper.ProductSpecMapper;
+import com.sld.backend.modules.product.mapper.ReviewMapper;
 import com.sld.backend.modules.product.service.impl.ProductServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,6 +49,18 @@ class ProductServiceTest {
 
     @Mock
     private BrandMapper brandMapper;
+
+    @Mock
+    private ProductSpecMapper productSpecMapper;
+
+    @Mock
+    private ProductAttrMapper productAttrMapper;
+
+    @Mock
+    private ReviewMapper reviewMapper;
+
+    @Mock
+    private CompatibilityMapper compatibilityMapper;
 
     @InjectMocks
     private ProductServiceImpl productService;
@@ -118,6 +134,10 @@ class ProductServiceTest {
         when(productMapper.selectById(1L)).thenReturn(testProduct);
         when(categoryMapper.selectById(1L)).thenReturn(testCategory);
         when(brandMapper.selectById(1L)).thenReturn(testBrand);
+        when(productSpecMapper.selectByProductId(1L)).thenReturn(List.of());
+        when(productAttrMapper.selectByProductId(1L)).thenReturn(List.of());
+        when(compatibilityMapper.selectByProductId(1L)).thenReturn(List.of());
+        when(reviewMapper.selectRatingDistribution(1L)).thenReturn(List.of());
 
         // Act
         ProductDetailVO result = productService.getProductDetail(1L);

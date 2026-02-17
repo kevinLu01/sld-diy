@@ -10,6 +10,7 @@ import com.sld.backend.modules.order.entity.OrderItem;
 import com.sld.backend.modules.order.mapper.OrderItemMapper;
 import com.sld.backend.modules.order.mapper.OrderMapper;
 import com.sld.backend.modules.order.service.impl.OrderServiceImpl;
+import com.sld.backend.modules.product.mapper.ProductMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 /**
@@ -39,6 +41,9 @@ class OrderServiceTest {
 
     @Mock
     private OrderItemMapper orderItemMapper;
+
+    @Mock
+    private ProductMapper productMapper;
 
     @InjectMocks
     private OrderServiceImpl orderService;
@@ -77,14 +82,19 @@ class OrderServiceTest {
     @DisplayName("获取订单列表 - 成功")
     void testListOrders_Success() {
         // Arrange - 使用MyBatis Plus标准方法
-        when(orderMapper.selectList(any())).thenReturn(List.of(testOrder));
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<Order> page =
+            new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(1, 10);
+        page.setRecords(List.of(testOrder));
+        page.setTotal(1);
+        when(orderMapper.selectPage(any(), any())).thenReturn(page);
+        when(orderItemMapper.selectList(any())).thenReturn(List.of(testOrderItem));
 
         // Act
         PageResult<OrderVO> result = orderService.listOrders(1L, null, 1L, 10L);
 
         // Assert
         assertThat(result).isNotNull();
-        verify(orderMapper).selectList(any());
+        verify(orderMapper).selectPage(any(), any());
     }
 
     @Test
@@ -160,7 +170,11 @@ class OrderServiceTest {
     @DisplayName("获取订单列表 - 空结果")
     void testListOrders_EmptyResult() {
         // Arrange
-        when(orderMapper.selectList(any())).thenReturn(List.of());
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<Order> page =
+            new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(1, 10);
+        page.setRecords(List.of());
+        page.setTotal(0);
+        when(orderMapper.selectPage(any(), any())).thenReturn(page);
 
         // Act
         PageResult<OrderVO> result = orderService.listOrders(1L, null, 1L, 10L);
@@ -169,6 +183,6 @@ class OrderServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getTotal()).isEqualTo(0);
 
-        verify(orderMapper).selectList(any());
+        verify(orderMapper).selectPage(any(), any());
     }
 }
