@@ -10,7 +10,7 @@ const LoginPage: React.FC = () => {
   const { setUser, setToken } = useUserStore();
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (values: { email: string; password: string }) => {
+  const handleLogin = async (values: { account: string; password: string }) => {
     setLoading(true);
     try {
       const response = await authService.login(values);
@@ -93,13 +93,12 @@ const LoginPage: React.FC = () => {
               children: (
                 <Form onFinish={handleLogin} size="large" autoComplete="off">
                   <Form.Item
-                    name="email"
+                    name="account"
                     rules={[
-                      { required: true, message: '请输入邮箱' },
-                      { type: 'email', message: '请输入有效的邮箱' },
+                      { required: true, message: '请输入邮箱或用户名' },
                     ]}
                   >
-                    <Input prefix={<MailOutlined />} placeholder="邮箱" />
+                    <Input prefix={<MailOutlined />} placeholder="邮箱或用户名" />
                   </Form.Item>
 
                   <Form.Item
