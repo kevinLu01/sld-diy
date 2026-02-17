@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -25,18 +26,25 @@ public class CartController {
     @GetMapping
     @Operation(summary = "获取购物车列表")
     public Result<List<CartItemVO>> getCart(
-        @Parameter(description = "用户ID") @RequestHeader("X-User-Id") Long userId
+        @Parameter(description = "用户ID") @RequestHeader(value = "X-User-Id", required = false) Long userId
     ) {
+        // 匿名用户返回空购物车
+        if (userId == null) {
+            return Result.success(Collections.emptyList());
+        }
         return Result.success(cartService.getCart(userId));
     }
 
     @PostMapping("/items")
     @Operation(summary = "添加购物车")
     public Result<CartItemVO> addItem(
-        @Parameter(description = "用户ID") @RequestHeader("X-User-Id") Long userId,
+        @Parameter(description = "用户ID") @RequestHeader(value = "X-User-Id", required = false) Long userId,
         @RequestParam Long productId,
         @RequestParam Integer quantity
     ) {
+        if (userId == null) {
+            return Result.error(401, "请先登录");
+        }
         return Result.success(cartService.addItem(userId, productId, quantity));
     }
 
@@ -44,9 +52,12 @@ public class CartController {
     @Operation(summary = "更新购物车项数量")
     public Result<CartItemVO> updateItem(
         @PathVariable Long id,
-        @Parameter(description = "用户ID") @RequestHeader("X-User-Id") Long userId,
+        @Parameter(description = "用户ID") @RequestHeader(value = "X-User-Id", required = false) Long userId,
         @RequestParam Integer quantity
     ) {
+        if (userId == null) {
+            return Result.error(401, "请先登录");
+        }
         return Result.success(cartService.updateItem(userId, id, quantity));
     }
 
@@ -60,8 +71,11 @@ public class CartController {
     @DeleteMapping("/clear")
     @Operation(summary = "清空购物车")
     public Result<Void> clearCart(
-        @Parameter(description = "用户ID") @RequestHeader("X-User-Id") Long userId
+        @Parameter(description = "用户ID") @RequestHeader(value = "X-User-Id", required = false) Long userId
     ) {
+        if (userId == null) {
+            return Result.error(401, "请先登录");
+        }
         cartService.clearCart(userId);
         return Result.success();
     }
