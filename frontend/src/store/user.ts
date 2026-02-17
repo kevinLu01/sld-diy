@@ -9,7 +9,7 @@ interface UserState {
   isAuthenticated: boolean;
   setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
-  login: (email: string, password: string) => Promise<void>;
+  login: (account: string, password: string) => Promise<void>;
   logout: () => void;
   fetchUserInfo: () => Promise<void>;
 }
@@ -32,8 +32,8 @@ export const useUserStore = create<UserState>()(
         set({ token, isAuthenticated: !!token });
       },
 
-      login: async (email, password) => {
-        const response = await authService.login({ email, password });
+      login: async (account, password) => {
+        const response = await authService.login({ account, password });
         const { user, token } = response.data;
         
         localStorage.setItem('token', token);
