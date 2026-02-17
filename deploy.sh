@@ -119,10 +119,10 @@ echo ""
 echo "⏳ 步骤11: 等待服务启动..."
 sleep 30
 
-# 12. 初始化数据库
+# 12. 检查Java后端健康状态
 echo ""
-echo "💾 步骤12: 初始化数据库..."
-docker-compose exec -T backend npx prisma db push || echo "⚠️  数据库初始化跳过（可能已存在）"
+echo "🏥 步骤12: 检查Java后端健康状态..."
+curl -f http://localhost:9002/api/v1/health || echo "⚠️  Java后端健康检查未通过，请稍后查看日志"
 
 # 13. 检查服务状态
 echo ""

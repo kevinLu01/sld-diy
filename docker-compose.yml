@@ -20,36 +20,6 @@ services:
       timeout: 5s
       retries: 5
 
-  # Node.js 后端服务
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: production
-    restart: always
-    ports:
-      - "9001:9001"
-    environment:
-      DATABASE_URL: mysql://root:${MYSQL_ROOT_PASSWORD:-sld_secure_password}@mysql:3306/sld_diy?connection_limit=5&socket_timeout=10
-      JWT_SECRET: ${JWT_SECRET:-change-this-secret-key-in-production}
-      PORT: 9001
-      NODE_ENV: production
-    volumes:
-      # 挂载源代码（开发时实时更新，生产环境可以注释掉）
-      - ./backend/src:/app/src:ro
-      - ./backend/prisma:/app/prisma:ro
-    depends_on:
-      mysql:
-        condition: service_healthy
-    networks:
-      - sld-network
-    healthcheck:
-      test: ["CMD", "node", "-e", "require('http').get('http://localhost:9001/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
-      interval: 30s
-      timeout: 3s
-      start_period: 40s
-      retries: 3
-
   # Spring Boot Java 后端服务
   backend-java:
     build:

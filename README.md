@@ -15,18 +15,17 @@
 - 🔍 React Query
 
 **后端**:
-- Node.js + Express
-- Prisma ORM
-- SQLite/PostgreSQL
+- Java 17 + Spring Boot
+- MyBatis Plus
+- MySQL + Redis
 - JWT认证
 
 ## 🚀 快速开始
 
-### 启动后端
+### 启动后端（Java）
 ```bash
-cd backend
-npm install
-npm run dev
+cd sld-diy-java
+mvn spring-boot:run
 ```
 
 ### 启动前端
@@ -44,8 +43,8 @@ npm run dev
 ```
 sld-diy/
 ├── frontend/          # React前端项目
-├── backend/           # Node.js后端
-├── admin/             # 管理后台
+├── sld-diy-java/      # Java后端
+├── legacy/admin/      # 管理后台
 └── README.md
 ```
 
