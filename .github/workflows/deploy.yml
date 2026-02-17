@@ -64,8 +64,12 @@ jobs:
             cp -r ../legacy dist/
             cd ..
 
-            # 重启Docker服务（只重启backend，利用volume自动更新代码）
+            # 重启Docker服务
+            echo "🔄 重启后端服务..."
             sudo docker compose restart backend
+            
+            echo "🔄 重启Nginx服务(应用前端更新)..."
+            sudo docker compose restart nginx
 
             # 等待服务启动
             sleep 20
