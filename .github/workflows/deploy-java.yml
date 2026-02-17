@@ -34,7 +34,7 @@ jobs:
           cache: 'maven'
 
       - name: 🔨 Build with Maven
-        working-directory: ./sld-diy/sld-diy-java
+        working-directory: sld-diy/sld-diy-java
         run: |
           echo "开始构建 Java 后端..."
           echo "Java version:" && java -version
@@ -44,7 +44,7 @@ jobs:
 
       - name: 🧪 Run Tests
         if: ${{ !inputs.skip_tests }}
-        working-directory: ./sld-diy/sld-diy-java
+        working-directory: sld-diy/sld-diy-java
         run: |
           echo "运行测试..."
           mvn test -B || echo "⚠️ 部分测试失败，继续部署"
