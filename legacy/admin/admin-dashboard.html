@@ -444,12 +444,12 @@
             var brandOptions = '';
             
             if (categories && categories.code === 200) {
-                categories.data.forEach(function(c) {
+                categories.data.items.forEach(function(c) {
                     categoryOptions += '<option value="' + c.id + '">' + c.name + '</option>';
                 });
             }
             if (brands && brands.code === 200) {
-                brands.data.forEach(function(b) {
+                brands.data.items.forEach(function(b) {
                     brandOptions += '<option value="' + b.id + '">' + b.name + '</option>';
                 });
             }
@@ -520,7 +520,7 @@
             if (!data || data.code !== 200) return;
             
             var html = '';
-            data.data.forEach(function(c) {
+            data.data.items.forEach(function(c) {
                 html += '<tr>' +
                     '<td class="px-6 py-4 text-sm font-medium text-gray-900">' + c.name + '</td>' +
                     '<td class="px-6 py-4 text-sm text-gray-500">' + c.slug + '</td>' +
@@ -580,7 +580,7 @@
             if (!data || data.code !== 200) return;
             
             var html = '';
-            data.data.forEach(function(b) {
+            data.data.items.forEach(function(b) {
                 html += '<tr>' +
                     '<td class="px-6 py-4 text-sm font-medium text-gray-900">' + b.name + '</td>' +
                     '<td class="px-6 py-4 text-sm font-medium">' +
@@ -657,7 +657,7 @@
             if (!data || data.code !== 200) return;
             
             var html = '';
-            data.data.forEach(function(s) {
+            data.data.items.forEach(function(s) {
                 html += '<tr>' +
                     '<td class="px-6 py-4 text-sm font-medium text-gray-900">' + s.title + '</td>' +
                     '<td class="px-6 py-4 text-sm text-gray-500">' + (s.industry || '-') + '</td>' +
@@ -823,7 +823,7 @@
             if (!data || data.code !== 200) return;
             
             var grouped = {};
-            data.data.forEach(function(c) {
+            data.data.items.forEach(function(c) {
                 if (!grouped[c.category]) grouped[c.category] = [];
                 grouped[c.category].push(c);
             });
@@ -888,7 +888,7 @@
             
             var html = '<table class="w-full text-sm"><thead><tr><th class="text-left py-2">场景</th><th class="text-left py-2">产品类型</th><th class="text-left py-2">分类</th><th class="text-left py-2">必选</th><th class="text-left py-2">操作</th></tr></thead><tbody>';
             var scenarioLabels = { cold_storage: '冷库制冷', supermarket: '商超冷柜', hvac: '中央空调', industrial: '工业制冷' };
-            data.data.forEach(function(r) {
+            data.data.items.forEach(function(r) {
                 html += '<tr class="border-b"><td class="py-2">' + (scenarioLabels[r.scenario] || r.scenario) + '</td><td class="py-2">' + r.productType + '</td><td class="py-2">' + (r.category ? r.category.name : '-') + '</td><td class="py-2">' + (r.isRequired ? '是' : '否') + '</td><td class="py-2"><button onclick="deleteDiyRec(' + r.id + ')" class="text-red-600">删除</button></td></tr>';
             });
             html += '</tbody></table>';
@@ -899,7 +899,7 @@
             var categoryOptions = '';
             fetch(API_BASE + '/admin/categories').then(function(res) { return res.json(); }).then(function(result) {
                 if (result.code === 200) {
-                    result.data.forEach(function(c) {
+                    result.data.items.forEach(function(c) {
                         categoryOptions += '<option value="' + c.id + '">' + c.name + '</option>';
                     });
                 }
@@ -919,7 +919,7 @@
             fetch(API_BASE + '/admin/categories').then(function(res) { return res.json(); }).then(function(result) {
                 if (result.code === 200) {
                     var select = document.querySelector('#diyRecForm select[name="categoryId"]');
-                    result.data.forEach(function(c) {
+                    result.data.items.forEach(function(c) {
                         var opt = document.createElement('option');
                         opt.value = c.id;
                         opt.textContent = c.name;
