@@ -44,7 +44,9 @@ public class CartItem {
      */
     private java.math.BigDecimal price;
     private String sku;
+    @TableField("product_name")
     private String productName;
+    @TableField("product_image")
     private String productImage;
 
     /**

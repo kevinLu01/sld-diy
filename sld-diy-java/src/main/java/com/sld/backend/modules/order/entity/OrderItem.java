@@ -25,14 +25,14 @@ public class OrderItem {
     @TableField("product_name")
     private String productName;
 
-    @TableField("product_sku")
+    @TableField("sku")
     private String sku;
 
     private BigDecimal price;
 
     private Integer quantity;
 
-    @TableField("subtotal")
+    @TableField("total")
     private BigDecimal total;
 
     @TableField(value = "create_time", fill = FieldFill.INSERT)
@@ -45,9 +45,7 @@ public class OrderItem {
     @TableField("deleted")
     private Integer deleted;
 
-    // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
-
-    @TableField(value = "product_image", exist = false)
+    @TableField("product_image")
     private String productImage;
 
     @TableField(exist = false)
