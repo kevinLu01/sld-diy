@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -25,20 +27,28 @@ public class OrderController {
     @PostMapping
     @Operation(summary = "创建订单")
     public Result<OrderVO> createOrder(
-        @Parameter(description = "用户ID") @RequestHeader("X-User-Id") Long userId,
+        @Parameter(description = "用户ID") @RequestHeader(value = "X-User-Id", required = false) Long userId,
         @RequestBody CreateOrderRequest request
     ) {
+        userId = resolveUserId(userId);
+        if (userId == null) {
+            return Result.error(401, "请先登录");
+        }
         return Result.success(orderService.createOrder(userId, request));
     }
 
     @GetMapping
     @Operation(summary = "获取订单列表")
     public Result<PageResult<OrderVO>> listOrders(
-        @Parameter(description = "用户ID") @RequestHeader("X-User-Id") Long userId,
+        @Parameter(description = "用户ID") @RequestHeader(value = "X-User-Id", required = false) Long userId,
         @Parameter(description = "订单状态") @RequestParam(required = false) String status,
         @RequestParam(defaultValue = "1") Long page,
         @RequestParam(defaultValue = "20") Long limit
     ) {
+        userId = resolveUserId(userId);
+        if (userId == null) {
+            return Result.error(401, "请先登录");
+        }
         return Result.success(orderService.listOrders(userId, status, page, limit));
     }
 
@@ -46,8 +56,12 @@ public class OrderController {
     @Operation(summary = "获取订单详情")
     public Result<OrderVO> getOrder(
         @PathVariable String orderNo,
-        @Parameter(description = "用户ID") @RequestHeader("X-User-Id") Long userId
+        @Parameter(description = "用户ID") @RequestHeader(value = "X-User-Id", required = false) Long userId
     ) {
+        userId = resolveUserId(userId);
+        if (userId == null) {
+            return Result.error(401, "请先登录");
+        }
         return Result.success(orderService.getOrder(orderNo, userId));
     }
 
@@ -55,9 +69,28 @@ public class OrderController {
     @Operation(summary = "取消订单")
     public Result<Void> cancelOrder(
         @PathVariable String orderNo,
-        @Parameter(description = "用户ID") @RequestHeader("X-User-Id") Long userId
+        @Parameter(description = "用户ID") @RequestHeader(value = "X-User-Id", required = false) Long userId
     ) {
+        userId = resolveUserId(userId);
+        if (userId == null) {
+            return Result.error(401, "请先登录");
+        }
         orderService.cancelOrder(orderNo, userId);
         return Result.success();
+    }
+
+    private Long resolveUserId(Long userIdHeader) {
+        if (userIdHeader != null) {
+            return userIdHeader;
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getName() == null || "anonymousUser".equals(auth.getName())) {
+            return null;
+        }
+        try {
+            return Long.valueOf(auth.getName());
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 }
