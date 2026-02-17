@@ -115,9 +115,10 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
             echo "🏥 前端健康检查..."
+            cd /var/www/sld-diy
             
             # 检查Nginx是否运行
-            if ! docker compose ps nginx | grep -q "running"; then
+            if ! sudo docker compose ps nginx | grep -q "running"; then
               echo "❌ Nginx 容器未运行"
               exit 1
             fi

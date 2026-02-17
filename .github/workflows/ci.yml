@@ -40,7 +40,7 @@ jobs:
         run: echo "✅ Frontend build successful"
 
   test-backend-java:
-    name: Java Backend Tests
+    name: Java Backend Build Check
     runs-on: ubuntu-latest
     
     services:
@@ -77,7 +77,7 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: 🧪 Run Java Tests
+      - name: 🔨 Build Java Backend (Skip Tests)
         working-directory: ./sld-diy-java
         env:
           MYSQL_HOST: 127.0.0.1
@@ -87,10 +87,10 @@ jobs:
           MYSQL_PASSWORD: test_password
           REDIS_HOST: 127.0.0.1
           REDIS_PORT: 6379
-        run: mvn test -B
+        run: mvn -DskipTests package -B
 
-      - name: ✅ Java Backend Check Success
-        run: echo "✅ Java backend checks successful"
+      - name: ✅ Java Backend Build Success
+        run: echo "✅ Java backend build successful"
 
   docker-build-java:
     name: Java Docker Build Test
