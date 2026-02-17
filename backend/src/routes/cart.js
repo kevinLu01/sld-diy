@@ -9,18 +9,42 @@ const authMiddleware = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.replace('Bearer ', '');
     if (!token) {
-      return res.status(401).json({ code: 401, message: '未登录' });
+      // 匿名用户，设置 userId 为 null
+      req.userId = null;
+      next();
+      return;
     }
     const decoded = jwt.verify(token, JWT_SECRET);
     req.userId = decoded.userId;
     next();
   } catch (error) {
-    res.status(401).json({ code: 401, message: 'token无效' });
+    // Token 无效，也作为匿名用户处理
+    req.userId = null;
+    next();
   }
+};
+
+const requireAuth = async (req, res, next) => {
+  if (!req.userId) {
+    return res.status(401).json({ code: 401, message: '请先登录' });
+  }
+  next();
 };
 
 router.get('/', authMiddleware, async (req, res) => {
   try {
+    // 匿名用户返回空购物车
+    if (!req.userId) {
+      return res.json({
+        code: 200,
+        data: {
+          items: [],
+          totalAmount: 0,
+          itemCount: 0
+        }
+      });
+    }
+
     let cart = await prisma.cart.findUnique({
       where: { userId: req.userId },
       include: {
@@ -68,7 +92,7 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
-router.post('/add', authMiddleware, async (req, res) => {
+router.post('/add', authMiddleware, requireAuth, async (req, res) => {
   try {
     const { productId, quantity = 1 } = req.body;
 
@@ -106,7 +130,7 @@ router.post('/add', authMiddleware, async (req, res) => {
   }
 });
 
-router.put('/items/:itemId', authMiddleware, async (req, res) => {
+router.put('/items/:itemId', authMiddleware, requireAuth, async (req, res) => {
   try {
     const { quantity } = req.body;
 
@@ -125,7 +149,7 @@ router.put('/items/:itemId', authMiddleware, async (req, res) => {
   }
 });
 
-router.delete('/items/:itemId', authMiddleware, async (req, res) => {
+router.delete('/items/:itemId', authMiddleware, requireAuth, async (req, res) => {
   try {
     await prisma.cartItem.delete({
       where: { id: Number(req.params.itemId) }
@@ -136,7 +160,7 @@ router.delete('/items/:itemId', authMiddleware, async (req, res) => {
   }
 });
 
-router.delete('/clear', authMiddleware, async (req, res) => {
+router.delete('/clear', authMiddleware, requireAuth, async (req, res) => {
   try {
     const cart = await prisma.cart.findUnique({
       where: { userId: req.userId }
