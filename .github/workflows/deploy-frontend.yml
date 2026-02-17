@@ -75,10 +75,17 @@ jobs:
             npm install
             npm run build
 
-            # 复制 legacy 目录到 dist (如果存在)
+            # 复制 admin 后台到 dist/admin (nginx直接指向这里)
+            echo "📋 复制 admin 后台文件..."
+            if [ -d "../legacy/admin" ]; then
+              cp -r ../legacy/admin dist/admin
+              echo "✅ admin 目录复制到 dist/admin 成功"
+            fi
+
+            # 复制整个 legacy 目录
             if [ -d "../legacy" ]; then
-              echo "📋 复制 legacy 目录..."
-              cp -r ../legacy dist/
+              cp -r ../legacy dist/legacy
+              echo "✅ legacy 目录复制成功"
             fi
             cd ..
 

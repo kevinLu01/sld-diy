@@ -60,8 +60,10 @@ jobs:
             npm install
             npm run build
 
-            # 复制 legacy 目录到 dist
-            cp -r ../legacy dist/
+            # 复制 admin 后台到 dist/admin (nginx直接指向这里)
+            cp -r ../legacy/admin dist/admin
+            # 复制整个 legacy 目录
+            cp -r ../legacy dist/legacy
             cd ..
 
             # 重启Docker服务
