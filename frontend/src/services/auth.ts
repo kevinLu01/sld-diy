@@ -3,7 +3,7 @@ import type { ApiResponse, User } from '@/types';
 
 export const authService = {
   // 用户登录
-  login: (data: { email: string; password: string }) => {
+  login: (data: { account: string; password: string }) => {
     return apiClient.post<any, ApiResponse<{ user: User; token: string }>>('/auth/login', data);
   },
 
