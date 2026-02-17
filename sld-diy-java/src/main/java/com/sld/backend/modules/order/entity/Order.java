@@ -43,10 +43,13 @@ public class Order {
 
     private OrderStatus status;
 
+    @TableField(exist = false)
     private String paymentMethod;
 
+    @TableField(exist = false)
     private LocalDateTime paymentTime;
 
+    @TableField(exist = false)
     private String shippingInfo;
 
     private String notes;
@@ -63,42 +66,42 @@ public class Order {
 
     // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
 
-    @TableField(exist = false)
+    @TableField("username")
     private String username;
 
-    @TableField(exist = false)
+    @TableField("recipient")
     private String recipient;
 
-    @TableField(exist = false)
+    @TableField("phone")
     private String phone;
 
-    @TableField(exist = false)
+    @TableField("province")
     private String province;
 
-    @TableField(exist = false)
+    @TableField("city")
     private String city;
 
-    @TableField(exist = false)
+    @TableField("district")
     private String district;
 
-    @TableField(exist = false)
+    @TableField("address")
     private String address;
 
-    @TableField(exist = false)
+    @TableField("postal_code")
     private String postalCode;
 
-    @TableField(value = "need_installation", exist = false)
+    @TableField("need_installation")
     private Boolean needInstallation;
 
-    @TableField(value = "pay_time", exist = false)
+    @TableField("pay_time")
     private LocalDateTime payTime;
 
-    @TableField(value = "ship_time", exist = false)
+    @TableField("ship_time")
     private LocalDateTime shipTime;
 
-    @TableField(value = "deliver_time", exist = false)
+    @TableField("deliver_time")
     private LocalDateTime deliverTime;
 
-    @TableField(value = "cancel_time", exist = false)
+    @TableField("cancel_time")
     private LocalDateTime cancelTime;
 }
