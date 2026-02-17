@@ -216,7 +216,18 @@ public class ProductServiceImpl implements ProductService {
         if (StrUtil.isBlank(images)) {
             return Collections.emptyList();
         }
-        return JSONUtil.toList(images, String.class);
+        try {
+            return JSONUtil.toList(images, String.class);
+        } catch (Exception ignored) {
+            // Backward compatibility: support plain URL or comma-separated URLs in legacy data.
+            if (images.contains(",")) {
+                return Arrays.stream(images.split(","))
+                    .map(String::trim)
+                    .filter(StrUtil::isNotBlank)
+                    .collect(Collectors.toList());
+            }
+            return Collections.singletonList(images.trim());
+        }
     }
 
     private Map<String, String> parseSpecifications(List<ProductSpec> specs) {
