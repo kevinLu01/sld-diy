@@ -35,13 +35,18 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public Page<ProductVO> listProducts(Long categoryId, String brand, String search, Long page, Long limit, String sort) {
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Product::getStatus, "on_shelf");
+        // 兼容历史数据：旧数据常用 active，新数据使用 on_shelf
+        wrapper.in(Product::getStatus, Arrays.asList("on_shelf", "active"));
 
         if (categoryId != null) {
             wrapper.eq(Product::getCategoryId, categoryId);
         }
         if (StrUtil.isNotBlank(brand)) {
-            wrapper.like(Product::getBrandId, brand);
+            try {
+                wrapper.eq(Product::getBrandId, Long.parseLong(brand));
+            } catch (NumberFormatException ignore) {
+                // legacy 参数可能是品牌名，这里忽略避免错误过滤
+            }
         }
         if (StrUtil.isNotBlank(search)) {
             wrapper.and(w -> w.like(Product::getName, search).or().like(Product::getDescription, search));

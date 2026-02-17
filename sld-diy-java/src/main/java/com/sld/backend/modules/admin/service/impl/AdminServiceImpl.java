@@ -493,14 +493,26 @@ public class AdminServiceImpl implements AdminService {
 
     // ==================== 转换方法 ====================
     private Map<String, Object> convertProductToMap(Product product) {
+        Category category = categoryMapper.selectById(product.getCategoryId());
+        Brand brand = brandMapper.selectById(product.getBrandId());
+
         Map<String, Object> map = new HashMap<>();
         map.put("id", product.getId());
         map.put("name", product.getName());
         map.put("sku", product.getSku());
         map.put("price", product.getPrice());
         map.put("stock", product.getStockQuantity());
+        map.put("stockQuantity", product.getStockQuantity());
         map.put("status", product.getStatus());
+        map.put("images", product.getImages());
+        map.put("brandId", product.getBrandId());
+        map.put("categoryId", product.getCategoryId());
+        map.put("brandName", brand != null ? brand.getName() : null);
+        map.put("categoryName", category != null ? category.getName() : null);
+        map.put("brand", brand != null ? convertBrandToMap(brand) : null);
+        map.put("category", category != null ? convertCategoryToMap(category) : null);
         map.put("createTime", product.getCreatedAt());
+        map.put("createdAt", product.getCreatedAt());
         return map;
     }
 
@@ -527,6 +539,7 @@ public class AdminServiceImpl implements AdminService {
         map.put("totalAmount", order.getTotalAmount());
         map.put("status", order.getStatus());
         map.put("createTime", order.getCreateTime());
+        map.put("createdAt", order.getCreateTime());
         return map;
     }
 
@@ -535,8 +548,12 @@ public class AdminServiceImpl implements AdminService {
         map.put("id", solution.getId());
         map.put("title", solution.getTitle());
         map.put("industry", solution.getIndustry());
+        map.put("totalPrice", solution.getTotalPrice());
+        map.put("usageCount", solution.getUsageCount() != null ? solution.getUsageCount() : 0);
+        map.put("viewCount", solution.getViewCount() != null ? solution.getViewCount() : 0);
         map.put("status", solution.getStatus());
         map.put("createTime", solution.getCreatedAt());
+        map.put("createdAt", solution.getCreatedAt());
         return map;
     }
 
@@ -546,7 +563,11 @@ public class AdminServiceImpl implements AdminService {
         map.put("title", article.getTitle());
         map.put("category", article.getCategory());
         map.put("status", article.getPublishStatus());
+        map.put("viewCount", article.getViewCount() != null ? article.getViewCount() : 0);
+        map.put("helpfulCount", article.getHelpfulCount() != null ? article.getHelpfulCount() : 0);
+        map.put("author", article.getAuthor());
         map.put("createTime", article.getCreateTime());
+        map.put("createdAt", article.getCreateTime());
         return map;
     }
 
@@ -556,7 +577,9 @@ public class AdminServiceImpl implements AdminService {
         map.put("username", user.getUsername());
         map.put("email", user.getEmail());
         map.put("phone", user.getPhone());
+        map.put("status", user.getStatus() != null ? user.getStatus().getCode() : null);
         map.put("createTime", user.getCreateTime());
+        map.put("createdAt", user.getCreateTime());
         return map;
     }
 
@@ -566,6 +589,8 @@ public class AdminServiceImpl implements AdminService {
         map.put("category", config.getCategory());
         map.put("key", config.getKey());
         map.put("label", config.getLabel());
+        map.put("value", config.getValue());
+        map.put("sortOrder", config.getSortOrder());
         map.put("isActive", config.getIsActive());
         return map;
     }
@@ -580,10 +605,18 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private Map<String, Object> convertDiyRecommendationToMap(DiyRecommendation rec) {
+        Category category = categoryMapper.selectById(rec.getCategoryId());
+
         Map<String, Object> map = new HashMap<>();
         map.put("id", rec.getId());
         map.put("scenario", rec.getScenario());
         map.put("productType", rec.getProductType());
+        map.put("categoryId", rec.getCategoryId());
+        map.put("category", category != null ? convertCategoryToMap(category) : null);
+        map.put("priority", rec.getPriority());
+        map.put("isRequired", rec.getIsRequired());
+        map.put("minQuantity", rec.getMinQuantity());
+        map.put("maxQuantity", rec.getMaxQuantity());
         map.put("isActive", rec.getIsActive());
         return map;
     }

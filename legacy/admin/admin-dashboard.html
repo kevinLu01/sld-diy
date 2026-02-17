@@ -365,6 +365,13 @@
                 return null; 
             }
         }
+
+        function getListData(payload) {
+            if (!payload) return [];
+            if (Array.isArray(payload)) return payload;
+            if (Array.isArray(payload.items)) return payload.items;
+            return [];
+        }
         
         // 通用函数
         function getStatusClass(status) {
@@ -400,10 +407,10 @@
             var data = await apiCall(API_BASE + '/admin/stats');
             if (!data || data.code !== 200) return;
             
-            document.getElementById('statProducts').textContent = data.data.products;
-            document.getElementById('statOrders').textContent = data.data.orders;
-            document.getElementById('statUsers').textContent = data.data.users;
-            document.getElementById('statSolutions').textContent = data.data.solutions;
+            document.getElementById('statProducts').textContent = data.data.totalProducts || data.data.products || 0;
+            document.getElementById('statOrders').textContent = data.data.totalOrders || data.data.orders || 0;
+            document.getElementById('statUsers').textContent = data.data.totalUsers || data.data.users || 0;
+            document.getElementById('statSolutions').textContent = data.data.totalSolutions || data.data.solutions || 0;
             
             // 最近订单
             var ordersRes = await apiCall(API_BASE + '/admin/orders?limit=5');
@@ -422,8 +429,9 @@
             var data = await apiCall(API_BASE + '/admin/products?limit=100');
             if (!data || data.code !== 200) return;
             
+            var items = getListData(data.data);
             var html = '';
-            data.data.items.forEach(function(p) {
+            items.forEach(function(p) {
                 var brandName = (p.brand && p.brand.name) ? p.brand.name : '-';
                 var categoryName = (p.category && p.category.name) ? p.category.name : '-';
                 var productImage = p.images ? p.images.split(',')[0] : 'https://placehold.co/40';
@@ -447,12 +455,12 @@
             var brandOptions = '';
             
             if (categories && categories.code === 200) {
-                categories.data.items.forEach(function(c) {
+                getListData(categories.data).forEach(function(c) {
                     categoryOptions += '<option value="' + c.id + '">' + c.name + '</option>';
                 });
             }
             if (brands && brands.code === 200) {
-                brands.data.items.forEach(function(b) {
+                getListData(brands.data).forEach(function(b) {
                     brandOptions += '<option value="' + b.id + '">' + b.name + '</option>';
                 });
             }
@@ -523,7 +531,7 @@
             if (!data || data.code !== 200) return;
             
             var html = '';
-            data.data.items.forEach(function(c) {
+            getListData(data.data).forEach(function(c) {
                 html += '<tr>' +
                     '<td class="px-6 py-4 text-sm font-medium text-gray-900">' + c.name + '</td>' +
                     '<td class="px-6 py-4 text-sm text-gray-500">' + c.slug + '</td>' +
@@ -583,7 +591,7 @@
             if (!data || data.code !== 200) return;
             
             var html = '';
-            data.data.items.forEach(function(b) {
+            getListData(data.data).forEach(function(b) {
                 html += '<tr>' +
                     '<td class="px-6 py-4 text-sm font-medium text-gray-900">' + b.name + '</td>' +
                     '<td class="px-6 py-4 text-sm font-medium">' +
@@ -641,14 +649,15 @@
             var data = await apiCall(API_BASE + '/admin/orders?limit=50');
             if (!data || data.code !== 200) return;
             
+            var items = getListData(data.data);
             var html = '';
-            data.data.items.forEach(function(o) {
+            items.forEach(function(o) {
                 html += '<tr>' +
                     '<td class="px-6 py-4 text-sm font-medium text-gray-900">' + o.orderNo + '</td>' +
                     '<td class="px-6 py-4 text-sm text-gray-500">' + (o.userName || '-') + '</td>' +
                     '<td class="px-6 py-4 text-sm text-gray-900">¥' + o.totalAmount + '</td>' +
-                    '<td class="px-6 py-4"><span class="px-2 py-1 rounded text-xs ' + getStatusClass(o.status) + '">' + getStatusText(o.status) + '</span></td>' +
-                    '<td class="px-6 py-4 text-sm text-gray-500">' + new Date(o.createdAt).toLocaleDateString() + '</td>' +
+                    '<td class="px-6 py-4"><span class="px-2 py-1 rounded text-xs ' + getStatusClass((o.status || '').toLowerCase()) + '">' + getStatusText((o.status || '').toLowerCase()) + '</span></td>' +
+                    '<td class="px-6 py-4 text-sm text-gray-500">' + new Date(o.createdAt || o.createTime).toLocaleDateString() + '</td>' +
                 '</tr>';
             });
             document.getElementById('ordersTable').innerHTML = html || '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">暂无数据</td></tr>';
@@ -659,8 +668,9 @@
             var data = await apiCall(API_BASE + '/admin/solutions');
             if (!data || data.code !== 200) return;
             
+            var items = getListData(data.data);
             var html = '';
-            data.data.items.forEach(function(s) {
+            items.forEach(function(s) {
                 html += '<tr>' +
                     '<td class="px-6 py-4 text-sm font-medium text-gray-900">' + s.title + '</td>' +
                     '<td class="px-6 py-4 text-sm text-gray-500">' + (s.industry || '-') + '</td>' +
@@ -733,8 +743,9 @@
             var data = await apiCall(API_BASE + '/admin/articles?limit=100');
             if (!data || data.code !== 200) return;
             
+            var items = getListData(data.data);
             var html = '';
-            data.data.items.forEach(function(a) {
+            items.forEach(function(a) {
                 html += '<tr>' +
                     '<td class="px-6 py-4 text-sm font-medium text-gray-900">' + a.title + '</td>' +
                     '<td class="px-6 py-4 text-sm text-gray-500">' + (a.category || '-') + '</td>' +
@@ -794,8 +805,9 @@
             var data = await apiCall(API_BASE + '/admin/users?limit=100');
             if (!data || data.code !== 200) return;
             
+            var items = getListData(data.data);
             var html = '';
-            data.data.items.forEach(function(u) {
+            items.forEach(function(u) {
                 var btnText = u.status === 'active' ? '禁用' : '启用';
                 html += '<tr>' +
                     '<td class="px-6 py-4 text-sm font-medium text-gray-900">' + u.username + '</td>' +
@@ -811,7 +823,7 @@
         
         async function toggleUserStatus(id, currentStatus) {
             var newStatus = currentStatus === 'active' ? 'disabled' : 'active';
-            var res = await apiCall(API_BASE + '/admin/users/' + id, { method: 'PUT', body: JSON.stringify({ status: newStatus }) });
+            var res = await apiCall(API_BASE + '/admin/users/' + id + '/status?status=' + encodeURIComponent(newStatus), { method: 'PUT' });
             if (res && res.code === 200) {
                 loadUsers();
                 alert('更新成功');
@@ -826,7 +838,7 @@
             if (!data || data.code !== 200) return;
             
             var grouped = {};
-            data.data.items.forEach(function(c) {
+            getListData(data.data).forEach(function(c) {
                 if (!grouped[c.category]) grouped[c.category] = [];
                 grouped[c.category].push(c);
             });
@@ -891,7 +903,7 @@
             
             var html = '<table class="w-full text-sm"><thead><tr><th class="text-left py-2">场景</th><th class="text-left py-2">产品类型</th><th class="text-left py-2">分类</th><th class="text-left py-2">必选</th><th class="text-left py-2">操作</th></tr></thead><tbody>';
             var scenarioLabels = { cold_storage: '冷库制冷', supermarket: '商超冷柜', hvac: '中央空调', industrial: '工业制冷' };
-            data.data.items.forEach(function(r) {
+            getListData(data.data).forEach(function(r) {
                 html += '<tr class="border-b"><td class="py-2">' + (scenarioLabels[r.scenario] || r.scenario) + '</td><td class="py-2">' + r.productType + '</td><td class="py-2">' + (r.category ? r.category.name : '-') + '</td><td class="py-2">' + (r.isRequired ? '是' : '否') + '</td><td class="py-2"><button onclick="deleteDiyRec(' + r.id + ')" class="text-red-600">删除</button></td></tr>';
             });
             html += '</tbody></table>';
@@ -902,7 +914,7 @@
             var categoryOptions = '';
             fetch(API_BASE + '/admin/categories').then(function(res) { return res.json(); }).then(function(result) {
                 if (result.code === 200) {
-                    result.data.items.forEach(function(c) {
+                    getListData(result.data).forEach(function(c) {
                         categoryOptions += '<option value="' + c.id + '">' + c.name + '</option>';
                     });
                 }
@@ -922,7 +934,7 @@
             fetch(API_BASE + '/admin/categories').then(function(res) { return res.json(); }).then(function(result) {
                 if (result.code === 200) {
                     var select = document.querySelector('#diyRecForm select[name="categoryId"]');
-                    result.data.items.forEach(function(c) {
+                    getListData(result.data).forEach(function(c) {
                         var opt = document.createElement('option');
                         opt.value = c.id;
                         opt.textContent = c.name;
