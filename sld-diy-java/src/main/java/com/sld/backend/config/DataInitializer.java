@@ -9,6 +9,8 @@ import com.sld.backend.modules.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -27,7 +29,13 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) {
         log.info("开始检查并初始化默认数据...");
-        initAdminUser();
+        try {
+            initAdminUser();
+        } catch (BadSqlGrammarException e) {
+            log.warn("数据库表不存在，跳过初始化。请确保数据库表已创建。");
+        } catch (DataAccessException e) {
+            log.warn("数据库访问异常，跳过初始化: {}", e.getMessage());
+        }
         log.info("数据初始化完成");
     }
 
