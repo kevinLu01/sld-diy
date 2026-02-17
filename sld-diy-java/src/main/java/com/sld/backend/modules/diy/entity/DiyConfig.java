@@ -23,6 +23,7 @@ public class DiyConfig {
     /**
      * 配置键
      */
+    @TableField("`key`")
     private String key;
 
     /**
