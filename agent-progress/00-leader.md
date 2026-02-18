@@ -141,3 +141,16 @@
   - API验证: 私发报价接口与DIY私发分享接口均返回200
   - 页面验证: 前台出现“自定义场景”；后台出现“创建私发链接”和“组件角色(主件/辅件)”
 - Step2-J 状态: J1~J5 全部完成
+
+## Checkpoint - 2026-02-18 19:25 CST
+- Leader心跳: OK
+- 针对“DIY配置不合理”已执行结构升级：
+  - 后台新增三层模型管理：场景模板 / 场景组件 / 组件规格选项
+  - 前台已按场景展示完整组件清单并要求必选项
+- 部署状态:
+  - Java Deploy `#22137617514` success
+  - Frontend manual deploy `#22137691719` success
+- 线上验证:
+  - `/api/v1/admin/diy-scene-templates` 返回冷库模板
+  - `/api/v1/admin/diy-scene-components` 返回压缩机/蒸发器/铜管等6类
+  - `/api/v1/admin/diy-component-options` 返回对应规格选项
