@@ -3,6 +3,7 @@ package com.sld.backend.modules.service.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sld.backend.modules.service.dto.request.CreateServiceRequest;
 import com.sld.backend.modules.service.dto.request.RateServiceRequest;
+import com.sld.backend.modules.service.dto.request.UpdateServiceStatusRequest;
 import com.sld.backend.modules.service.dto.response.ServiceRequestVO;
 
 /**
@@ -29,4 +30,18 @@ public interface ServiceRequestService {
      * 评价服务
      */
     void rateService(String requestNo, Long userId, RateServiceRequest request);
+
+    /**
+     * 管理员查询服务工单
+     */
+    Page<ServiceRequestVO> adminListServiceRequests(String status, Long page, Long limit);
+
+    /**
+     * 管理员更新工单状态
+     */
+    ServiceRequestVO adminUpdateStatus(
+        String requestNo,
+        Long operatorId,
+        UpdateServiceStatusRequest request
+    );
 }

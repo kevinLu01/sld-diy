@@ -1,10 +1,12 @@
 package com.sld.backend.modules.service.service.impl;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.sld.backend.common.exception.BusinessException;
 import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.modules.service.dto.request.CreateServiceRequest;
 import com.sld.backend.modules.service.dto.request.RateServiceRequest;
+import com.sld.backend.modules.service.dto.request.UpdateServiceStatusRequest;
 import com.sld.backend.modules.service.dto.response.ServiceRequestVO;
 import com.sld.backend.modules.service.entity.ServiceRequest;
 import com.sld.backend.modules.service.mapper.ServiceRequestMapper;
@@ -47,6 +49,7 @@ public class ServiceRequestServiceImpl implements ServiceRequestService {
         STATUS_NAMES.put("pending", "待处理");
         STATUS_NAMES.put("processing", "处理中");
         STATUS_NAMES.put("completed", "已完成");
+        STATUS_NAMES.put("closed", "已关闭");
         STATUS_NAMES.put("cancelled", "已取消");
     }
 
@@ -114,6 +117,73 @@ public class ServiceRequestServiceImpl implements ServiceRequestService {
         serviceRequest.setUpdateTime(LocalDateTime.now());
 
         serviceRequestMapper.updateById(serviceRequest);
+    }
+
+    @Override
+    public Page<ServiceRequestVO> adminListServiceRequests(String status, Long page, Long limit) {
+        Page<ServiceRequest> pageParam = new Page<>(page, limit);
+        LambdaQueryWrapper<ServiceRequest> wrapper = new LambdaQueryWrapper<>();
+        if (status != null && !status.isBlank()) {
+            wrapper.eq(ServiceRequest::getStatus, status);
+        }
+        wrapper.orderByDesc(ServiceRequest::getCreateTime);
+        Page<ServiceRequest> result = serviceRequestMapper.selectPage(pageParam, wrapper);
+        Page<ServiceRequestVO> voPage = new Page<>(page, limit, result.getTotal());
+        voPage.setRecords(result.getRecords().stream().map(this::convertToVO).collect(Collectors.toList()));
+        return voPage;
+    }
+
+    @Override
+    public ServiceRequestVO adminUpdateStatus(
+        String requestNo,
+        Long operatorId,
+        UpdateServiceStatusRequest request
+    ) {
+        ServiceRequest serviceRequest = serviceRequestMapper.selectByRequestNo(requestNo);
+        if (serviceRequest == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND, "服务请求不存在");
+        }
+        String from = serviceRequest.getStatus();
+        String to = request.getStatus();
+        validateStatusTransition(from, to);
+
+        if ("processing".equals(to)) {
+            serviceRequest.setAssignedTo(
+                request.getAssignedTo() != null ? request.getAssignedTo() : operatorId
+            );
+        }
+        if ("completed".equals(to) && (request.getResolution() == null || request.getResolution().isBlank())) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "完成工单时必须填写处理结果");
+        }
+        if (request.getResolution() != null && !request.getResolution().isBlank()) {
+            serviceRequest.setResolution(request.getResolution());
+        }
+        serviceRequest.setStatus(to);
+        serviceRequest.setUpdateTime(LocalDateTime.now());
+        serviceRequestMapper.updateById(serviceRequest);
+        return convertToVO(serviceRequest);
+    }
+
+    private void validateStatusTransition(String from, String to) {
+        if (to == null) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "目标状态不能为空");
+        }
+        if (from == null) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "当前状态异常");
+        }
+        if (from.equals(to)) {
+            return;
+        }
+        boolean allowed =
+            ("pending".equals(from) && ("processing".equals(to) || "closed".equals(to))) ||
+            ("processing".equals(from) && ("completed".equals(to) || "closed".equals(to))) ||
+            ("completed".equals(from) && "closed".equals(to));
+        if (!allowed) {
+            throw new BusinessException(
+                ErrorCode.BAD_REQUEST,
+                String.format("不允许的状态流转: %s -> %s", from, to)
+            );
+        }
     }
 
     private String generateRequestNo() {
