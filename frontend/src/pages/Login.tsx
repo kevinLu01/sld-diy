@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Form, Input, Button, Card, Tabs, message, Space } from 'antd';
-import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Card, Tabs, message, Space, Divider, Grid } from 'antd';
+import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined, WechatOutlined } from '@ant-design/icons';
 import { useUserStore } from '@/store/user';
 import { authService } from '@/services/auth';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
   const { setUser, setToken } = useUserStore();
   const [loading, setLoading] = useState(false);
 
@@ -122,6 +124,20 @@ const LoginPage: React.FC = () => {
                     </Button>
                   </Form.Item>
 
+                  <Divider plain style={{ margin: '12px 0 16px' }}>
+                    其他登录方式
+                  </Divider>
+
+                  <Form.Item>
+                    <Button
+                      block
+                      icon={<WechatOutlined />}
+                      onClick={() => message.info('微信登录即将开放，当前版本可先使用账号密码登录')}
+                    >
+                      微信登录
+                    </Button>
+                  </Form.Item>
+
                   <div style={{ textAlign: 'center' }}>
                     <Link to="/">返回首页</Link>
                   </div>
@@ -188,7 +204,7 @@ const LoginPage: React.FC = () => {
                   <Form.Item name="userType" initialValue="personal">
                     <div>
                       <div style={{ marginBottom: 8 }}>用户类型</div>
-                      <Button.Group style={{ width: '100%' }}>
+                      <Button.Group style={{ width: '100%', display: 'flex' }}>
                         <Button style={{ width: '50%' }}>个人用户</Button>
                         <Button style={{ width: '50%' }}>企业用户</Button>
                       </Button.Group>
@@ -209,6 +225,11 @@ const LoginPage: React.FC = () => {
             },
           ]}
         />
+        {isMobile && (
+          <div style={{ marginTop: 10, textAlign: 'center', color: '#999', fontSize: 12 }}>
+            建议使用微信或账号登录继续下单流程
+          </div>
+        )}
       </Card>
     </div>
   );

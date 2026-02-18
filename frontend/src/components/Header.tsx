@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Layout, Menu, Input, Badge, Avatar, Dropdown, Space } from 'antd';
+import { Layout, Menu, Input, Badge, Avatar, Dropdown, Space, Grid, Button, Drawer } from 'antd';
 import {
   HomeOutlined,
   AppstoreOutlined,
@@ -11,6 +11,7 @@ import {
   LoginOutlined,
   BulbOutlined,
   SolutionOutlined,
+  MenuOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useUserStore } from '@/store/user';
@@ -20,7 +21,10 @@ const { Header: AntHeader } = Layout;
 const { Search } = Input;
 
 const AppHeader: React.FC = () => {
+  const [drawerOpen, setDrawerOpen] = useState(false);
   const navigate = useNavigate();
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
   const { user, isAuthenticated, logout } = useUserStore();
   const { totalQuantity } = useCartStore();
 
@@ -98,30 +102,60 @@ const AppHeader: React.FC = () => {
   };
 
   return (
-    <AntHeader style={{ background: '#fff', padding: '0 50px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
-          <Link to="/" style={{ marginRight: 40 }}>
+    <AntHeader
+      style={{
+        background: '#fff',
+        padding: isMobile ? '0 12px' : '0 50px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        height: 'auto',
+        lineHeight: 'normal',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          minHeight: 64,
+          gap: 8,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
+          {isMobile && (
+            <Button
+              type="text"
+              icon={<MenuOutlined />}
+              onClick={() => setDrawerOpen(true)}
+              aria-label="打开菜单"
+              style={{ marginRight: 8 }}
+            />
+          )}
+
+          <Link to="/" style={{ marginRight: isMobile ? 8 : 40 }}>
             <Space size={12}>
               <div style={{ fontSize: 24, color: '#1890ff' }}>❄️</div>
-              <span style={{ fontSize: 20, fontWeight: 'bold', color: '#1890ff' }}>生利达</span>
+              <span style={{ fontSize: isMobile ? 18 : 20, fontWeight: 'bold', color: '#1890ff' }}>生利达</span>
             </Space>
           </Link>
 
-          <Menu
-            mode="horizontal"
-            items={menuItems}
-            style={{ border: 'none', flex: 1, minWidth: 400 }}
-          />
+          {!isMobile && (
+            <Menu
+              mode="horizontal"
+              items={menuItems}
+              style={{ border: 'none', flex: 1, minWidth: 400 }}
+            />
+          )}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-          <Search
-            placeholder="搜索产品..."
-            onSearch={handleSearch}
-            style={{ width: 250 }}
-            allowClear
-          />
+        <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? 10 : 20 }}>
+          {!isMobile && (
+            <Search
+              placeholder="搜索产品..."
+              onSearch={handleSearch}
+              style={{ width: 250 }}
+              allowClear
+            />
+          )}
 
           <Link to="/cart">
             <Badge count={totalQuantity} offset={[0, 5]}>
@@ -136,11 +170,27 @@ const AppHeader: React.FC = () => {
                 src={user?.avatar}
                 style={{ backgroundColor: '#1890ff' }}
               />
-              <span>{user?.username || '未登录'}</span>
+              {!isMobile && <span>{user?.username || '未登录'}</span>}
             </Space>
           </Dropdown>
         </div>
       </div>
+
+      {isMobile && (
+        <div style={{ paddingBottom: 10 }}>
+          <Search placeholder="搜索产品..." onSearch={handleSearch} allowClear />
+        </div>
+      )}
+
+      <Drawer
+        title="导航菜单"
+        placement="left"
+        width={280}
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+      >
+        <Menu mode="inline" items={menuItems} onClick={() => setDrawerOpen(false)} />
+      </Drawer>
     </AntHeader>
   );
 };

@@ -16,6 +16,7 @@ import {
   Space,
   Modal,
   Select,
+  Grid,
 } from 'antd';
 import {
   UserOutlined,
@@ -42,6 +43,8 @@ interface Address {
 
 const UserProfilePage: React.FC = () => {
   const navigate = useNavigate();
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
   const { user } = useUserStore();
   const [activeTab, setActiveTab] = useState('profile');
   const [addressModalVisible, setAddressModalVisible] = useState(false);
@@ -181,8 +184,8 @@ const UserProfilePage: React.FC = () => {
   ];
 
   return (
-    <div style={{ background: '#f5f5f5', minHeight: '100vh', padding: '24px 0' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px' }}>
+    <div style={{ background: '#f5f5f5', minHeight: '100vh', padding: isMobile ? '12px 0' : '24px 0' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 12px' : '0 20px' }}>
         <Title level={2}>个人中心</Title>
 
         <Row gutter={24}>
@@ -312,6 +315,7 @@ const UserProfilePage: React.FC = () => {
                           columns={addressColumns}
                           rowKey="id"
                           pagination={false}
+                          scroll={{ x: 760 }}
                         />
                       </div>
                     ),
@@ -356,11 +360,11 @@ const UserProfilePage: React.FC = () => {
             addressForm.resetFields();
           }}
           footer={null}
-          width={600}
+          width={isMobile ? '95%' : 600}
         >
           <Form form={addressForm} layout="vertical" onFinish={handleAddressSubmit}>
             <Row gutter={16}>
-              <Col span={12}>
+              <Col xs={24} md={12}>
                 <Form.Item
                   label="收货人"
                   name="recipient"
@@ -369,7 +373,7 @@ const UserProfilePage: React.FC = () => {
                   <Input />
                 </Form.Item>
               </Col>
-              <Col span={12}>
+              <Col xs={24} md={12}>
                 <Form.Item
                   label="联系电话"
                   name="phone"
@@ -381,7 +385,7 @@ const UserProfilePage: React.FC = () => {
             </Row>
 
             <Row gutter={16}>
-              <Col span={8}>
+              <Col xs={24} md={8}>
                 <Form.Item
                   label="省份"
                   name="province"
@@ -394,7 +398,7 @@ const UserProfilePage: React.FC = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={8}>
+              <Col xs={24} md={8}>
                 <Form.Item
                   label="城市"
                   name="city"
@@ -406,7 +410,7 @@ const UserProfilePage: React.FC = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={8}>
+              <Col xs={24} md={8}>
                 <Form.Item
                   label="区县"
                   name="district"

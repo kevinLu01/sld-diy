@@ -18,6 +18,7 @@ import {
   message,
   Alert,
   Divider,
+  Grid,
 } from 'antd';
 import {
   CheckCircleOutlined,
@@ -41,6 +42,8 @@ interface SelectedProduct {
 
 const DIYToolPage: React.FC = () => {
   const navigate = useNavigate();
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
   const [form] = Form.useForm();
   const selectedScenario = Form.useWatch('scenario', form);
   const [currentStep, setCurrentStep] = useState(0);
@@ -156,8 +159,8 @@ const DIYToolPage: React.FC = () => {
   );
 
   return (
-    <div style={{ background: '#f5f5f5', minHeight: '100vh', padding: '24px 0' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px' }}>
+    <div style={{ background: '#f5f5f5', minHeight: '100vh', padding: isMobile ? '12px 0' : '24px 0' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 12px' : '0 20px' }}>
         <Title level={2}>智能DIY配套工具</Title>
         <Paragraph type="secondary">
           根据您的需求，智能推荐最合适的配件组合，确保兼容性和性能
@@ -165,7 +168,7 @@ const DIYToolPage: React.FC = () => {
 
         {/* 步骤条 */}
         <Card style={{ marginBottom: 24 }}>
-          <Steps current={currentStep}>
+          <Steps current={currentStep} direction={isMobile ? 'vertical' : 'horizontal'} size={isMobile ? 'small' : 'default'}>
             <Step title="选择场景" description="选择应用场景" />
             <Step title="配置需求" description="输入具体参数" />
             <Step title="选择配件" description="查看推荐并选择" />
@@ -296,7 +299,7 @@ const DIYToolPage: React.FC = () => {
               </Row>
 
               <Form.Item label="其他选项">
-                <Space>
+                <Space wrap>
                   <Form.Item name={['options', 'energySaving']} valuePropName="checked" noStyle>
                     <Checkbox>节能优先</Checkbox>
                   </Form.Item>
@@ -418,6 +421,7 @@ const DIYToolPage: React.FC = () => {
                   dataSource={selectedProducts}
                   rowKey="productId"
                   pagination={false}
+                  scroll={{ x: 680 }}
                   columns={[
                     {
                       title: '产品',
@@ -495,11 +499,15 @@ const DIYToolPage: React.FC = () => {
 
         {/* 底部操作按钮 */}
         <Card style={{ marginTop: 24 }}>
-          <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+          <Space
+            style={{ width: '100%', justifyContent: 'space-between' }}
+            direction={isMobile ? 'vertical' : 'horizontal'}
+            size={isMobile ? 10 : 8}
+          >
             <Button onClick={() => currentStep > 0 && setCurrentStep(currentStep - 1)}>
               上一步
             </Button>
-            <Space>
+            <Space wrap>
               {currentStep === 3 && (
                 <>
                   <Button icon={<SaveOutlined />} onClick={handleSaveProject}>

@@ -15,6 +15,7 @@ import {
   Col,
   Divider,
   Checkbox,
+  Grid,
 } from 'antd';
 import { DeleteOutlined, ShoppingOutlined } from '@ant-design/icons';
 import { useCartStore } from '@/store/cart';
@@ -24,6 +25,8 @@ const { Title, Text } = Typography;
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
   const { items, loading, fetchCart, updateItem, removeItem, clearCart } =
     useCartStore();
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
@@ -215,20 +218,21 @@ const CartPage: React.FC = () => {
         <Title level={2}>购物车</Title>
 
         <Card style={{ marginBottom: 16 }}>
-          <Table
-            dataSource={items}
-            columns={columns}
-            rowKey="id"
-            loading={loading}
-            pagination={false}
-          />
-        </Card>
+            <Table
+              dataSource={items}
+              columns={columns}
+              rowKey="id"
+              loading={loading}
+              pagination={false}
+              scroll={{ x: 940 }}
+            />
+          </Card>
 
         {/* 底部操作栏 */}
         <Card>
-          <Row justify="space-between" align="middle">
-            <Col>
-              <Space size={24}>
+          <Row justify="space-between" align={isMobile ? 'top' : 'middle'} gutter={[12, 12]}>
+            <Col xs={24} md={12}>
+              <Space size={isMobile ? 12 : 24} wrap>
                 <Checkbox
                   checked={selectedItems.length === items.length && items.length > 0}
                   indeterminate={selectedItems.length > 0 && selectedItems.length < items.length}
@@ -260,8 +264,8 @@ const CartPage: React.FC = () => {
               </Space>
             </Col>
 
-            <Col>
-              <Space size={32} align="center">
+            <Col xs={24} md={12}>
+              <Space size={isMobile ? 12 : 32} align={isMobile ? 'start' : 'center'} direction={isMobile ? 'vertical' : 'horizontal'}>
                 <div>
                   <Text>
                     已选商品 <Text strong>{selectedItems.length}</Text> 件

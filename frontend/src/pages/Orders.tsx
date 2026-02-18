@@ -14,6 +14,7 @@ import {
   Timeline,
   message,
   Popconfirm,
+  Grid,
 } from 'antd';
 import {
   ClockCircleOutlined,
@@ -29,6 +30,8 @@ const { Title, Text } = Typography;
 
 const OrdersPage: React.FC = () => {
   const navigate = useNavigate();
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
   const queryClient = useQueryClient();
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -202,8 +205,8 @@ const OrdersPage: React.FC = () => {
   ];
 
   return (
-    <div style={{ background: '#f5f5f5', minHeight: '100vh', padding: '24px 0' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px' }}>
+    <div style={{ background: '#f5f5f5', minHeight: '100vh', padding: isMobile ? '12px 0' : '24px 0' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 12px' : '0 20px' }}>
         <Title level={2}>我的订单</Title>
 
         <Card>
@@ -220,6 +223,7 @@ const OrdersPage: React.FC = () => {
               columns={columns}
               rowKey="id"
               loading={isLoading}
+              scroll={{ x: 920 }}
               pagination={{
                 total: ordersData.data.total,
                 pageSize: 20,
@@ -251,7 +255,7 @@ const OrdersPage: React.FC = () => {
               关闭
             </Button>,
           ]}
-          width={800}
+          width={isMobile ? '95%' : 800}
         >
           {selectedOrder && (
             <Space direction="vertical" size={24} style={{ width: '100%' }}>
@@ -294,6 +298,7 @@ const OrdersPage: React.FC = () => {
                   rowKey="id"
                   pagination={false}
                   size="small"
+                  scroll={{ x: 620 }}
                   columns={[
                     {
                       title: '商品名称',

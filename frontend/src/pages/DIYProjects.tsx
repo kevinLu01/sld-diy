@@ -12,6 +12,7 @@ import {
   message,
   Empty,
   QRCode,
+  Grid,
 } from 'antd';
 import {
   EditOutlined,
@@ -27,6 +28,8 @@ const { Title, Text, Paragraph } = Typography;
 
 const DIYProjectsPage: React.FC = () => {
   const navigate = useNavigate();
+  const screens = Grid.useBreakpoint();
+  const isMobile = !screens.md;
   const [shareModalVisible, setShareModalVisible] = useState(false);
   const [shareData, setShareData] = useState<any>(null);
 
@@ -172,9 +175,9 @@ const DIYProjectsPage: React.FC = () => {
   ];
 
   return (
-    <div style={{ background: '#f5f5f5', minHeight: '100vh', padding: '24px 0' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 20px' }}>
-        <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div style={{ background: '#f5f5f5', minHeight: '100vh', padding: isMobile ? '12px 0' : '24px 0' }}>
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: isMobile ? '0 12px' : '0 20px' }}>
+        <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center', flexDirection: isMobile ? 'column' : 'row', gap: 12 }}>
           <Title level={2}>我的DIY方案</Title>
           <Button type="primary" onClick={() => navigate('/diy')}>
             创建新方案
@@ -188,6 +191,7 @@ const DIYProjectsPage: React.FC = () => {
               columns={columns}
               rowKey="id"
               loading={isLoading}
+              scroll={{ x: 980 }}
               pagination={{
                 total: projectsData.data.total,
                 pageSize: 20,
@@ -222,11 +226,12 @@ const DIYProjectsPage: React.FC = () => {
               关闭
             </Button>,
           ]}
+          width={isMobile ? '95%' : 520}
         >
           {shareData && (
             <Space direction="vertical" size={24} style={{ width: '100%', textAlign: 'center' }}>
               <div>
-                <QRCode value={shareData.shareUrl} size={200} />
+                <QRCode value={shareData.shareUrl} size={isMobile ? 160 : 200} />
               </div>
               <div>
                 <Paragraph copyable={{ text: shareData.shareUrl }}>
