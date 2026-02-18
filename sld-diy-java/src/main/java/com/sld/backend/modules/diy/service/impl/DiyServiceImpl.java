@@ -166,7 +166,7 @@ public class DiyServiceImpl implements DiyService {
             project.setOptions(JSONUtil.toJsonStr(request.getRequirements()));
         }
         project.setTotalPrice(request.getTotalPrice() != null ? request.getTotalPrice().doubleValue() : null);
-        project.setStatus(0);
+        project.setStatus("draft");
         project.setShared(request.getShared() != null ? request.getShared() : false);
         project.setCreatedAt(LocalDateTime.now());
         project.setUpdatedAt(LocalDateTime.now());

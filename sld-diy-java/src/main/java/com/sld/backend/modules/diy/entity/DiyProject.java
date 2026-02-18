@@ -114,4 +114,21 @@ public class DiyProject {
      */
     @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updatedAt;
+
+    // Keep backward compatibility with tests/service code that still sets status by string.
+    public void setStatus(String status) {
+        if (status == null) {
+            this.status = null;
+            return;
+        }
+        if ("draft".equalsIgnoreCase(status)) {
+            this.status = 0;
+            return;
+        }
+        if ("saved".equalsIgnoreCase(status)) {
+            this.status = 1;
+            return;
+        }
+        this.status = Integer.valueOf(status);
+    }
 }
