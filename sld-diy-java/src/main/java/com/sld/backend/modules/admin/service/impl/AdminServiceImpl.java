@@ -155,6 +155,7 @@ public class AdminServiceImpl implements AdminService {
     public Map<String, Object> createCategory(CreateCategoryRequest request) {
         Category category = new Category();
         BeanUtils.copyProperties(request, category);
+        category.setSlug(normalizeSlug(request.getSlug(), request.getName()));
         categoryMapper.insert(category);
         return convertCategoryToMap(category);
     }
@@ -166,6 +167,7 @@ public class AdminServiceImpl implements AdminService {
             throw new BusinessException(ErrorCode.NOT_FOUND, "分类不存在");
         }
         BeanUtils.copyProperties(request, category);
+        category.setSlug(normalizeSlug(request.getSlug(), request.getName() != null ? request.getName() : category.getName()));
         categoryMapper.updateById(category);
         return convertCategoryToMap(category);
     }
@@ -522,6 +524,20 @@ public class AdminServiceImpl implements AdminService {
         map.put("name", category.getName());
         map.put("slug", category.getSlug());
         return map;
+    }
+
+    private String normalizeSlug(String slug, String name) {
+        String candidate = (slug != null && !slug.trim().isEmpty()) ? slug : name;
+        if (candidate == null || candidate.trim().isEmpty()) {
+            return "category-" + System.currentTimeMillis();
+        }
+        String normalized = candidate.toLowerCase()
+            .replaceAll("[^a-z0-9\\u4e00-\\u9fa5]+", "-")
+            .replaceAll("^-+|-+$", "");
+        if (normalized.isEmpty()) {
+            return "category-" + System.currentTimeMillis();
+        }
+        return normalized;
     }
 
     private Map<String, Object> convertBrandToMap(Brand brand) {
