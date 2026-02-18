@@ -12,6 +12,10 @@ CREATE TABLE IF NOT EXISTS t_user (
     status VARCHAR(20) DEFAULT 'active',
     avatar VARCHAR(500),
     nickname VARCHAR(50),
+    wechat_openid VARCHAR(128),
+    wechat_unionid VARCHAR(128),
+    wechat_nickname VARCHAR(100),
+    wechat_avatar VARCHAR(500),
     company_name VARCHAR(200),
     business_license VARCHAR(500),
     credit_code VARCHAR(50),
@@ -387,4 +391,3 @@ CREATE TABLE IF NOT EXISTS t_service_request (
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-

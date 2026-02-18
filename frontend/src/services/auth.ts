@@ -10,6 +10,21 @@ export const authService = {
     >('/auth/login', data);
   },
 
+  // 获取微信授权地址
+  getWechatAuthorizeUrl: () => {
+    return apiClient.get<any, ApiResponse<{ authorizeUrl: string; state: string }>>(
+      '/auth/wechat/authorize-url'
+    );
+  },
+
+  // 微信授权登录
+  wechatLogin: (data: { code: string; state: string }) => {
+    return apiClient.post<
+      any,
+      ApiResponse<{ userId: number; username: string; email: string; userType: string; token: string }>
+    >('/auth/wechat/login', data);
+  },
+
   // 用户注册
   register: (data: {
     username: string;

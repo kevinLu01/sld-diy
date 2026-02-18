@@ -3,7 +3,9 @@ package com.sld.backend.modules.auth.controller;
 import com.sld.backend.common.result.Result;
 import com.sld.backend.modules.auth.dto.request.LoginRequest;
 import com.sld.backend.modules.auth.dto.request.RegisterRequest;
+import com.sld.backend.modules.auth.dto.request.WechatLoginRequest;
 import com.sld.backend.modules.auth.dto.response.AuthResponse;
+import com.sld.backend.modules.auth.dto.response.WechatAuthorizeResponse;
 import com.sld.backend.modules.auth.service.AuthService;
 import com.sld.backend.modules.user.dto.response.UserProfileResponse;
 import com.sld.backend.modules.user.service.UserService;
@@ -37,6 +39,18 @@ public class AuthController {
     @Operation(summary = "用户登录")
     public Result<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return Result.success(authService.login(request));
+    }
+
+    @GetMapping("/wechat/authorize-url")
+    @Operation(summary = "获取微信授权地址")
+    public Result<WechatAuthorizeResponse> getWechatAuthorizeUrl() {
+        return Result.success(authService.getWechatAuthorizeUrl());
+    }
+
+    @PostMapping("/wechat/login")
+    @Operation(summary = "微信授权登录")
+    public Result<AuthResponse> wechatLogin(@Valid @RequestBody WechatLoginRequest request) {
+        return Result.success(authService.wechatLogin(request));
     }
 
     @GetMapping("/me")

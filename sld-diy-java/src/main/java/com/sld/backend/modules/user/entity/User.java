@@ -34,6 +34,18 @@ public class User {
 
     private String nickname;
 
+    @TableField("wechat_openid")
+    private String wechatOpenid;
+
+    @TableField("wechat_unionid")
+    private String wechatUnionid;
+
+    @TableField("wechat_nickname")
+    private String wechatNickname;
+
+    @TableField("wechat_avatar")
+    private String wechatAvatar;
+
     @TableField("company_name")
     private String companyName;
 

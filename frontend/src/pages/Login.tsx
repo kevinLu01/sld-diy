@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Form, Input, Button, Card, Tabs, message, Space, Divider, Grid } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, PhoneOutlined, WechatOutlined } from '@ant-design/icons';
 import { useUserStore } from '@/store/user';
@@ -7,10 +7,12 @@ import { authService } from '@/services/auth';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
   const { setUser, setToken } = useUserStore();
   const [loading, setLoading] = useState(false);
+  const wechatCallbackHandled = useRef(false);
 
   const handleLogin = async (values: { account: string; password: string }) => {
     setLoading(true);
@@ -58,6 +60,48 @@ const LoginPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const handleWechatLogin = async () => {
+    try {
+      const response = await authService.getWechatAuthorizeUrl();
+      const authorizeUrl = response.data.authorizeUrl;
+      if (!authorizeUrl) {
+        message.error('暂未获取到微信授权地址');
+        return;
+      }
+      window.location.href = authorizeUrl;
+    } catch (error: any) {
+      message.error(error.response?.data?.message || '微信登录暂不可用');
+    }
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const code = params.get('code');
+    const state = params.get('state');
+
+    if (!code || !state || wechatCallbackHandled.current) {
+      return;
+    }
+
+    wechatCallbackHandled.current = true;
+    setLoading(true);
+    authService
+      .wechatLogin({ code, state })
+      .then(async (response) => {
+        setToken(response.data.token);
+        const profile = await authService.getCurrentUser();
+        setUser(profile.data);
+        message.success('微信登录成功');
+        navigate('/', { replace: true });
+      })
+      .catch((error: any) => {
+        message.error(error.response?.data?.message || '微信登录失败');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [location.search, navigate, setToken, setUser]);
 
   return (
     <div
@@ -132,7 +176,8 @@ const LoginPage: React.FC = () => {
                     <Button
                       block
                       icon={<WechatOutlined />}
-                      onClick={() => message.info('微信登录即将开放，当前版本可先使用账号密码登录')}
+                      onClick={handleWechatLogin}
+                      loading={loading}
                     >
                       微信登录
                     </Button>

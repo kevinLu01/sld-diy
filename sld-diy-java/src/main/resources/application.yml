@@ -64,6 +64,14 @@ jwt:
   secret: ${JWT_SECRET:change-this-secret-key-in-production}
   expiration: 604800000  # 7天 (毫秒)
 
+auth:
+  wechat:
+    enabled: ${WECHAT_AUTH_ENABLED:false}
+    app-id: ${WECHAT_APP_ID:}
+    app-secret: ${WECHAT_APP_SECRET:}
+    redirect-uri: ${WECHAT_REDIRECT_URI:http://ffjj.sldbd.com:9000/login}
+    scope: ${WECHAT_SCOPE:snsapi_userinfo}
+
 # Knife4j 配置
 knife4j:
   enable: true
