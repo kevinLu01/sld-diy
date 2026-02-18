@@ -27,7 +27,7 @@ public interface CartService {
     /**
      * 删除购物车项
      */
-    void deleteItem(Long id);
+    void deleteItem(Long userId, Long id);
 
     /**
      * 清空购物车

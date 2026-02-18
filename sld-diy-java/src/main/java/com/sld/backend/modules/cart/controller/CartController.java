@@ -94,15 +94,27 @@ public class CartController {
 
     @DeleteMapping("/items/{id}")
     @Operation(summary = "删除购物车项")
-    public Result<Void> deleteItem(@PathVariable Long id) {
-        cartService.deleteItem(id);
+    public Result<Void> deleteItem(
+        @PathVariable Long id,
+        @Parameter(description = "用户ID") @CurrentUserId(required = false) Long userId
+    ) {
+        if (userId == null) {
+            return Result.error(ErrorCode.UNAUTHORIZED);
+        }
+        cartService.deleteItem(userId, id);
         return Result.success();
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "删除购物车项(兼容前端路径)")
-    public Result<Void> deleteItemCompat(@PathVariable Long id) {
-        cartService.deleteItem(id);
+    public Result<Void> deleteItemCompat(
+        @PathVariable Long id,
+        @Parameter(description = "用户ID") @CurrentUserId(required = false) Long userId
+    ) {
+        if (userId == null) {
+            return Result.error(ErrorCode.UNAUTHORIZED);
+        }
+        cartService.deleteItem(userId, id);
         return Result.success();
     }
 

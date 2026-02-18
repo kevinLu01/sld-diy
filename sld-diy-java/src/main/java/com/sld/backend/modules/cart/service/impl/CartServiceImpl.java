@@ -104,7 +104,14 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void deleteItem(Long id) {
+    public void deleteItem(Long userId, Long id) {
+        CartItem item = cartItemMapper.selectById(id);
+        if (item == null) {
+            throw new BusinessException(ErrorCode.CART_ITEM_NOT_FOUND);
+        }
+        if (!item.getUserId().equals(userId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN, "无权删除此购物车项");
+        }
         cartItemMapper.deleteById(id);
     }
 

@@ -28,6 +28,7 @@ import {
 } from '@ant-design/icons';
 import { useMutation } from '@tanstack/react-query';
 import { diyService } from '@/services/diy';
+import { cartService } from '@/services/order';
 import type { Product } from '@/types';
 
 const { Title, Text, Paragraph } = Typography;
@@ -151,6 +152,26 @@ const DIYToolPage: React.FC = () => {
       };
       saveMutation.mutate(projectData);
     });
+  };
+
+  const handleAddToCart = async () => {
+    if (selectedProducts.length === 0) {
+      message.warning('请先选择配件');
+      return;
+    }
+    if (compatibilityResult && compatibilityResult.errors?.length > 0) {
+      message.error('存在不兼容配件，无法加入购物车');
+      return;
+    }
+    try {
+      await Promise.all(
+        selectedProducts.map((item) => cartService.addToCart(item.productId, item.quantity))
+      );
+      message.success('已加入购物车');
+      navigate('/cart');
+    } catch (error) {
+      message.error('加入购物车失败，请稍后重试');
+    }
   };
 
   const totalPrice = selectedProducts.reduce(
@@ -520,7 +541,7 @@ const DIYToolPage: React.FC = () => {
                   <Button
                     type="primary"
                     icon={<ShoppingCartOutlined />}
-                    onClick={() => navigate('/cart')}
+                    onClick={handleAddToCart}
                   >
                     加入购物车
                   </Button>
