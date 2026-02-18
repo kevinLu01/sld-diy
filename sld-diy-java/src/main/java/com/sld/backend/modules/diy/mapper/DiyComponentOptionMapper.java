@@ -13,7 +13,11 @@ public interface DiyComponentOptionMapper extends BaseMapper<DiyComponentOption>
 
     @Select({
         "<script>",
-        "SELECT * FROM t_diy_component_option",
+        "SELECT id, scene_component_id AS sceneComponentId, product_id AS productId,",
+        "option_name AS optionName, brand_name AS brandName, model_spec AS modelSpec,",
+        "spec_json AS specJson, base_price AS basePrice, is_active AS isActive,",
+        "sort_order AS sortOrder, create_time AS createTime, update_time AS updateTime",
+        "FROM t_diy_component_option",
         "WHERE is_active = 1 AND scene_component_id IN",
         "<foreach collection='componentIds' item='id' open='(' separator=',' close=')'>",
         "#{id}",

@@ -13,7 +13,11 @@ public interface DiySceneComponentMapper extends BaseMapper<DiySceneComponent> {
 
     @Select({
         "<script>",
-        "SELECT * FROM t_diy_scene_component",
+        "SELECT id, scene_id AS sceneId, component_code AS componentCode, component_name AS componentName,",
+        "component_role AS componentRole, is_required AS required, min_qty AS minQty, max_qty AS maxQty,",
+        "selection_mode AS selectionMode, spec_requirement AS specRequirement,",
+        "sort_order AS sortOrder, is_active AS isActive, create_time AS createTime, update_time AS updateTime",
+        "FROM t_diy_scene_component",
         "WHERE is_active = 1 AND scene_id IN",
         "<foreach collection='sceneIds' item='id' open='(' separator=',' close=')'>",
         "#{id}",
