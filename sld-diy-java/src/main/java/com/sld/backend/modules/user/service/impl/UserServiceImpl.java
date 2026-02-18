@@ -52,12 +52,12 @@ public class UserServiceImpl implements UserService {
 
         // 检查手机号是否被其他用户使用
         if (request.getPhone() != null) {
-            User existUser = userMapper.selectOne(
+            Long existCount = userMapper.selectCount(
                 new LambdaQueryWrapper<User>()
                     .eq(User::getPhone, request.getPhone())
                     .ne(User::getId, userId)
             );
-            if (existUser != null) {
+            if (existCount != null && existCount > 0) {
                 throw new BusinessException(ErrorCode.PHONE_ALREADY_EXISTS);
             }
         }

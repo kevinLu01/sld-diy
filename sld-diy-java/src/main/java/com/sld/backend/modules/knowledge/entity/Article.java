@@ -26,6 +26,7 @@ public class Article {
     @TableField("cover_image")
     private String coverImage;
 
+    @TableField(exist = false)
     private String attachments;
 
     @TableField("view_count")
