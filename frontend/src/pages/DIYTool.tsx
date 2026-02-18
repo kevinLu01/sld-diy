@@ -176,7 +176,11 @@ const DIYToolPage: React.FC = () => {
           </Steps>
         </Card>
 
-        <Form form={form} layout="vertical">
+        <Form
+          form={form}
+          layout="vertical"
+          initialValues={{ capacityUnit: 'kW', coolingCapacity: 1 }}
+        >
           {/* 步骤 0: 选择场景 */}
           {currentStep === 0 && (
             <Card
@@ -237,7 +241,7 @@ const DIYToolPage: React.FC = () => {
           {currentStep === 1 && (
             <Card title="第二步：配置需求参数">
               <Row gutter={16}>
-                <Col xs={24} md={12}>
+                <Col xs={24} md={8}>
                   <Form.Item
                     name="temperatureRange"
                     label="温度范围"
@@ -251,7 +255,7 @@ const DIYToolPage: React.FC = () => {
                     </Select>
                   </Form.Item>
                 </Col>
-                <Col xs={24} md={12}>
+                <Col xs={24} md={8}>
                   <Form.Item
                     name="coolingCapacity"
                     label="制冷量"
@@ -262,15 +266,15 @@ const DIYToolPage: React.FC = () => {
                       max={1000}
                       placeholder="输入制冷量"
                       style={{ width: '100%' }}
-                      addonAfter={
-                        <Form.Item name="capacityUnit" noStyle initialValue="kW">
-                          <Select style={{ width: 80 }}>
-                            <Select.Option value="kW">kW</Select.Option>
-                            <Select.Option value="HP">HP</Select.Option>
-                          </Select>
-                        </Form.Item>
-                      }
                     />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} md={8}>
+                  <Form.Item name="capacityUnit" label="制冷量单位">
+                    <Select>
+                      <Select.Option value="kW">kW</Select.Option>
+                      <Select.Option value="HP">HP</Select.Option>
+                    </Select>
                   </Form.Item>
                 </Col>
               </Row>
