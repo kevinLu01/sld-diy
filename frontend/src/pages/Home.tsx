@@ -32,19 +32,22 @@ const HomePage: React.FC = () => {
     {
       title: '智能DIY配套系统',
       description: '一站式配件选型，让制冷系统搭建更简单',
-      image: 'https://via.placeholder.com/1200x400/1890ff/ffffff?text=DIY智能配套',
+      image:
+        'https://images.pexels.com/photos/159358/air-conditioner-conditioner-air-cold-159358.jpeg?auto=compress&cs=tinysrgb&w=1600',
       action: () => navigate('/diy'),
     },
     {
       title: '专业解决方案',
       description: '20年行业经验，为您提供定制化解决方案',
-      image: 'https://via.placeholder.com/1200x400/52c41a/ffffff?text=专业解决方案',
+      image:
+        'https://images.pexels.com/photos/257736/pexels-photo-257736.jpeg?auto=compress&cs=tinysrgb&w=1600',
       action: () => navigate('/solutions'),
     },
     {
       title: '优质配件供应',
       description: '原厂正品，质量保证，全国包邮',
-      image: 'https://via.placeholder.com/1200x400/fa8c16/ffffff?text=优质配件',
+      image:
+        'https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg?auto=compress&cs=tinysrgb&w=1600',
       action: () => navigate('/products'),
     },
   ];
@@ -81,7 +84,7 @@ const HomePage: React.FC = () => {
             <div
               style={{
                 height: 400,
-                background: `url(${banner.image}) center/cover`,
+                background: `linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35)), url(${banner.image}) center/cover`,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
