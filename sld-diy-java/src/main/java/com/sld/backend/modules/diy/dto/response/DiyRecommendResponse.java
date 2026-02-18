@@ -72,6 +72,9 @@ public class DiyRecommendResponse {
 
         @Schema(description = "数量")
         private Integer quantity;
+
+        @Schema(description = "组件角色 main/auxiliary")
+        private String componentRole;
     }
 
     @Data
@@ -82,6 +85,9 @@ public class DiyRecommendResponse {
     public static class ExplanationVO {
         @Schema(description = "产品类型")
         private String productType;
+
+        @Schema(description = "组件角色 main/auxiliary")
+        private String componentRole;
 
         @Schema(description = "评分")
         private Integer score;

@@ -69,4 +69,7 @@ public interface AdminService {
     Map<String, Object> createDiyRecommendation(CreateDiyRecommendationRequest request);
     Map<String, Object> updateDiyRecommendation(Long id, UpdateDiyRecommendationRequest request);
     void deleteDiyRecommendation(Long id);
+
+    // ==================== DIY私发报价 ====================
+    Map<String, Object> createPrivateDiyQuote(Long projectId, CreatePrivateDiyQuoteRequest request);
 }

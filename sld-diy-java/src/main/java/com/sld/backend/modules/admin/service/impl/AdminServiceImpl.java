@@ -10,8 +10,10 @@ import com.sld.backend.modules.admin.dto.request.*;
 import com.sld.backend.modules.admin.dto.response.AdminStatsResponse;
 import com.sld.backend.modules.admin.service.AdminService;
 import com.sld.backend.modules.diy.entity.DiyConfig;
+import com.sld.backend.modules.diy.entity.DiyProject;
 import com.sld.backend.modules.diy.entity.DiyRecommendation;
 import com.sld.backend.modules.diy.mapper.DiyConfigMapper;
+import com.sld.backend.modules.diy.mapper.DiyProjectMapper;
 import com.sld.backend.modules.diy.mapper.DiyRecommendationMapper;
 import com.sld.backend.modules.knowledge.entity.Article;
 import com.sld.backend.modules.knowledge.mapper.ArticleMapper;
@@ -36,6 +38,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +61,7 @@ public class AdminServiceImpl implements AdminService {
     private final UserMapper userMapper;
     private final DiyConfigMapper diyConfigMapper;
     private final DiyRecommendationMapper diyRecommendationMapper;
+    private final DiyProjectMapper diyProjectMapper;
 
     @Override
     public AdminStatsResponse getStats() {
@@ -489,6 +493,7 @@ public class AdminServiceImpl implements AdminService {
     public Map<String, Object> createDiyRecommendation(CreateDiyRecommendationRequest request) {
         DiyRecommendation rec = new DiyRecommendation();
         BeanUtils.copyProperties(request, rec);
+        rec.setComponentRole(normalizeComponentRole(request.getComponentRole()));
         rec.setIsActive(true);
         diyRecommendationMapper.insert(rec);
         return convertDiyRecommendationToMap(rec);
@@ -501,6 +506,7 @@ public class AdminServiceImpl implements AdminService {
             throw new BusinessException(ErrorCode.NOT_FOUND, "推荐配置不存在");
         }
         BeanUtils.copyProperties(request, rec);
+        rec.setComponentRole(normalizeComponentRole(request.getComponentRole()));
         diyRecommendationMapper.updateById(rec);
         return convertDiyRecommendationToMap(rec);
     }
@@ -508,6 +514,61 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public void deleteDiyRecommendation(Long id) {
         diyRecommendationMapper.deleteById(id);
+    }
+
+    @Override
+    public Map<String, Object> createPrivateDiyQuote(Long projectId, CreatePrivateDiyQuoteRequest request) {
+        DiyProject project = diyProjectMapper.selectById(projectId);
+        if (project == null) {
+            throw new BusinessException(ErrorCode.DIY_PROJECT_NOT_FOUND);
+        }
+
+        String shareToken = java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+        Double baseTotal = project.getTotalPrice() == null ? 0D : project.getTotalPrice();
+        Double quoted = baseTotal;
+        if (request.getDiscountRate() != null) {
+            if (request.getDiscountRate() < 0 || request.getDiscountRate() >= 1) {
+                throw new BusinessException(ErrorCode.BAD_REQUEST, "discountRate 必须在 [0,1) 范围");
+            }
+            quoted = quoted * (1 - request.getDiscountRate());
+        }
+        if (request.getDiscountAmount() != null) {
+            if (request.getDiscountAmount() < 0) {
+                throw new BusinessException(ErrorCode.BAD_REQUEST, "discountAmount 不能小于0");
+            }
+            quoted = Math.max(0, quoted - request.getDiscountAmount());
+        }
+
+        LocalDateTime expiresAt = null;
+        if (request.getExpiresAt() != null && !request.getExpiresAt().isBlank()) {
+            try {
+                expiresAt = LocalDateTime.parse(request.getExpiresAt());
+            } catch (DateTimeParseException ex) {
+                throw new BusinessException(ErrorCode.BAD_REQUEST, "expiresAt 格式错误，请使用 ISO8601");
+            }
+        }
+
+        project.setShareMode("private_offer");
+        project.setShared(true);
+        project.setShareToken(shareToken);
+        project.setQuotedTotalPrice(quoted);
+        project.setDiscountRate(request.getDiscountRate());
+        project.setDiscountAmount(request.getDiscountAmount());
+        project.setPrivateNote(request.getPrivateNote());
+        project.setShareExpiresAt(expiresAt);
+        project.setUpdatedAt(LocalDateTime.now());
+        diyProjectMapper.updateById(project);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("projectId", projectId);
+        result.put("shareMode", "private_offer");
+        result.put("shareToken", shareToken);
+        result.put("shareUrl", "/diy/share/" + shareToken);
+        result.put("quotedTotalPrice", quoted);
+        result.put("discountRate", request.getDiscountRate());
+        result.put("discountAmount", request.getDiscountAmount());
+        result.put("expiresAt", expiresAt);
+        return result;
     }
 
     // ==================== 转换方法 ====================
@@ -652,6 +713,7 @@ public class AdminServiceImpl implements AdminService {
         map.put("id", rec.getId());
         map.put("scenario", rec.getScenario());
         map.put("productType", rec.getProductType());
+        map.put("componentRole", normalizeComponentRole(rec.getComponentRole()));
         map.put("categoryId", rec.getCategoryId());
         map.put("category", category != null ? convertCategoryToMap(category) : null);
         map.put("priority", rec.getPriority());
@@ -660,5 +722,16 @@ public class AdminServiceImpl implements AdminService {
         map.put("maxQuantity", rec.getMaxQuantity());
         map.put("isActive", rec.getIsActive());
         return map;
+    }
+
+    private String normalizeComponentRole(String role) {
+        if (role == null || role.isBlank()) {
+            return "main";
+        }
+        String normalized = role.trim().toLowerCase();
+        if (!"main".equals(normalized) && !"auxiliary".equals(normalized)) {
+            return "main";
+        }
+        return normalized;
     }
 }

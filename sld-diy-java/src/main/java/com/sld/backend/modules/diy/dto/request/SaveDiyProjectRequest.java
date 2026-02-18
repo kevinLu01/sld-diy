@@ -22,6 +22,9 @@ public class SaveDiyProjectRequest {
     @Schema(description = "场景")
     private String scenario;
 
+    @Schema(description = "自定义场景名称")
+    private String customScenarioName;
+
     @Schema(description = "需求参数")
     private Map<String, Object> requirements;
 

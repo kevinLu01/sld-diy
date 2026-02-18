@@ -7,6 +7,7 @@ import com.sld.backend.common.exception.BusinessException;
 import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.modules.diy.dto.request.DiyRecommendRequest;
 import com.sld.backend.modules.diy.dto.request.SaveDiyProjectRequest;
+import com.sld.backend.modules.diy.dto.request.ShareDiyProjectRequest;
 import com.sld.backend.modules.diy.dto.response.DiyConfigVO;
 import com.sld.backend.modules.diy.dto.response.DiyProjectVO;
 import com.sld.backend.modules.diy.dto.response.DiyRecommendResponse;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -88,13 +90,15 @@ public class DiyServiceImpl implements DiyService {
                 vo.setMatchScore(calculateMatchScore(request, rec));
                 vo.setMatchReason(buildMatchReason(request, rec));
                 vo.setQuantity(1);
+                vo.setComponentRole(normalizeComponentRole(rec.getComponentRole()));
                 return vo;
             }).collect(Collectors.toList());
 
-            typedProductsMap.put(rec.getProductType(), productList);
+            typedProductsMap.put(normalizeComponentRole(rec.getComponentRole()) + ":" + rec.getProductType(), productList);
             explanations.add(
                 DiyRecommendResponse.ExplanationVO.builder()
                     .productType(rec.getProductType())
+                    .componentRole(normalizeComponentRole(rec.getComponentRole()))
                     .score(calculateMatchScore(request, rec))
                     .reason(buildMatchReason(request, rec))
                     .alternatives(List.of("可尝试同类低噪音型号", "可按预算选择更高能效型号"))
@@ -105,6 +109,7 @@ public class DiyServiceImpl implements DiyService {
         // Convert request to Map for requirements
         Map<String, Object> requirementsMap = new HashMap<>();
         requirementsMap.put("scenario", request.getScenario());
+        requirementsMap.put("customScenarioName", request.getCustomScenarioName());
         requirementsMap.put("temperatureRange", request.getTemperatureRange());
         requirementsMap.put("coolingCapacity", request.getCoolingCapacity());
         requirementsMap.put("volume", request.getVolume());
@@ -192,11 +197,14 @@ public class DiyServiceImpl implements DiyService {
         project.setUserId(userId);
         project.setProjectName(request.getProjectName());
         project.setScenario(request.getScenario());
+        project.setCustomScenarioName(request.getCustomScenarioName());
         // Store options as JSON string
         if (request.getRequirements() != null) {
             project.setOptions(JSONUtil.toJsonStr(request.getRequirements()));
         }
         project.setTotalPrice(request.getTotalPrice() != null ? request.getTotalPrice().doubleValue() : null);
+        project.setQuotedTotalPrice(project.getTotalPrice());
+        project.setShareMode("public");
         project.setStatus("draft");
         project.setShared(request.getShared() != null ? request.getShared() : false);
         project.setCreatedAt(LocalDateTime.now());
@@ -232,7 +240,7 @@ public class DiyServiceImpl implements DiyService {
 
     @Override
     @Transactional
-    public DiyShareResponse shareProject(Long id, Long userId) {
+    public DiyShareResponse shareProject(Long id, Long userId, ShareDiyProjectRequest request) {
         DiyProject project = diyProjectMapper.selectById(id);
         if (project == null) {
             throw new BusinessException(ErrorCode.DIY_PROJECT_NOT_FOUND);
@@ -243,18 +251,24 @@ public class DiyServiceImpl implements DiyService {
         
         // 生成分享token
         String shareToken = generateShareToken();
+        applyShareParams(project, request);
         project.setShareToken(shareToken);
         project.setShared(true);
         project.setUpdatedAt(LocalDateTime.now());
         diyProjectMapper.updateById(project);
-        
-        String shareUrl = "https://sld-mall.com/diy/share/" + shareToken;
+
+        String shareUrl = "/diy/share/" + shareToken;
         String qrCode = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + shareUrl;
-        
+
         DiyShareResponse response = new DiyShareResponse();
         response.setShareUrl(shareUrl);
         response.setShareToken(shareToken);
         response.setQrCode(qrCode);
+        response.setShareMode(project.getShareMode());
+        response.setQuotedTotalPrice(toBigDecimal(project.getQuotedTotalPrice()));
+        response.setDiscountRate(toBigDecimal(project.getDiscountRate()));
+        response.setDiscountAmount(toBigDecimal(project.getDiscountAmount()));
+        response.setShareExpiresAt(project.getShareExpiresAt() != null ? project.getShareExpiresAt().toString() : null);
         return response;
     }
 
@@ -268,6 +282,9 @@ public class DiyServiceImpl implements DiyService {
         if (project == null) {
             throw new BusinessException(ErrorCode.DIY_PROJECT_NOT_FOUND, "分享链接已失效");
         }
+        if (project.getShareExpiresAt() != null && LocalDateTime.now().isAfter(project.getShareExpiresAt())) {
+            throw new BusinessException(ErrorCode.DIY_PROJECT_NOT_FOUND, "分享链接已过期");
+        }
         // 增加浏览量 - viewCount handled by viewCount field
         diyProjectMapper.updateById(project);
         return toVO(project);
@@ -278,8 +295,15 @@ public class DiyServiceImpl implements DiyService {
             .id(project.getId())
             .projectName(project.getProjectName())
             .scenario(project.getScenario())
-            .totalPrice(project.getTotalPrice() != null ? new java.math.BigDecimal(project.getTotalPrice()) : null)
+            .customScenarioName(project.getCustomScenarioName())
+            .totalPrice(toBigDecimal(project.getTotalPrice()))
+            .quotedTotalPrice(toBigDecimal(project.getQuotedTotalPrice()))
+            .discountRate(toBigDecimal(project.getDiscountRate()))
+            .discountAmount(toBigDecimal(project.getDiscountAmount()))
+            .privateNote(project.getPrivateNote())
             .shared(project.getShared())
+            .shareMode(project.getShareMode())
+            .shareExpiresAt(project.getShareExpiresAt() != null ? project.getShareExpiresAt().toString() : null)
             .createTime(project.getCreatedAt() != null ? project.getCreatedAt().toString() : null)
             .build();
     }
@@ -302,6 +326,7 @@ public class DiyServiceImpl implements DiyService {
         vo.put("id", rec.getId());
         vo.put("scenario", rec.getScenario());
         vo.put("productType", rec.getProductType());
+        vo.put("componentRole", normalizeComponentRole(rec.getComponentRole()));
         vo.put("categoryId", rec.getCategoryId());
         vo.put("priority", rec.getPriority());
         vo.put("isRequired", rec.getIsRequired());
@@ -309,6 +334,70 @@ public class DiyServiceImpl implements DiyService {
     }
 
     private String generateShareToken() {
-        return UUID.randomUUID().toString().substring(0, 8);
+        return UUID.randomUUID().toString().replace("-", "").substring(0, 12);
+    }
+
+    private String normalizeComponentRole(String role) {
+        if (role == null || role.isBlank()) {
+            return "main";
+        }
+        String normalized = role.trim().toLowerCase(Locale.ROOT);
+        if (!"auxiliary".equals(normalized) && !"main".equals(normalized)) {
+            return "main";
+        }
+        return normalized;
+    }
+
+    private void applyShareParams(DiyProject project, ShareDiyProjectRequest request) {
+        String shareMode = "public";
+        if (request != null && request.getShareMode() != null && !request.getShareMode().isBlank()) {
+            shareMode = request.getShareMode().trim().toLowerCase(Locale.ROOT);
+        }
+        if (!"private_offer".equals(shareMode)) {
+            shareMode = "public";
+        }
+        project.setShareMode(shareMode);
+
+        Double baseTotal = project.getTotalPrice() == null ? 0D : project.getTotalPrice();
+        Double quote = baseTotal;
+        Double discountRate = null;
+        Double discountAmount = null;
+        String privateNote = null;
+        LocalDateTime expiresAt = null;
+
+        if ("private_offer".equals(shareMode) && request != null) {
+            if (request.getDiscountRate() != null) {
+                if (request.getDiscountRate() < 0 || request.getDiscountRate() >= 1) {
+                    throw new BusinessException(ErrorCode.BAD_REQUEST, "discountRate 必须在 [0,1) 范围");
+                }
+                discountRate = request.getDiscountRate();
+                quote = quote * (1 - discountRate);
+            }
+            if (request.getDiscountAmount() != null) {
+                if (request.getDiscountAmount() < 0) {
+                    throw new BusinessException(ErrorCode.BAD_REQUEST, "discountAmount 不能小于0");
+                }
+                discountAmount = request.getDiscountAmount();
+                quote = Math.max(0, quote - discountAmount);
+            }
+            privateNote = request.getPrivateNote();
+            if (request.getExpiresAt() != null && !request.getExpiresAt().isBlank()) {
+                try {
+                    expiresAt = LocalDateTime.parse(request.getExpiresAt());
+                } catch (DateTimeParseException ex) {
+                    throw new BusinessException(ErrorCode.BAD_REQUEST, "expiresAt 格式错误，请使用 ISO8601");
+                }
+            }
+        }
+
+        project.setQuotedTotalPrice(quote);
+        project.setDiscountRate(discountRate);
+        project.setDiscountAmount(discountAmount);
+        project.setPrivateNote(privateNote);
+        project.setShareExpiresAt(expiresAt);
+    }
+
+    private java.math.BigDecimal toBigDecimal(Double value) {
+        return value == null ? null : java.math.BigDecimal.valueOf(value);
     }
 }

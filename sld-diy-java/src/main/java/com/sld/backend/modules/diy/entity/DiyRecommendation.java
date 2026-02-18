@@ -28,6 +28,12 @@ public class DiyRecommendation {
     private String productType;
 
     /**
+     * 组件角色：main/auxiliary
+     */
+    @TableField("component_role")
+    private String componentRole;
+
+    /**
      * 分类ID
      */
     @TableField("category_id")

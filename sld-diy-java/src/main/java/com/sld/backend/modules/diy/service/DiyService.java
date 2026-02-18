@@ -3,6 +3,7 @@ package com.sld.backend.modules.diy.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sld.backend.modules.diy.dto.request.DiyRecommendRequest;
 import com.sld.backend.modules.diy.dto.request.SaveDiyProjectRequest;
+import com.sld.backend.modules.diy.dto.request.ShareDiyProjectRequest;
 import com.sld.backend.modules.diy.dto.response.DiyProjectVO;
 import com.sld.backend.modules.diy.dto.response.DiyRecommendResponse;
 import com.sld.backend.modules.diy.dto.response.DiyShareResponse;
@@ -47,7 +48,7 @@ public interface DiyService {
     /**
      * 分享DIY方案
      */
-    DiyShareResponse shareProject(Long id, Long userId);
+    DiyShareResponse shareProject(Long id, Long userId, ShareDiyProjectRequest request);
 
     /**
      * 通过分享Token获取DIY方案

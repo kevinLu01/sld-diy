@@ -19,6 +19,9 @@ public class DiyRecommendRequest {
     @Schema(description = "场景", example = "cold_storage")
     private String scenario;
 
+    @Schema(description = "自定义场景名称", example = "海鲜加工车间")
+    private String customScenarioName;
+
     @Schema(description = "温度范围", example = "-5~0")
     private String temperatureRange;
 

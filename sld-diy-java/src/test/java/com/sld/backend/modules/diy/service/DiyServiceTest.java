@@ -6,8 +6,10 @@ import com.sld.backend.common.exception.BusinessException;
 import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.modules.diy.dto.request.DiyRecommendRequest;
 import com.sld.backend.modules.diy.dto.request.SaveDiyProjectRequest;
+import com.sld.backend.modules.diy.dto.request.ShareDiyProjectRequest;
 import com.sld.backend.modules.diy.dto.response.DiyProjectVO;
 import com.sld.backend.modules.diy.dto.response.DiyRecommendResponse;
+import com.sld.backend.modules.diy.dto.response.DiyShareResponse;
 import com.sld.backend.modules.diy.entity.DiyConfig;
 import com.sld.backend.modules.diy.entity.DiyProject;
 import com.sld.backend.modules.diy.entity.DiyRecommendation;
@@ -215,5 +217,45 @@ class DiyServiceTest {
         assertThat(result.getScenario()).isEqualTo("cold_storage");
 
         verify(diyRecommendationMapper).selectByScenario("cold_storage");
+    }
+
+    @Test
+    @DisplayName("分享DIY项目 - 私发折扣成功")
+    void testShareProject_PrivateOfferSuccess() {
+        testProject.setShared(false);
+        testProject.setTotalPrice(5000.0);
+        when(diyProjectMapper.selectById(1L)).thenReturn(testProject);
+        when(diyProjectMapper.updateById(any(DiyProject.class))).thenReturn(1);
+
+        ShareDiyProjectRequest request = new ShareDiyProjectRequest();
+        request.setShareMode("private_offer");
+        request.setDiscountRate(0.1);
+        request.setDiscountAmount(200.0);
+        request.setPrivateNote("VIP客户专享");
+
+        DiyShareResponse response = diyService.shareProject(1L, 1L, request);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getShareMode()).isEqualTo("private_offer");
+        assertThat(response.getQuotedTotalPrice()).isNotNull();
+        assertThat(response.getQuotedTotalPrice().doubleValue()).isEqualTo(4300.0);
+        verify(diyProjectMapper).updateById(any(DiyProject.class));
+    }
+
+    @Test
+    @DisplayName("分享DIY项目 - 非所有者禁止")
+    void testShareProject_NotOwner() {
+        testProject.setUserId(2L);
+        when(diyProjectMapper.selectById(1L)).thenReturn(testProject);
+
+        ShareDiyProjectRequest request = new ShareDiyProjectRequest();
+        request.setShareMode("private_offer");
+
+        BusinessException exception = assertThrows(
+            BusinessException.class,
+            () -> diyService.shareProject(1L, 1L, request)
+        );
+
+        assertThat(exception.getCode()).isEqualTo(ErrorCode.FORBIDDEN.getCode());
     }
 }

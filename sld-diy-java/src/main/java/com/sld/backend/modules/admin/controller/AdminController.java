@@ -338,4 +338,14 @@ public class AdminController {
         adminService.deleteDiyRecommendation(id);
         return Result.success();
     }
+
+    @PostMapping("/diy-projects/{id}/private-offer")
+    @Operation(summary = "创建DIY私发报价链接")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<Map<String, Object>> createPrivateDiyQuote(
+        @PathVariable Long id,
+        @RequestBody CreatePrivateDiyQuoteRequest request
+    ) {
+        return Result.success(adminService.createPrivateDiyQuote(id, request));
+    }
 }

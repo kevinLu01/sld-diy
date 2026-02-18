@@ -11,4 +11,9 @@ public class DiyShareResponse {
     private String shareUrl;
     private String shareToken;
     private String qrCode;
+    private String shareMode;
+    private java.math.BigDecimal quotedTotalPrice;
+    private java.math.BigDecimal discountRate;
+    private java.math.BigDecimal discountAmount;
+    private String shareExpiresAt;
 }

@@ -4,6 +4,7 @@ import com.sld.backend.common.result.PageResult;
 import com.sld.backend.common.result.Result;
 import com.sld.backend.modules.diy.dto.request.DiyRecommendRequest;
 import com.sld.backend.modules.diy.dto.request.SaveDiyProjectRequest;
+import com.sld.backend.modules.diy.dto.request.ShareDiyProjectRequest;
 import com.sld.backend.modules.diy.dto.response.DiyConfigVO;
 import com.sld.backend.modules.diy.dto.response.DiyProjectVO;
 import com.sld.backend.modules.diy.dto.response.DiyRecommendResponse;
@@ -93,9 +94,10 @@ public class DiyController {
     @Operation(summary = "分享DIY方案")
     public Result<DiyShareResponse> shareProject(
         @PathVariable Long id,
-        @Parameter(description = "用户ID") @CurrentUserId Long userId
+        @Parameter(description = "用户ID") @CurrentUserId Long userId,
+        @RequestBody(required = false) ShareDiyProjectRequest request
     ) {
-        return Result.success(diyService.shareProject(id, userId));
+        return Result.success(diyService.shareProject(id, userId, request));
     }
 
     @GetMapping("/share/{token}")

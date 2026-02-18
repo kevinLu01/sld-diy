@@ -16,6 +16,8 @@ public class CreateDiyRecommendationRequest {
     @NotBlank(message = "产品类型不能为空")
     private String productType;
 
+    private String componentRole;
+
     @NotNull(message = "分类ID不能为空")
     private Long categoryId;
 

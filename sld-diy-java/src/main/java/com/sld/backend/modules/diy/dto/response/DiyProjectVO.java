@@ -27,6 +27,9 @@ public class DiyProjectVO {
     @Schema(description = "场景")
     private String scenario;
 
+    @Schema(description = "自定义场景名称")
+    private String customScenarioName;
+
     @Schema(description = "总价")
     private BigDecimal totalPrice;
 
@@ -41,6 +44,24 @@ public class DiyProjectVO {
 
     @Schema(description = "是否分享")
     private Boolean shared;
+
+    @Schema(description = "分享模式")
+    private String shareMode;
+
+    @Schema(description = "报价金额")
+    private BigDecimal quotedTotalPrice;
+
+    @Schema(description = "折扣比例")
+    private BigDecimal discountRate;
+
+    @Schema(description = "立减金额")
+    private BigDecimal discountAmount;
+
+    @Schema(description = "私发说明")
+    private String privateNote;
+
+    @Schema(description = "分享过期时间")
+    private String shareExpiresAt;
 
     @Schema(description = "浏览次数")
     private Integer viewCount;

@@ -29,9 +29,7 @@ export const diyService = {
 
   // 验证配件兼容性
   validateCompatibility: (productIds: number[]) => {
-    return apiClient.post<any, ApiResponse<CompatibilityCheck>>('/diy/validate-compatibility', {
-      productIds,
-    });
+    return apiClient.post<any, ApiResponse<CompatibilityCheck>>('/diy/validate-compatibility', productIds);
   },
 
   // 保存DIY项目
@@ -68,15 +66,29 @@ export const diyService = {
   },
 
   // 分享DIY项目
-  shareProject: (id: number) => {
+  shareProject: (
+    id: number,
+    payload?: {
+      shareMode?: 'public' | 'private_offer';
+      discountRate?: number;
+      discountAmount?: number;
+      expiresAt?: string;
+      privateNote?: string;
+    }
+  ) => {
     return apiClient.post<
       any,
       ApiResponse<{
         shareUrl: string;
         shareToken: string;
         qrCode: string;
+        shareMode?: string;
+        quotedTotalPrice?: number;
+        discountRate?: number;
+        discountAmount?: number;
+        shareExpiresAt?: string;
       }>
-    >(`/diy/projects/${id}/share`);
+    >(`/diy/projects/${id}/share`, payload || {});
   },
 
   // 获取解决方案列表

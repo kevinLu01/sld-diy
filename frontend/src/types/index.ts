@@ -146,6 +146,7 @@ export interface DiyProject {
   userId: number;
   projectName: string;
   scenario?: string;
+  customScenarioName?: string;
   temperatureRange?: string;
   coolingCapacity?: number;
   capacityUnit?: string;
@@ -154,6 +155,12 @@ export interface DiyProject {
   ambientTemp?: string;
   selectedProducts: DiyProjectItem[];
   totalPrice: number;
+  quotedTotalPrice?: number;
+  discountRate?: number;
+  discountAmount?: number;
+  privateNote?: string;
+  shareMode?: 'public' | 'private_offer';
+  shareExpiresAt?: string;
   status: 'draft' | 'saved' | 'ordered';
   shared: boolean;
   shareToken?: string;

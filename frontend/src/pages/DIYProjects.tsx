@@ -8,6 +8,11 @@ import {
   Typography,
   Tag,
   Modal,
+  Form,
+  Select,
+  InputNumber,
+  DatePicker,
+  Input,
   Popconfirm,
   message,
   Empty,
@@ -32,6 +37,9 @@ const DIYProjectsPage: React.FC = () => {
   const isMobile = !screens.md;
   const [shareModalVisible, setShareModalVisible] = useState(false);
   const [shareData, setShareData] = useState<any>(null);
+  const [shareProjectId, setShareProjectId] = useState<number | null>(null);
+  const [shareForm] = Form.useForm();
+  const shareMode = Form.useWatch('shareMode', shareForm);
 
   const { data: projectsData, isLoading } = useQuery({
     queryKey: ['diy-projects'],
@@ -39,7 +47,7 @@ const DIYProjectsPage: React.FC = () => {
   });
 
   const shareMutation = useMutation({
-    mutationFn: (projectId: number) => diyService.shareProject(projectId),
+    mutationFn: (payload: any) => diyService.shareProject(payload.projectId, payload.data),
     onSuccess: (data) => {
       setShareData(data.data);
       setShareModalVisible(true);
@@ -50,7 +58,25 @@ const DIYProjectsPage: React.FC = () => {
   });
 
   const handleShare = (projectId: number) => {
-    shareMutation.mutate(projectId);
+    setShareProjectId(projectId);
+    setShareData(null);
+    shareForm.setFieldsValue({ shareMode: 'public', discountRate: null, discountAmount: null, expiresAt: null, privateNote: '' });
+    setShareModalVisible(true);
+  };
+
+  const handleCreateShare = () => {
+    if (!shareProjectId) return;
+    const values = shareForm.getFieldsValue();
+    shareMutation.mutate({
+      projectId: shareProjectId,
+      data: {
+        shareMode: values.shareMode,
+        discountRate: values.discountRate != null ? Number(values.discountRate) : undefined,
+        discountAmount: values.discountAmount != null ? Number(values.discountAmount) : undefined,
+        expiresAt: values.expiresAt ? values.expiresAt.format('YYYY-MM-DDTHH:mm:ss') : undefined,
+        privateNote: values.privateNote || undefined,
+      },
+    });
   };
 
   const handleCopyLink = () => {
@@ -108,17 +134,31 @@ const DIYProjectsPage: React.FC = () => {
       ),
     },
     {
+      title: '报价',
+      key: 'quotedTotalPrice',
+      render: (_: any, record: any) => (
+        <Text type={record.shareMode === 'private_offer' ? 'danger' : undefined}>
+          ¥{(record.quotedTotalPrice ?? record.totalPrice ?? 0).toFixed(2)}
+        </Text>
+      ),
+    },
+    {
       title: '状态',
       dataIndex: 'status',
       key: 'status',
-      render: (status: string) => {
+      render: (status: string, record: any) => {
         const statusMap: Record<string, { color: string; text: string }> = {
           draft: { color: 'default', text: '草稿' },
           saved: { color: 'blue', text: '已保存' },
           ordered: { color: 'green', text: '已下单' },
         };
         const config = statusMap[status] || statusMap.draft;
-        return <Tag color={config.color}>{config.text}</Tag>;
+        return (
+          <Space>
+            <Tag color={config.color}>{config.text}</Tag>
+            {record.shareMode === 'private_offer' ? <Tag color="magenta">私发</Tag> : null}
+          </Space>
+        );
       },
     },
     {
@@ -219,7 +259,10 @@ const DIYProjectsPage: React.FC = () => {
           open={shareModalVisible}
           onCancel={() => setShareModalVisible(false)}
           footer={[
-            <Button key="copy" type="primary" onClick={handleCopyLink}>
+            <Button key="generate" type="primary" onClick={handleCreateShare} loading={shareMutation.isPending}>
+              生成链接
+            </Button>,
+            <Button key="copy" onClick={handleCopyLink} disabled={!shareData?.shareUrl}>
               复制链接
             </Button>,
             <Button key="close" onClick={() => setShareModalVisible(false)}>
@@ -228,19 +271,39 @@ const DIYProjectsPage: React.FC = () => {
           ]}
           width={isMobile ? '95%' : 520}
         >
+          <Form form={shareForm} layout="vertical" initialValues={{ shareMode: 'public' }}>
+            <Form.Item name="shareMode" label="分享模式">
+              <Select
+                options={[
+                  { label: '公开分享', value: 'public' },
+                  { label: '私发报价', value: 'private_offer' },
+                ]}
+              />
+            </Form.Item>
+            {shareMode === 'private_offer' && (
+              <>
+                <Form.Item name="discountRate" label="折扣率(0.1=9折)">
+                  <InputNumber min={0} max={0.99} step={0.01} style={{ width: '100%' }} />
+                </Form.Item>
+                <Form.Item name="discountAmount" label="立减金额">
+                  <InputNumber min={0} style={{ width: '100%' }} />
+                </Form.Item>
+                <Form.Item name="expiresAt" label="过期时间">
+                  <DatePicker showTime style={{ width: '100%' }} />
+                </Form.Item>
+                <Form.Item name="privateNote" label="报价说明">
+                  <Input.TextArea rows={3} />
+                </Form.Item>
+              </>
+            )}
+          </Form>
           {shareData && (
-            <Space direction="vertical" size={24} style={{ width: '100%', textAlign: 'center' }}>
-              <div>
-                <QRCode value={shareData.shareUrl} size={isMobile ? 160 : 200} />
-              </div>
-              <div>
-                <Paragraph copyable={{ text: shareData.shareUrl }}>
-                  {shareData.shareUrl}
-                </Paragraph>
-              </div>
-              <div style={{ fontSize: 12, color: '#999' }}>
-                扫描二维码或复制链接分享给朋友
-              </div>
+            <Space direction="vertical" size={16} style={{ width: '100%', textAlign: 'center' }}>
+              <QRCode value={shareData.shareUrl} size={isMobile ? 150 : 180} />
+              <Paragraph copyable={{ text: shareData.shareUrl }}>{shareData.shareUrl}</Paragraph>
+              {shareData.shareMode === 'private_offer' ? (
+                <Text type="danger">私发报价: ¥{Number(shareData.quotedTotalPrice || 0).toFixed(2)}</Text>
+              ) : null}
             </Space>
           )}
         </Modal>

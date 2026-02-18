@@ -113,3 +113,22 @@
   - 结果 `PASS=37 WARN=1 FAIL=0`（唯一WARN为业务预期：服务单未完成不可评价）
 - DB观察:
   - `sld_diy` 中 `t_*` 与 CamelCase 两套表并存，当前功能可用，但需后续统一
+
+## Checkpoint - 2026-02-18 18:20 CST
+- Leader心跳: OK
+- 新任务拆解: 已创建 Step2-J（DIY可配置化+私发报价）任务清单
+- 本轮执行顺序: J1数据模型 -> J2后端接口 -> J3后台配置 -> J4前台交互 -> J5测试回归
+- 进度要求: 每个子任务完成后先单测再业务流测试并发送通知
+- 服务器观察: 继续保留日志跟踪，关注 DIY 推荐/分享/后台配置接口
+
+## Checkpoint - 2026-02-18 18:16 CST
+- Leader心跳: OK
+- Step2-J完成项:
+  - J1 数据模型扩展（迁移脚本+schema同步）
+  - J2 后端接口改造（DIY推荐主辅件/私发分享参数/后台私发接口）
+  - J3 后台页面能力（组件角色、私发报价入口）
+  - J4 前台交互改造（动态场景、自定义场景、主辅件分区、私发报价）
+- 测试结果:
+  - `mvn -Dtest=DiyServiceTest,CriticalFlowIntegrationTest test` PASS
+  - `npm run build` PASS
+- 待执行: J5.3 线上前后台点击流回归 + J5.4回写

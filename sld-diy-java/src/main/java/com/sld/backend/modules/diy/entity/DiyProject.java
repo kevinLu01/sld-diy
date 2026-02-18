@@ -40,6 +40,12 @@ public class DiyProject {
     private String scenario;
 
     /**
+     * 自定义场景名称
+     */
+    @TableField("custom_scenario_name")
+    private String customScenarioName;
+
+    /**
      * 温度范围
      */
     @TableField(exist = false)
@@ -98,10 +104,46 @@ public class DiyProject {
     private Boolean shared;
 
     /**
+     * 分享模式：public/private_offer
+     */
+    @TableField("share_mode")
+    private String shareMode;
+
+    /**
      * 分享Token
      */
     @TableField("share_token")
     private String shareToken;
+
+    /**
+     * 分享过期时间
+     */
+    @TableField("share_expires_at")
+    private LocalDateTime shareExpiresAt;
+
+    /**
+     * 报价金额（折扣后）
+     */
+    @TableField("quoted_total_price")
+    private Double quotedTotalPrice;
+
+    /**
+     * 折扣比例（0.15 = 85折）
+     */
+    @TableField("discount_rate")
+    private Double discountRate;
+
+    /**
+     * 立减金额
+     */
+    @TableField("discount_amount")
+    private Double discountAmount;
+
+    /**
+     * 私发说明
+     */
+    @TableField("private_note")
+    private String privateNote;
 
     /**
      * 创建时间

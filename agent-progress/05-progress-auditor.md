@@ -96,3 +96,17 @@
   - 后台分类创建500已修复并复测通过
 - 风险留档:
   - 数据库双表体系并存（`t_*` + CamelCase），建议在Step2/Step3阶段纳入架构优化
+
+## Checkpoint - 2026-02-18 18:20 CST
+- Auditor心跳: OK
+- 新审计对象: `agent-progress/reports/step2-j-diy-customization-private-quote-plan.md`
+- 审计结论: PASS（任务拆分、验收口径、执行顺序完整）
+- 规则确认: 后续每完成一个子任务必须同步文档与通知
+
+## Checkpoint - 2026-02-18 18:16 CST
+- Auditor心跳: OK
+- 审计范围: Step2-J 清单与代码测试证据
+- 审计结论: PASS（J1-J4已完成并有测试输出，J5.3/J5.4待执行）
+- 证据:
+  - 后端测试 `DiyServiceTest + CriticalFlowIntegrationTest` 通过
+  - 前端构建 `npm run build` 通过

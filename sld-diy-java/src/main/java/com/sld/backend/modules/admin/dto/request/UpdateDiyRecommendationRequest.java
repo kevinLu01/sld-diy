@@ -10,6 +10,7 @@ public class UpdateDiyRecommendationRequest {
 
     private String scenario;
     private String productType;
+    private String componentRole;
     private Long categoryId;
     private Integer priority;
     private Boolean isRequired;

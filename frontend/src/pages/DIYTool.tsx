@@ -5,6 +5,7 @@ import {
   Card,
   Form,
   Select,
+  Input,
   InputNumber,
   Button,
   Space,
@@ -26,7 +27,7 @@ import {
   SaveOutlined,
   ShoppingCartOutlined,
 } from '@ant-design/icons';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { diyService } from '@/services/diy';
 import { cartService } from '@/services/order';
 import type { Product } from '@/types';
@@ -41,19 +42,38 @@ interface SelectedProduct {
   category: string;
 }
 
+interface ScenarioOption {
+  value: string;
+  label: string;
+  description?: string;
+}
+
 const DIYToolPage: React.FC = () => {
   const navigate = useNavigate();
   const screens = Grid.useBreakpoint();
   const isMobile = !screens.md;
   const [form] = Form.useForm();
   const selectedScenario = Form.useWatch('scenario', form);
+  const isCustomScenario = selectedScenario === 'custom';
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([]);
   const [recommendedProducts, setRecommendedProducts] = useState<Record<string, Product[]>>({});
   const [recommendExplanations, setRecommendExplanations] = useState<
-    Array<{ productType: string; score: number; reason: string; alternatives?: string[] }>
+    Array<{ productType: string; componentRole?: string; score: number; reason: string; alternatives?: string[] }>
   >([]);
   const [compatibilityResult, setCompatibilityResult] = useState<any>(null);
+
+  const { data: diyConfigData } = useQuery({
+    queryKey: ['diy-config'],
+    queryFn: () => diyService.getConfig(),
+  });
+
+  const scenarioConfigs: ScenarioOption[] =
+    diyConfigData?.data?.configs?.scenario?.map((item: any) => ({
+      value: item.key,
+      label: item.label,
+      description: item.description,
+    })) || [];
 
   // 获取推荐的产品
   const recommendMutation = useMutation({
@@ -93,12 +113,13 @@ const DIYToolPage: React.FC = () => {
     },
   });
 
-  const scenarios = [
+  const defaultScenarios: ScenarioOption[] = [
     { value: 'cold_storage', label: '冷库制冷', description: '适用于各类冷库' },
     { value: 'supermarket_freezer', label: '商超冷柜', description: '超市冷藏冷冻柜' },
     { value: 'cold_chain', label: '冷链运输', description: '冷藏车、保温车' },
     { value: 'air_conditioning', label: '空调系统', description: '中央空调、分体空调' },
   ];
+  const scenarios = scenarioConfigs.length > 0 ? scenarioConfigs : defaultScenarios;
 
   const handleStepSubmit = () => {
     if (currentStep === 0) {
@@ -106,6 +127,10 @@ const DIYToolPage: React.FC = () => {
       const values = form.getFieldsValue();
       if (!values.scenario) {
         message.warning('请选择应用场景');
+        return;
+      }
+      if (values.scenario === 'custom' && !values.customScenarioName) {
+        message.warning('请输入自定义场景名称');
         return;
       }
       setCurrentStep(1);
@@ -257,8 +282,42 @@ const DIYToolPage: React.FC = () => {
                       </Card>
                     </Col>
                   ))}
+                  <Col xs={24} sm={12} md={6} key="custom">
+                    <Card
+                      hoverable
+                      onClick={() => form.setFieldValue('scenario', 'custom')}
+                      style={{
+                        border:
+                          selectedScenario === 'custom'
+                            ? '2px solid #1890ff'
+                            : '1px solid #d9d9d9',
+                        background: selectedScenario === 'custom' ? '#e6f4ff' : '#fff',
+                      }}
+                    >
+                      <Space align="center" style={{ width: '100%', justifyContent: 'space-between' }}>
+                        <Title level={4} style={{ margin: 0 }}>
+                          自定义场景
+                        </Title>
+                        {selectedScenario === 'custom' && (
+                          <Tag color="success" icon={<CheckCircleOutlined />}>
+                            已选中
+                          </Tag>
+                        )}
+                      </Space>
+                      <Text type="secondary">按项目自行定义业务场景</Text>
+                    </Card>
+                  </Col>
                 </Row>
               </Form.Item>
+              {isCustomScenario && (
+                <Form.Item
+                  name="customScenarioName"
+                  label="自定义场景名称"
+                  rules={[{ required: true, message: '请输入自定义场景名称' }]}
+                >
+                  <Input placeholder="例如：海鲜加工车间速冻线" />
+                </Form.Item>
+              )}
             </Card>
           )}
 
@@ -360,7 +419,7 @@ const DIYToolPage: React.FC = () => {
                     <Space direction="vertical">
                       {recommendExplanations.map((item, idx) => (
                         <div key={`${item.productType}-${idx}`}>
-                          <Text strong>{item.productType}</Text>
+                          <Text strong>{item.componentRole === 'auxiliary' ? '辅件' : '主件'} · {item.productType}</Text>
                           <Text>（评分 {item.score}）</Text>
                           <div style={{ color: '#666' }}>{item.reason}</div>
                           {item.alternatives?.length ? (
@@ -374,9 +433,15 @@ const DIYToolPage: React.FC = () => {
                   }
                 />
               )}
-              {Object.entries(recommendedProducts).map(([category, products]) => (
+              {Object.entries(recommendedProducts).map(([category, products]) => {
+                const [componentRole, productType] = category.includes(':')
+                  ? category.split(':')
+                  : ['main', category];
+                return (
                 <div key={category} style={{ marginBottom: 24 }}>
-                  <Title level={4}>{category}</Title>
+                  <Title level={4}>
+                    {componentRole === 'auxiliary' ? '辅件' : '主件'} · {productType}
+                  </Title>
                   <Row gutter={[16, 16]}>
                     {products.map((product: Product) => {
                       const isSelected = selectedProducts.some(
@@ -426,7 +491,7 @@ const DIYToolPage: React.FC = () => {
                   </Row>
                   <Divider />
                 </div>
-              ))}
+              )})}
             </Card>
           )}
 

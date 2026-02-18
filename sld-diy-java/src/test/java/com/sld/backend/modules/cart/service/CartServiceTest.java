@@ -240,12 +240,17 @@ class CartServiceTest {
     @DisplayName("删除购物车项 - 成功")
     void testDeleteItem_Success() {
         // Arrange
+        CartItem cartItem = new CartItem();
+        cartItem.setId(1L);
+        cartItem.setUserId(1L);
+        when(cartItemMapper.selectById(1L)).thenReturn(cartItem);
         when(cartItemMapper.deleteById(1L)).thenReturn(1);
 
         // Act
-        cartService.deleteItem(1L);
+        cartService.deleteItem(1L, 1L);
 
         // Assert
+        verify(cartItemMapper).selectById(1L);
         verify(cartItemMapper).deleteById(1L);
     }
 
@@ -253,13 +258,17 @@ class CartServiceTest {
     @DisplayName("删除购物车项 - 不存在的项")
     void testDeleteItem_NotExists() {
         // Arrange
-        when(cartItemMapper.deleteById(999L)).thenReturn(0);
+        when(cartItemMapper.selectById(999L)).thenReturn(null);
 
-        // Act
-        cartService.deleteItem(999L);
+        // Act & Assert
+        org.junit.jupiter.api.Assertions.assertThrows(
+            BusinessException.class,
+            () -> cartService.deleteItem(1L, 999L)
+        );
 
         // Assert
-        verify(cartItemMapper).deleteById(999L);
+        verify(cartItemMapper).selectById(999L);
+        verify(cartItemMapper, never()).deleteById(999L);
     }
 
     @Test
