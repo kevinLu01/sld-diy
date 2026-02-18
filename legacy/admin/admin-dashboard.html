@@ -287,6 +287,30 @@
                         </div>
                         <p class="text-sm text-gray-500">输入DIY项目ID，可生成不自动上架的私发折扣链接。</p>
                     </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold">场景模板</h3>
+                                <button onclick="showDiySceneTemplateModal()" class="px-3 py-1 bg-blue-600 text-white rounded text-sm">添加场景</button>
+                            </div>
+                            <div id="diySceneTemplatesTable" class="max-h-96 overflow-y-auto"></div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold">场景组件</h3>
+                                <button onclick="showDiySceneComponentModal()" class="px-3 py-1 bg-green-600 text-white rounded text-sm">添加组件</button>
+                            </div>
+                            <div id="diySceneComponentsTable" class="max-h-96 overflow-y-auto"></div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold">组件规格选项</h3>
+                                <button onclick="showDiyComponentOptionModal()" class="px-3 py-1 bg-purple-600 text-white rounded text-sm">添加规格</button>
+                            </div>
+                            <div id="diyComponentOptionsTable" class="max-h-96 overflow-y-auto"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -362,7 +386,13 @@
             if (page === 'solutions') loadSolutions();
             if (page === 'articles') loadArticles();
             if (page === 'users') loadUsers();
-            if (page === 'diy') { loadDiyConfigs(); loadDiyRecommendations(); }
+            if (page === 'diy') { 
+                loadDiyConfigs(); 
+                loadDiyRecommendations(); 
+                loadDiySceneTemplates();
+                loadDiySceneComponents();
+                loadDiyComponentOptions();
+            }
         }
         
         // API 请求
@@ -1059,6 +1089,160 @@
             });
 
             document.getElementById('modal').classList.remove('hidden');
+        }
+
+        // ===== 场景模板/组件/规格（BOM）管理 =====
+        var currentSceneId = null;
+        var currentSceneComponentId = null;
+
+        async function loadDiySceneTemplates() {
+            var data = await apiCall(API_BASE + '/admin/diy-scene-templates?limit=100');
+            if (!data || data.code !== 200) return;
+            var items = getListData(data.data);
+            if (!currentSceneId && items.length) currentSceneId = items[0].id;
+            var html = '<table class="w-full text-sm"><thead><tr><th class="text-left py-2">场景</th><th class="text-left py-2">编码</th><th class="text-left py-2">操作</th></tr></thead><tbody>';
+            items.forEach(function(s) {
+                var activeClass = currentSceneId === s.id ? 'text-blue-600 font-bold' : '';
+                html += '<tr class="border-b"><td class="py-2 ' + activeClass + '">' + s.name + '</td><td class="py-2 text-gray-500">' + s.sceneCode + '</td><td class="py-2"><button class="text-blue-600 mr-2" onclick="selectSceneTemplate(' + s.id + ')">选中</button><button class="text-red-600" onclick="deleteDiySceneTemplate(' + s.id + ')">删</button></td></tr>';
+            });
+            html += '</tbody></table>';
+            document.getElementById('diySceneTemplatesTable').innerHTML = html || '<p class="text-gray-500">暂无场景模板</p>';
+        }
+
+        function selectSceneTemplate(sceneId) {
+            currentSceneId = sceneId;
+            loadDiySceneTemplates();
+            loadDiySceneComponents();
+            currentSceneComponentId = null;
+            loadDiyComponentOptions();
+        }
+
+        function showDiySceneTemplateModal() {
+            document.getElementById('modalTitle').textContent = '新增场景模板';
+            document.getElementById('modalContent').innerHTML =
+                '<form id="diySceneTemplateForm" class="space-y-4">' +
+                    '<div class="grid grid-cols-2 gap-4"><div><label class="block text-sm mb-1">场景编码 *</label><input name="sceneCode" required class="w-full px-3 py-2 border rounded-lg" placeholder="cold_storage"></div><div><label class="block text-sm mb-1">场景名称 *</label><input name="name" required class="w-full px-3 py-2 border rounded-lg" placeholder="冷库制冷"></div></div>' +
+                    '<div><label class="block text-sm mb-1">描述</label><input name="description" class="w-full px-3 py-2 border rounded-lg"></div>' +
+                    '<div class="flex justify-end"><button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">保存</button></div>' +
+                '</form>';
+            document.getElementById('diySceneTemplateForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                var data = Object.fromEntries(new FormData(e.target));
+                var res = await apiCall(API_BASE + '/admin/diy-scene-templates', { method: 'POST', body: JSON.stringify(data) });
+                if (res && res.code === 200) { closeModal(); loadDiySceneTemplates(); } else { alert(res && res.message || '创建失败'); }
+            });
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        async function deleteDiySceneTemplate(id) {
+            if (!confirm('确定删除场景模板?')) return;
+            var res = await apiCall(API_BASE + '/admin/diy-scene-templates/' + id, { method: 'DELETE' });
+            if (res && res.code === 200) {
+                if (currentSceneId === id) currentSceneId = null;
+                loadDiySceneTemplates();
+                loadDiySceneComponents();
+                loadDiyComponentOptions();
+            }
+        }
+
+        async function loadDiySceneComponents() {
+            if (!currentSceneId) {
+                document.getElementById('diySceneComponentsTable').innerHTML = '<p class="text-gray-500">请先选择场景模板</p>';
+                return;
+            }
+            var data = await apiCall(API_BASE + '/admin/diy-scene-components?sceneId=' + currentSceneId + '&limit=200');
+            if (!data || data.code !== 200) return;
+            var items = getListData(data.data);
+            if (!currentSceneComponentId && items.length) currentSceneComponentId = items[0].id;
+            var html = '<table class="w-full text-sm"><thead><tr><th class="text-left py-2">组件</th><th class="text-left py-2">角色</th><th class="text-left py-2">操作</th></tr></thead><tbody>';
+            items.forEach(function(c) {
+                var role = c.componentRole === 'auxiliary' ? '辅件' : '主件';
+                var activeClass = currentSceneComponentId === c.id ? 'text-blue-600 font-bold' : '';
+                html += '<tr class="border-b"><td class="py-2 ' + activeClass + '">' + c.componentName + (c.required ? ' <span class=\"text-red-500\">*</span>' : '') + '</td><td class="py-2">' + role + '</td><td class="py-2"><button class="text-blue-600 mr-2" onclick="selectSceneComponent(' + c.id + ')">选中</button><button class="text-red-600" onclick="deleteDiySceneComponent(' + c.id + ')">删</button></td></tr>';
+            });
+            html += '</tbody></table>';
+            document.getElementById('diySceneComponentsTable').innerHTML = html || '<p class="text-gray-500">该场景暂无组件</p>';
+        }
+
+        function selectSceneComponent(componentId) {
+            currentSceneComponentId = componentId;
+            loadDiySceneComponents();
+            loadDiyComponentOptions();
+        }
+
+        function showDiySceneComponentModal() {
+            if (!currentSceneId) { alert('请先选择场景模板'); return; }
+            document.getElementById('modalTitle').textContent = '新增场景组件';
+            document.getElementById('modalContent').innerHTML =
+                '<form id="diySceneComponentForm" class="space-y-4">' +
+                    '<input type="hidden" name="sceneId" value="' + currentSceneId + '">' +
+                    '<div class="grid grid-cols-2 gap-4"><div><label class="block text-sm mb-1">组件编码 *</label><input name="componentCode" required class="w-full px-3 py-2 border rounded-lg" placeholder="compressor_unit"></div><div><label class="block text-sm mb-1">组件名称 *</label><input name="componentName" required class="w-full px-3 py-2 border rounded-lg" placeholder="压缩机/冷凝机组"></div></div>' +
+                    '<div class="grid grid-cols-2 gap-4"><div><label class="block text-sm mb-1">角色</label><select name="componentRole" class="w-full px-3 py-2 border rounded-lg"><option value="main">主件</option><option value="auxiliary">辅件</option></select></div><div class="flex items-end"><label class="text-sm"><input type="checkbox" name="required" value="true" checked class="mr-2">必选</label></div></div>' +
+                    '<div class="flex justify-end"><button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-lg">保存</button></div>' +
+                '</form>';
+            document.getElementById('diySceneComponentForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                var data = Object.fromEntries(new FormData(e.target));
+                data.sceneId = Number(data.sceneId);
+                data.required = data.required === 'true';
+                var res = await apiCall(API_BASE + '/admin/diy-scene-components', { method: 'POST', body: JSON.stringify(data) });
+                if (res && res.code === 200) { closeModal(); loadDiySceneComponents(); } else { alert(res && res.message || '创建失败'); }
+            });
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        async function deleteDiySceneComponent(id) {
+            if (!confirm('确定删除场景组件?')) return;
+            var res = await apiCall(API_BASE + '/admin/diy-scene-components/' + id, { method: 'DELETE' });
+            if (res && res.code === 200) {
+                if (currentSceneComponentId === id) currentSceneComponentId = null;
+                loadDiySceneComponents();
+                loadDiyComponentOptions();
+            }
+        }
+
+        async function loadDiyComponentOptions() {
+            if (!currentSceneComponentId) {
+                document.getElementById('diyComponentOptionsTable').innerHTML = '<p class="text-gray-500">请先选择场景组件</p>';
+                return;
+            }
+            var data = await apiCall(API_BASE + '/admin/diy-component-options?sceneComponentId=' + currentSceneComponentId + '&limit=200');
+            if (!data || data.code !== 200) return;
+            var items = getListData(data.data);
+            var html = '<table class="w-full text-sm"><thead><tr><th class="text-left py-2">规格</th><th class="text-left py-2">品牌</th><th class="text-left py-2">价格</th><th class="text-left py-2">操作</th></tr></thead><tbody>';
+            items.forEach(function(o) {
+                html += '<tr class="border-b"><td class="py-2">' + (o.optionName || '-') + '</td><td class="py-2">' + (o.brandName || '-') + '</td><td class="py-2">' + (o.basePrice || '-') + '</td><td class="py-2"><button class="text-red-600" onclick="deleteDiyComponentOption(' + o.id + ')">删</button></td></tr>';
+            });
+            html += '</tbody></table>';
+            document.getElementById('diyComponentOptionsTable').innerHTML = html || '<p class="text-gray-500">该组件暂无规格</p>';
+        }
+
+        function showDiyComponentOptionModal() {
+            if (!currentSceneComponentId) { alert('请先选择场景组件'); return; }
+            document.getElementById('modalTitle').textContent = '新增组件规格';
+            document.getElementById('modalContent').innerHTML =
+                '<form id="diyComponentOptionForm" class="space-y-4">' +
+                    '<input type="hidden" name="sceneComponentId" value="' + currentSceneComponentId + '">' +
+                    '<div><label class="block text-sm mb-1">规格名称 *</label><input name="optionName" required class="w-full px-3 py-2 border rounded-lg" placeholder="8HP 冷凝机组"></div>' +
+                    '<div class="grid grid-cols-2 gap-4"><div><label class="block text-sm mb-1">品牌</label><input name="brandName" class="w-full px-3 py-2 border rounded-lg"></div><div><label class="block text-sm mb-1">型号规格</label><input name="modelSpec" class="w-full px-3 py-2 border rounded-lg"></div></div>' +
+                    '<div><label class="block text-sm mb-1">价格</label><input type="number" step="0.01" name="basePrice" class="w-full px-3 py-2 border rounded-lg"></div>' +
+                    '<div class="flex justify-end"><button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-lg">保存</button></div>' +
+                '</form>';
+            document.getElementById('diyComponentOptionForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                var data = Object.fromEntries(new FormData(e.target));
+                data.sceneComponentId = Number(data.sceneComponentId);
+                data.basePrice = data.basePrice ? Number(data.basePrice) : null;
+                var res = await apiCall(API_BASE + '/admin/diy-component-options', { method: 'POST', body: JSON.stringify(data) });
+                if (res && res.code === 200) { closeModal(); loadDiyComponentOptions(); } else { alert(res && res.message || '创建失败'); }
+            });
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+        async function deleteDiyComponentOption(id) {
+            if (!confirm('确定删除规格?')) return;
+            var res = await apiCall(API_BASE + '/admin/diy-component-options/' + id, { method: 'DELETE' });
+            if (res && res.code === 200) loadDiyComponentOptions();
         }
         
         // 初始化

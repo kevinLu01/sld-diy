@@ -85,3 +85,10 @@
 - [x] K3 默认“冷库制冷”模板数据（压缩机/蒸发器/膨胀阀/铜管/控制器/冷媒）
 - [x] K4 前台DIY第2步展示“场景完整组件清单 + 规格选型”
 - [x] K5 本地验证：`mvn -Dtest=DiyServiceTest test` + `npm run build` 通过
+
+## Step2-L 增量改造（后台三层配置）
+- [x] L1 后端新增管理API：场景模板 CRUD
+- [x] L2 后端新增管理API：场景组件 CRUD
+- [x] L3 后端新增管理API：组件规格选项 CRUD
+- [x] L4 后台页面新增三层管理区并联动加载
+- [x] L5 验证：`mvn -DskipTests package` + `npm run build` 通过

@@ -10,11 +10,17 @@ import com.sld.backend.modules.admin.dto.request.*;
 import com.sld.backend.modules.admin.dto.response.AdminStatsResponse;
 import com.sld.backend.modules.admin.service.AdminService;
 import com.sld.backend.modules.diy.entity.DiyConfig;
+import com.sld.backend.modules.diy.entity.DiyComponentOption;
 import com.sld.backend.modules.diy.entity.DiyProject;
 import com.sld.backend.modules.diy.entity.DiyRecommendation;
+import com.sld.backend.modules.diy.entity.DiySceneComponent;
+import com.sld.backend.modules.diy.entity.DiySceneTemplate;
+import com.sld.backend.modules.diy.mapper.DiyComponentOptionMapper;
 import com.sld.backend.modules.diy.mapper.DiyConfigMapper;
 import com.sld.backend.modules.diy.mapper.DiyProjectMapper;
 import com.sld.backend.modules.diy.mapper.DiyRecommendationMapper;
+import com.sld.backend.modules.diy.mapper.DiySceneComponentMapper;
+import com.sld.backend.modules.diy.mapper.DiySceneTemplateMapper;
 import com.sld.backend.modules.knowledge.entity.Article;
 import com.sld.backend.modules.knowledge.mapper.ArticleMapper;
 import com.sld.backend.modules.order.entity.Order;
@@ -62,6 +68,9 @@ public class AdminServiceImpl implements AdminService {
     private final DiyConfigMapper diyConfigMapper;
     private final DiyRecommendationMapper diyRecommendationMapper;
     private final DiyProjectMapper diyProjectMapper;
+    private final DiySceneTemplateMapper diySceneTemplateMapper;
+    private final DiySceneComponentMapper diySceneComponentMapper;
+    private final DiyComponentOptionMapper diyComponentOptionMapper;
 
     @Override
     public AdminStatsResponse getStats() {
@@ -571,6 +580,138 @@ public class AdminServiceImpl implements AdminService {
         return result;
     }
 
+    @Override
+    public Page<Map<String, Object>> getDiySceneTemplates(Long page, Long limit) {
+        Page<DiySceneTemplate> scenePage = diySceneTemplateMapper.selectPage(
+            new Page<>(page, limit),
+            new LambdaQueryWrapper<DiySceneTemplate>().orderByAsc(DiySceneTemplate::getSortOrder).orderByAsc(DiySceneTemplate::getId)
+        );
+        List<Map<String, Object>> list = scenePage.getRecords().stream()
+            .map(this::convertDiySceneTemplateToMap)
+            .collect(Collectors.toList());
+        Page<Map<String, Object>> result = new Page<>(scenePage.getCurrent(), scenePage.getSize(), scenePage.getTotal());
+        result.setRecords(list);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> createDiySceneTemplate(CreateDiySceneTemplateRequest request) {
+        DiySceneTemplate scene = new DiySceneTemplate();
+        BeanUtils.copyProperties(request, scene);
+        scene.setIsActive(true);
+        scene.setSortOrder(scene.getSortOrder() == null ? 0 : scene.getSortOrder());
+        diySceneTemplateMapper.insert(scene);
+        return convertDiySceneTemplateToMap(scene);
+    }
+
+    @Override
+    public Map<String, Object> updateDiySceneTemplate(Long id, UpdateDiySceneTemplateRequest request) {
+        DiySceneTemplate scene = diySceneTemplateMapper.selectById(id);
+        if (scene == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND, "场景模板不存在");
+        }
+        BeanUtils.copyProperties(request, scene);
+        diySceneTemplateMapper.updateById(scene);
+        return convertDiySceneTemplateToMap(scene);
+    }
+
+    @Override
+    public void deleteDiySceneTemplate(Long id) {
+        diySceneTemplateMapper.deleteById(id);
+    }
+
+    @Override
+    public Page<Map<String, Object>> getDiySceneComponents(Long sceneId, Long page, Long limit) {
+        LambdaQueryWrapper<DiySceneComponent> wrapper = new LambdaQueryWrapper<DiySceneComponent>()
+            .orderByAsc(DiySceneComponent::getSortOrder)
+            .orderByAsc(DiySceneComponent::getId);
+        if (sceneId != null) {
+            wrapper.eq(DiySceneComponent::getSceneId, sceneId);
+        }
+        Page<DiySceneComponent> componentPage = diySceneComponentMapper.selectPage(new Page<>(page, limit), wrapper);
+        List<Map<String, Object>> list = componentPage.getRecords().stream()
+            .map(this::convertDiySceneComponentToMap)
+            .collect(Collectors.toList());
+        Page<Map<String, Object>> result = new Page<>(componentPage.getCurrent(), componentPage.getSize(), componentPage.getTotal());
+        result.setRecords(list);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> createDiySceneComponent(CreateDiySceneComponentRequest request) {
+        DiySceneComponent component = new DiySceneComponent();
+        BeanUtils.copyProperties(request, component);
+        component.setComponentRole(normalizeComponentRole(request.getComponentRole()));
+        component.setRequired(request.getRequired() == null ? Boolean.TRUE : request.getRequired());
+        component.setMinQty(component.getMinQty() == null ? 1 : component.getMinQty());
+        component.setMaxQty(component.getMaxQty() == null ? 1 : component.getMaxQty());
+        component.setSelectionMode(component.getSelectionMode() == null ? "single" : component.getSelectionMode());
+        component.setSortOrder(component.getSortOrder() == null ? 0 : component.getSortOrder());
+        component.setIsActive(true);
+        diySceneComponentMapper.insert(component);
+        return convertDiySceneComponentToMap(component);
+    }
+
+    @Override
+    public Map<String, Object> updateDiySceneComponent(Long id, UpdateDiySceneComponentRequest request) {
+        DiySceneComponent component = diySceneComponentMapper.selectById(id);
+        if (component == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND, "场景组件不存在");
+        }
+        BeanUtils.copyProperties(request, component);
+        component.setComponentRole(normalizeComponentRole(request.getComponentRole()));
+        diySceneComponentMapper.updateById(component);
+        return convertDiySceneComponentToMap(component);
+    }
+
+    @Override
+    public void deleteDiySceneComponent(Long id) {
+        diySceneComponentMapper.deleteById(id);
+    }
+
+    @Override
+    public Page<Map<String, Object>> getDiyComponentOptions(Long sceneComponentId, Long page, Long limit) {
+        LambdaQueryWrapper<DiyComponentOption> wrapper = new LambdaQueryWrapper<DiyComponentOption>()
+            .orderByAsc(DiyComponentOption::getSortOrder)
+            .orderByAsc(DiyComponentOption::getId);
+        if (sceneComponentId != null) {
+            wrapper.eq(DiyComponentOption::getSceneComponentId, sceneComponentId);
+        }
+        Page<DiyComponentOption> optionPage = diyComponentOptionMapper.selectPage(new Page<>(page, limit), wrapper);
+        List<Map<String, Object>> list = optionPage.getRecords().stream()
+            .map(this::convertDiyComponentOptionToMap)
+            .collect(Collectors.toList());
+        Page<Map<String, Object>> result = new Page<>(optionPage.getCurrent(), optionPage.getSize(), optionPage.getTotal());
+        result.setRecords(list);
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> createDiyComponentOption(CreateDiyComponentOptionRequest request) {
+        DiyComponentOption option = new DiyComponentOption();
+        BeanUtils.copyProperties(request, option);
+        option.setSortOrder(option.getSortOrder() == null ? 0 : option.getSortOrder());
+        option.setIsActive(true);
+        diyComponentOptionMapper.insert(option);
+        return convertDiyComponentOptionToMap(option);
+    }
+
+    @Override
+    public Map<String, Object> updateDiyComponentOption(Long id, UpdateDiyComponentOptionRequest request) {
+        DiyComponentOption option = diyComponentOptionMapper.selectById(id);
+        if (option == null) {
+            throw new BusinessException(ErrorCode.NOT_FOUND, "组件规格不存在");
+        }
+        BeanUtils.copyProperties(request, option);
+        diyComponentOptionMapper.updateById(option);
+        return convertDiyComponentOptionToMap(option);
+    }
+
+    @Override
+    public void deleteDiyComponentOption(Long id) {
+        diyComponentOptionMapper.deleteById(id);
+    }
+
     // ==================== 转换方法 ====================
     private Map<String, Object> convertProductToMap(Product product) {
         Category category = categoryMapper.selectById(product.getCategoryId());
@@ -686,6 +827,54 @@ public class AdminServiceImpl implements AdminService {
         map.put("value", config.getValue());
         map.put("sortOrder", config.getSortOrder());
         map.put("isActive", config.getIsActive());
+        return map;
+    }
+
+    private Map<String, Object> convertDiySceneTemplateToMap(DiySceneTemplate scene) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", scene.getId());
+        map.put("sceneCode", scene.getSceneCode());
+        map.put("name", scene.getName());
+        map.put("description", scene.getDescription());
+        map.put("applicationNotes", scene.getApplicationNotes());
+        map.put("tempMin", scene.getTempMin());
+        map.put("tempMax", scene.getTempMax());
+        map.put("capacityMin", scene.getCapacityMin());
+        map.put("capacityMax", scene.getCapacityMax());
+        map.put("sortOrder", scene.getSortOrder());
+        map.put("isActive", scene.getIsActive());
+        return map;
+    }
+
+    private Map<String, Object> convertDiySceneComponentToMap(DiySceneComponent component) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", component.getId());
+        map.put("sceneId", component.getSceneId());
+        map.put("componentCode", component.getComponentCode());
+        map.put("componentName", component.getComponentName());
+        map.put("componentRole", normalizeComponentRole(component.getComponentRole()));
+        map.put("required", component.getRequired());
+        map.put("minQty", component.getMinQty());
+        map.put("maxQty", component.getMaxQty());
+        map.put("selectionMode", component.getSelectionMode());
+        map.put("specRequirement", component.getSpecRequirement());
+        map.put("sortOrder", component.getSortOrder());
+        map.put("isActive", component.getIsActive());
+        return map;
+    }
+
+    private Map<String, Object> convertDiyComponentOptionToMap(DiyComponentOption option) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", option.getId());
+        map.put("sceneComponentId", option.getSceneComponentId());
+        map.put("productId", option.getProductId());
+        map.put("optionName", option.getOptionName());
+        map.put("brandName", option.getBrandName());
+        map.put("modelSpec", option.getModelSpec());
+        map.put("specJson", option.getSpecJson());
+        map.put("basePrice", option.getBasePrice());
+        map.put("sortOrder", option.getSortOrder());
+        map.put("isActive", option.getIsActive());
         return map;
     }
 

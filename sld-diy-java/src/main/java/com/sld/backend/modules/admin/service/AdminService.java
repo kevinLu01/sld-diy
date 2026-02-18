@@ -72,4 +72,22 @@ public interface AdminService {
 
     // ==================== DIY私发报价 ====================
     Map<String, Object> createPrivateDiyQuote(Long projectId, CreatePrivateDiyQuoteRequest request);
+
+    // ==================== DIY场景模板管理 ====================
+    Page<Map<String, Object>> getDiySceneTemplates(Long page, Long limit);
+    Map<String, Object> createDiySceneTemplate(CreateDiySceneTemplateRequest request);
+    Map<String, Object> updateDiySceneTemplate(Long id, UpdateDiySceneTemplateRequest request);
+    void deleteDiySceneTemplate(Long id);
+
+    // ==================== DIY场景组件管理 ====================
+    Page<Map<String, Object>> getDiySceneComponents(Long sceneId, Long page, Long limit);
+    Map<String, Object> createDiySceneComponent(CreateDiySceneComponentRequest request);
+    Map<String, Object> updateDiySceneComponent(Long id, UpdateDiySceneComponentRequest request);
+    void deleteDiySceneComponent(Long id);
+
+    // ==================== DIY组件规格选项管理 ====================
+    Page<Map<String, Object>> getDiyComponentOptions(Long sceneComponentId, Long page, Long limit);
+    Map<String, Object> createDiyComponentOption(CreateDiyComponentOptionRequest request);
+    Map<String, Object> updateDiyComponentOption(Long id, UpdateDiyComponentOptionRequest request);
+    void deleteDiyComponentOption(Long id);
 }

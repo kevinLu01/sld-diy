@@ -348,4 +348,102 @@ public class AdminController {
     ) {
         return Result.success(adminService.createPrivateDiyQuote(id, request));
     }
+
+    @GetMapping("/diy-scene-templates")
+    @Operation(summary = "获取DIY场景模板列表")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<PageResult<Map<String, Object>>> getDiySceneTemplates(
+        @RequestParam(defaultValue = "1") Long page,
+        @RequestParam(defaultValue = "20") Long limit
+    ) {
+        return Result.success(PageResult.of(adminService.getDiySceneTemplates(page, limit)));
+    }
+
+    @PostMapping("/diy-scene-templates")
+    @Operation(summary = "创建DIY场景模板")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<Map<String, Object>> createDiySceneTemplate(@Valid @RequestBody CreateDiySceneTemplateRequest request) {
+        return Result.success(adminService.createDiySceneTemplate(request));
+    }
+
+    @PutMapping("/diy-scene-templates/{id}")
+    @Operation(summary = "更新DIY场景模板")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<Map<String, Object>> updateDiySceneTemplate(@PathVariable Long id, @Valid @RequestBody UpdateDiySceneTemplateRequest request) {
+        return Result.success(adminService.updateDiySceneTemplate(id, request));
+    }
+
+    @DeleteMapping("/diy-scene-templates/{id}")
+    @Operation(summary = "删除DIY场景模板")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<Void> deleteDiySceneTemplate(@PathVariable Long id) {
+        adminService.deleteDiySceneTemplate(id);
+        return Result.success();
+    }
+
+    @GetMapping("/diy-scene-components")
+    @Operation(summary = "获取DIY场景组件列表")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<PageResult<Map<String, Object>>> getDiySceneComponents(
+        @RequestParam(required = false) Long sceneId,
+        @RequestParam(defaultValue = "1") Long page,
+        @RequestParam(defaultValue = "50") Long limit
+    ) {
+        return Result.success(PageResult.of(adminService.getDiySceneComponents(sceneId, page, limit)));
+    }
+
+    @PostMapping("/diy-scene-components")
+    @Operation(summary = "创建DIY场景组件")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<Map<String, Object>> createDiySceneComponent(@Valid @RequestBody CreateDiySceneComponentRequest request) {
+        return Result.success(adminService.createDiySceneComponent(request));
+    }
+
+    @PutMapping("/diy-scene-components/{id}")
+    @Operation(summary = "更新DIY场景组件")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<Map<String, Object>> updateDiySceneComponent(@PathVariable Long id, @Valid @RequestBody UpdateDiySceneComponentRequest request) {
+        return Result.success(adminService.updateDiySceneComponent(id, request));
+    }
+
+    @DeleteMapping("/diy-scene-components/{id}")
+    @Operation(summary = "删除DIY场景组件")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<Void> deleteDiySceneComponent(@PathVariable Long id) {
+        adminService.deleteDiySceneComponent(id);
+        return Result.success();
+    }
+
+    @GetMapping("/diy-component-options")
+    @Operation(summary = "获取DIY组件规格选项列表")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<PageResult<Map<String, Object>>> getDiyComponentOptions(
+        @RequestParam(required = false) Long sceneComponentId,
+        @RequestParam(defaultValue = "1") Long page,
+        @RequestParam(defaultValue = "50") Long limit
+    ) {
+        return Result.success(PageResult.of(adminService.getDiyComponentOptions(sceneComponentId, page, limit)));
+    }
+
+    @PostMapping("/diy-component-options")
+    @Operation(summary = "创建DIY组件规格选项")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<Map<String, Object>> createDiyComponentOption(@Valid @RequestBody CreateDiyComponentOptionRequest request) {
+        return Result.success(adminService.createDiyComponentOption(request));
+    }
+
+    @PutMapping("/diy-component-options/{id}")
+    @Operation(summary = "更新DIY组件规格选项")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<Map<String, Object>> updateDiyComponentOption(@PathVariable Long id, @Valid @RequestBody UpdateDiyComponentOptionRequest request) {
+        return Result.success(adminService.updateDiyComponentOption(id, request));
+    }
+
+    @DeleteMapping("/diy-component-options/{id}")
+    @Operation(summary = "删除DIY组件规格选项")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<Void> deleteDiyComponentOption(@PathVariable Long id) {
+        adminService.deleteDiyComponentOption(id);
+        return Result.success();
+    }
 }
