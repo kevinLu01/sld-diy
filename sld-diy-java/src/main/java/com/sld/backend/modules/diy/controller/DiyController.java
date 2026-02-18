@@ -1,5 +1,7 @@
 package com.sld.backend.modules.diy.controller;
 
+import com.sld.backend.common.exception.BusinessException;
+import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.common.result.PageResult;
 import com.sld.backend.common.result.Result;
 import com.sld.backend.modules.diy.dto.request.DiyRecommendRequest;
@@ -16,6 +18,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -66,20 +70,20 @@ public class DiyController {
     @PostMapping("/projects")
     @Operation(summary = "保存DIY方案")
     public Result<DiyProjectVO> saveProject(
-        @Parameter(description = "用户ID") @RequestHeader("X-User-Id") Long userId,
+        @Parameter(description = "用户ID") @RequestHeader(value = "X-User-Id", required = false) Long userId,
         @Valid @RequestBody SaveDiyProjectRequest request
     ) {
-        return Result.success(diyService.saveProject(userId, request));
+        return Result.success(diyService.saveProject(resolveUserId(userId), request));
     }
 
     @GetMapping("/projects")
     @Operation(summary = "获取用户DIY方案列表")
     public Result<PageResult<DiyProjectVO>> listProjects(
-        @Parameter(description = "用户ID") @RequestHeader("X-User-Id") Long userId,
+        @Parameter(description = "用户ID") @RequestHeader(value = "X-User-Id", required = false) Long userId,
         @RequestParam(defaultValue = "1") Long page,
         @RequestParam(defaultValue = "10") Long limit
     ) {
-        return Result.success(PageResult.of(diyService.listProjects(userId, page, limit)));
+        return Result.success(PageResult.of(diyService.listProjects(resolveUserId(userId), page, limit)));
     }
 
     @GetMapping("/projects/{id}")
@@ -92,14 +96,29 @@ public class DiyController {
     @Operation(summary = "分享DIY方案")
     public Result<DiyShareResponse> shareProject(
         @PathVariable Long id,
-        @Parameter(description = "用户ID") @RequestHeader("X-User-Id") Long userId
+        @Parameter(description = "用户ID") @RequestHeader(value = "X-User-Id", required = false) Long userId
     ) {
-        return Result.success(diyService.shareProject(id, userId));
+        return Result.success(diyService.shareProject(id, resolveUserId(userId)));
     }
 
     @GetMapping("/share/{token}")
     @Operation(summary = "通过分享Token获取DIY方案")
     public Result<DiyProjectVO> getProjectByShareToken(@PathVariable String token) {
         return Result.success(diyService.getProjectByShareToken(token));
+    }
+
+    private Long resolveUserId(Long headerUserId) {
+        if (headerUserId != null) {
+            return headerUserId;
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getName() == null) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED);
+        }
+        try {
+            return Long.parseLong(auth.getName());
+        } catch (NumberFormatException e) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED);
+        }
     }
 }
