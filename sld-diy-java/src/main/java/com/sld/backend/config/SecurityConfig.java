@@ -1,6 +1,8 @@
 package com.sld.backend.config;
 
 import com.sld.backend.security.JwtAuthenticationFilter;
+import com.sld.backend.security.RestAccessDeniedHandler;
+import com.sld.backend.security.RestAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,6 +26,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final RestAccessDeniedHandler restAccessDeniedHandler;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -36,6 +40,10 @@ public class SecurityConfig {
             .csrf(AbstractHttpConfigurer::disable)
             .sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint(restAuthenticationEntryPoint)
+                .accessDeniedHandler(restAccessDeniedHandler)
             )
             .authorizeHttpRequests(auth -> auth
                 // 公开放行的接口

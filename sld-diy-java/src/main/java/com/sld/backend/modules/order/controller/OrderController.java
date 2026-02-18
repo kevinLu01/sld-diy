@@ -1,6 +1,7 @@
 package com.sld.backend.modules.order.controller;
 
 import com.sld.backend.common.result.PageResult;
+import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.common.result.Result;
 import com.sld.backend.modules.order.dto.request.CreateOrderRequest;
 import com.sld.backend.modules.order.dto.response.OrderVO;
@@ -30,7 +31,7 @@ public class OrderController {
         @RequestBody CreateOrderRequest request
     ) {
         if (userId == null) {
-            return Result.error(401, "请先登录");
+            return Result.error(ErrorCode.UNAUTHORIZED);
         }
         return Result.success(orderService.createOrder(userId, request));
     }
@@ -44,7 +45,7 @@ public class OrderController {
         @RequestParam(defaultValue = "20") Long limit
     ) {
         if (userId == null) {
-            return Result.error(401, "请先登录");
+            return Result.error(ErrorCode.UNAUTHORIZED);
         }
         return Result.success(orderService.listOrders(userId, status, page, limit));
     }
@@ -56,7 +57,7 @@ public class OrderController {
         @Parameter(description = "用户ID") @CurrentUserId(required = false) Long userId
     ) {
         if (userId == null) {
-            return Result.error(401, "请先登录");
+            return Result.error(ErrorCode.UNAUTHORIZED);
         }
         return Result.success(orderService.getOrder(orderNo, userId));
     }
@@ -68,7 +69,7 @@ public class OrderController {
         @Parameter(description = "用户ID") @CurrentUserId(required = false) Long userId
     ) {
         if (userId == null) {
-            return Result.error(401, "请先登录");
+            return Result.error(ErrorCode.UNAUTHORIZED);
         }
         orderService.cancelOrder(orderNo, userId);
         return Result.success();

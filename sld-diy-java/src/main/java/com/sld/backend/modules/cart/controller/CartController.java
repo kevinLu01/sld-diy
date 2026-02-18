@@ -1,6 +1,7 @@
 package com.sld.backend.modules.cart.controller;
 
 import com.sld.backend.common.result.Result;
+import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.modules.cart.dto.response.CartItemVO;
 import com.sld.backend.modules.cart.service.CartService;
 import com.sld.backend.security.CurrentUserId;
@@ -45,7 +46,7 @@ public class CartController {
         @RequestParam Integer quantity
     ) {
         if (userId == null) {
-            return Result.error(401, "请先登录");
+            return Result.error(ErrorCode.UNAUTHORIZED);
         }
         return Result.success(cartService.addItem(userId, productId, quantity));
     }
@@ -57,7 +58,7 @@ public class CartController {
         @RequestBody Map<String, Object> body
     ) {
         if (userId == null) {
-            return Result.error(401, "请先登录");
+            return Result.error(ErrorCode.UNAUTHORIZED);
         }
         Long productId = Long.valueOf(String.valueOf(body.get("productId")));
         Integer quantity = body.get("quantity") == null ? 1 : Integer.valueOf(String.valueOf(body.get("quantity")));
@@ -72,7 +73,7 @@ public class CartController {
         @RequestParam Integer quantity
     ) {
         if (userId == null) {
-            return Result.error(401, "请先登录");
+            return Result.error(ErrorCode.UNAUTHORIZED);
         }
         return Result.success(cartService.updateItem(userId, id, quantity));
     }
@@ -85,7 +86,7 @@ public class CartController {
         @RequestBody Map<String, Object> body
     ) {
         if (userId == null) {
-            return Result.error(401, "请先登录");
+            return Result.error(ErrorCode.UNAUTHORIZED);
         }
         Integer quantity = Integer.valueOf(String.valueOf(body.get("quantity")));
         return Result.success(cartService.updateItem(userId, id, quantity));
@@ -111,7 +112,7 @@ public class CartController {
         @Parameter(description = "用户ID") @CurrentUserId(required = false) Long userId
     ) {
         if (userId == null) {
-            return Result.error(401, "请先登录");
+            return Result.error(ErrorCode.UNAUTHORIZED);
         }
         cartService.clearCart(userId);
         return Result.success();
@@ -123,7 +124,7 @@ public class CartController {
         @Parameter(description = "用户ID") @CurrentUserId(required = false) Long userId
     ) {
         if (userId == null) {
-            return Result.error(401, "请先登录");
+            return Result.error(ErrorCode.UNAUTHORIZED);
         }
         cartService.clearCart(userId);
         return Result.success();
