@@ -1,5 +1,7 @@
 package com.sld.backend.modules.service.controller;
 
+import com.sld.backend.common.exception.BusinessException;
+import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.common.result.PageResult;
 import com.sld.backend.common.result.Result;
 import com.sld.backend.modules.service.dto.request.CreateServiceRequest;
@@ -11,6 +13,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -27,40 +31,55 @@ public class ServiceRequestController {
     @PostMapping("/requests")
     @Operation(summary = "创建服务请求")
     public Result<ServiceRequestVO> createServiceRequest(
-            @Parameter(description = "用户ID") @RequestHeader("X-User-Id") Long userId,
+            @Parameter(description = "用户ID") @RequestHeader(value = "X-User-Id", required = false) Long userId,
             @Valid @RequestBody CreateServiceRequest request
     ) {
-        return Result.success(serviceRequestService.createServiceRequest(userId, request));
+        return Result.success(serviceRequestService.createServiceRequest(resolveUserId(userId), request));
     }
 
     @GetMapping("/requests")
     @Operation(summary = "获取服务请求列表")
     public Result<PageResult<ServiceRequestVO>> listServiceRequests(
-            @Parameter(description = "用户ID") @RequestHeader("X-User-Id") Long userId,
+            @Parameter(description = "用户ID") @RequestHeader(value = "X-User-Id", required = false) Long userId,
             @Parameter(description = "状态") @RequestParam(required = false) String status,
             @RequestParam(defaultValue = "1") Long page,
             @RequestParam(defaultValue = "10") Long limit
     ) {
-        return Result.success(PageResult.of(serviceRequestService.listServiceRequests(userId, status, page, limit)));
+        return Result.success(PageResult.of(serviceRequestService.listServiceRequests(resolveUserId(userId), status, page, limit)));
     }
 
     @GetMapping("/requests/{requestNo}")
     @Operation(summary = "获取服务请求详情")
     public Result<ServiceRequestVO> getServiceRequest(
             @PathVariable String requestNo,
-            @Parameter(description = "用户ID") @RequestHeader("X-User-Id") Long userId
+            @Parameter(description = "用户ID") @RequestHeader(value = "X-User-Id", required = false) Long userId
     ) {
-        return Result.success(serviceRequestService.getServiceRequest(requestNo, userId));
+        return Result.success(serviceRequestService.getServiceRequest(requestNo, resolveUserId(userId)));
     }
 
     @PostMapping("/requests/{requestNo}/rate")
     @Operation(summary = "评价服务")
     public Result<Void> rateService(
             @PathVariable String requestNo,
-            @Parameter(description = "用户ID") @RequestHeader("X-User-Id") Long userId,
+            @Parameter(description = "用户ID") @RequestHeader(value = "X-User-Id", required = false) Long userId,
             @Valid @RequestBody RateServiceRequest request
     ) {
-        serviceRequestService.rateService(requestNo, userId, request);
+        serviceRequestService.rateService(requestNo, resolveUserId(userId), request);
         return Result.success();
+    }
+
+    private Long resolveUserId(Long headerUserId) {
+        if (headerUserId != null) {
+            return headerUserId;
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getName() == null) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED);
+        }
+        try {
+            return Long.parseLong(auth.getName());
+        } catch (NumberFormatException e) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED);
+        }
     }
 }

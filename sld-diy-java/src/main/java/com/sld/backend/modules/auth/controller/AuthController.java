@@ -1,5 +1,7 @@
 package com.sld.backend.modules.auth.controller;
 
+import com.sld.backend.common.exception.BusinessException;
+import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.common.result.Result;
 import com.sld.backend.modules.auth.dto.request.LoginRequest;
 import com.sld.backend.modules.auth.dto.request.RegisterRequest;
@@ -12,6 +14,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -41,8 +45,23 @@ public class AuthController {
     @GetMapping("/me")
     @Operation(summary = "获取当前用户信息")
     public Result<UserProfileResponse> getCurrentUser(
-            @Parameter(description = "用户ID") @RequestHeader("X-User-Id") Long userId
+            @Parameter(description = "用户ID") @RequestHeader(value = "X-User-Id", required = false) Long userId
     ) {
-        return Result.success(userService.getUserProfile(userId));
+        return Result.success(userService.getUserProfile(resolveUserId(userId)));
+    }
+
+    private Long resolveUserId(Long headerUserId) {
+        if (headerUserId != null) {
+            return headerUserId;
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || auth.getName() == null) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED);
+        }
+        try {
+            return Long.parseLong(auth.getName());
+        } catch (NumberFormatException e) {
+            throw new BusinessException(ErrorCode.UNAUTHORIZED);
+        }
     }
 }
