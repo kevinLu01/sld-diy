@@ -1,19 +1,16 @@
 package com.sld.backend.modules.solution.controller;
 
-import com.sld.backend.common.exception.BusinessException;
-import com.sld.backend.common.result.ErrorCode;
 import com.sld.backend.common.result.PageResult;
 import com.sld.backend.common.result.Result;
 import com.sld.backend.modules.order.dto.response.OrderVO;
 import com.sld.backend.modules.solution.dto.response.SolutionCaseVO;
 import com.sld.backend.modules.solution.dto.response.SolutionVO;
 import com.sld.backend.modules.solution.service.SolutionService;
+import com.sld.backend.security.CurrentUserId;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -57,23 +54,8 @@ public class SolutionController {
     @Operation(summary = "基于解决方案创建订单")
     public Result<OrderVO> createOrderFromSolution(
         @PathVariable Long id,
-        @Parameter(description = "用户ID") @RequestHeader(value = "X-User-Id", required = false) Long userId
+        @Parameter(description = "用户ID") @CurrentUserId Long userId
     ) {
-        return Result.success(solutionService.createOrderFromSolution(id, resolveUserId(userId)));
-    }
-
-    private Long resolveUserId(Long headerUserId) {
-        if (headerUserId != null) {
-            return headerUserId;
-        }
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || auth.getName() == null) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED);
-        }
-        try {
-            return Long.parseLong(auth.getName());
-        } catch (NumberFormatException e) {
-            throw new BusinessException(ErrorCode.UNAUTHORIZED);
-        }
+        return Result.success(solutionService.createOrderFromSolution(id, userId));
     }
 }
