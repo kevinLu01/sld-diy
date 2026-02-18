@@ -69,6 +69,7 @@ public class DiyServiceImpl implements DiyService {
         List<DiyRecommendation> recommendations = diyRecommendationMapper.selectByScenario(request.getScenario());
         
         Map<String, List<DiyRecommendResponse.ProductVO>> typedProductsMap = new HashMap<>();
+        List<DiyRecommendResponse.ExplanationVO> explanations = new ArrayList<>();
 
         // 为每种推荐类型查询产品
         for (DiyRecommendation rec : recommendations) {
@@ -84,11 +85,21 @@ public class DiyServiceImpl implements DiyService {
                 vo.setId(p.getId());
                 vo.setName(p.getName());
                 vo.setPrice(p.getPrice());
+                vo.setMatchScore(calculateMatchScore(request, rec));
+                vo.setMatchReason(buildMatchReason(request, rec));
                 vo.setQuantity(1);
                 return vo;
             }).collect(Collectors.toList());
 
             typedProductsMap.put(rec.getProductType(), productList);
+            explanations.add(
+                DiyRecommendResponse.ExplanationVO.builder()
+                    .productType(rec.getProductType())
+                    .score(calculateMatchScore(request, rec))
+                    .reason(buildMatchReason(request, rec))
+                    .alternatives(List.of("可尝试同类低噪音型号", "可按预算选择更高能效型号"))
+                    .build()
+            );
         }
 
         // Convert request to Map for requirements
@@ -108,7 +119,27 @@ public class DiyServiceImpl implements DiyService {
             .energyEfficiency("A++")
             .estimatedPowerConsumption("0kW/day")
             .suggestions(Collections.emptyList())
+            .explanations(explanations)
             .build();
+    }
+
+    private Integer calculateMatchScore(DiyRecommendRequest request, DiyRecommendation rec) {
+        int base = 70;
+        if (request.getCoolingCapacity() != null) {
+            base += 10;
+        }
+        if (Boolean.TRUE.equals(rec.getIsRequired())) {
+            base += 10;
+        }
+        if (rec.getPriority() != null) {
+            base += Math.max(0, 10 - rec.getPriority());
+        }
+        return Math.min(base, 98);
+    }
+
+    private String buildMatchReason(DiyRecommendRequest request, DiyRecommendation rec) {
+        String scenario = request.getScenario() == null ? "当前场景" : request.getScenario();
+        return String.format("基于场景[%s]与类型[%s]规则命中，优先级=%s", scenario, rec.getProductType(), rec.getPriority());
     }
 
     @Override

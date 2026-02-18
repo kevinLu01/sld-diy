@@ -9,6 +9,8 @@ import com.sld.backend.modules.service.dto.request.RateServiceRequest;
 import com.sld.backend.modules.service.dto.request.UpdateServiceStatusRequest;
 import com.sld.backend.modules.service.dto.response.ServiceRequestVO;
 import com.sld.backend.modules.service.entity.ServiceRequest;
+import com.sld.backend.modules.service.entity.ServiceRequestHistory;
+import com.sld.backend.modules.service.mapper.ServiceRequestHistoryMapper;
 import com.sld.backend.modules.service.mapper.ServiceRequestMapper;
 import com.sld.backend.modules.service.service.ServiceRequestService;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
 public class ServiceRequestServiceImpl implements ServiceRequestService {
 
     private final ServiceRequestMapper serviceRequestMapper;
+    private final ServiceRequestHistoryMapper serviceRequestHistoryMapper;
 
     private static final Map<String, String> SERVICE_TYPE_NAMES = new HashMap<>();
     private static final Map<String, String> PRIORITY_NAMES = new HashMap<>();
@@ -69,6 +72,7 @@ public class ServiceRequestServiceImpl implements ServiceRequestService {
         serviceRequest.setUpdateTime(LocalDateTime.now());
 
         serviceRequestMapper.insert(serviceRequest);
+        appendHistory(serviceRequest.getRequestNo(), null, "pending", userId, "user", "用户创建工单");
         return convertToVO(serviceRequest);
     }
 
@@ -161,6 +165,14 @@ public class ServiceRequestServiceImpl implements ServiceRequestService {
         serviceRequest.setStatus(to);
         serviceRequest.setUpdateTime(LocalDateTime.now());
         serviceRequestMapper.updateById(serviceRequest);
+        appendHistory(
+            serviceRequest.getRequestNo(),
+            from,
+            to,
+            operatorId,
+            "admin",
+            request.getResolution()
+        );
         return convertToVO(serviceRequest);
     }
 
@@ -198,6 +210,40 @@ public class ServiceRequestServiceImpl implements ServiceRequestService {
         vo.setServiceTypeName(SERVICE_TYPE_NAMES.getOrDefault(serviceRequest.getServiceType(), serviceRequest.getServiceType()));
         vo.setPriorityName(PRIORITY_NAMES.getOrDefault(serviceRequest.getPriority(), serviceRequest.getPriority()));
         vo.setStatusName(STATUS_NAMES.getOrDefault(serviceRequest.getStatus(), serviceRequest.getStatus()));
+        List<ServiceRequestHistory> histories = serviceRequestHistoryMapper.selectList(
+            new LambdaQueryWrapper<ServiceRequestHistory>()
+                .eq(ServiceRequestHistory::getRequestNo, serviceRequest.getRequestNo())
+                .orderByAsc(ServiceRequestHistory::getCreateTime)
+        );
+        vo.setHistories(histories.stream().map(h -> {
+            ServiceRequestVO.HistoryVO item = new ServiceRequestVO.HistoryVO();
+            item.setFromStatus(h.getFromStatus());
+            item.setToStatus(h.getToStatus());
+            item.setOperatorId(h.getOperatorId());
+            item.setOperatorRole(h.getOperatorRole());
+            item.setNote(h.getNote());
+            item.setCreateTime(h.getCreateTime());
+            return item;
+        }).collect(Collectors.toList()));
         return vo;
+    }
+
+    private void appendHistory(
+        String requestNo,
+        String fromStatus,
+        String toStatus,
+        Long operatorId,
+        String operatorRole,
+        String note
+    ) {
+        ServiceRequestHistory history = new ServiceRequestHistory();
+        history.setRequestNo(requestNo);
+        history.setFromStatus(fromStatus);
+        history.setToStatus(toStatus);
+        history.setOperatorId(operatorId);
+        history.setOperatorRole(operatorRole);
+        history.setNote(note);
+        history.setCreateTime(LocalDateTime.now());
+        serviceRequestHistoryMapper.insert(history);
     }
 }

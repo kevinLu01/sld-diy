@@ -50,6 +50,9 @@ const DIYToolPage: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([]);
   const [recommendedProducts, setRecommendedProducts] = useState<Record<string, Product[]>>({});
+  const [recommendExplanations, setRecommendExplanations] = useState<
+    Array<{ productType: string; score: number; reason: string; alternatives?: string[] }>
+  >([]);
   const [compatibilityResult, setCompatibilityResult] = useState<any>(null);
 
   // 获取推荐的产品
@@ -57,6 +60,7 @@ const DIYToolPage: React.FC = () => {
     mutationFn: (data: any) => diyService.recommend(data),
     onSuccess: (response) => {
       setRecommendedProducts(response.data.products || {});
+      setRecommendExplanations(response.data.explanations || []);
       setCurrentStep(2);
       message.success('推荐方案已生成');
     },
@@ -346,6 +350,30 @@ const DIYToolPage: React.FC = () => {
               extra={<Text>已选择 {selectedProducts.length} 个配件</Text>}
               loading={recommendMutation.isPending}
             >
+              {recommendExplanations.length > 0 && (
+                <Alert
+                  type="info"
+                  showIcon
+                  style={{ marginBottom: 16 }}
+                  message="推荐解释"
+                  description={
+                    <Space direction="vertical">
+                      {recommendExplanations.map((item, idx) => (
+                        <div key={`${item.productType}-${idx}`}>
+                          <Text strong>{item.productType}</Text>
+                          <Text>（评分 {item.score}）</Text>
+                          <div style={{ color: '#666' }}>{item.reason}</div>
+                          {item.alternatives?.length ? (
+                            <div style={{ color: '#999' }}>
+                              替代建议：{item.alternatives.join('；')}
+                            </div>
+                          ) : null}
+                        </div>
+                      ))}
+                    </Space>
+                  }
+                />
+              )}
               {Object.entries(recommendedProducts).map(([category, products]) => (
                 <div key={category} style={{ marginBottom: 24 }}>
                   <Title level={4}>{category}</Title>

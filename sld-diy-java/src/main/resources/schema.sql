@@ -391,3 +391,27 @@ CREATE TABLE IF NOT EXISTS t_service_request (
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS t_admin_audit_log (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    operator_id BIGINT,
+    action VARCHAR(32) NOT NULL,
+    entity_type VARCHAR(64) NOT NULL,
+    entity_id VARCHAR(64),
+    request_path VARCHAR(255),
+    request_method VARCHAR(16),
+    request_payload TEXT,
+    result_code INT,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS t_service_request_history (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    request_no VARCHAR(50) NOT NULL,
+    from_status VARCHAR(20),
+    to_status VARCHAR(20) NOT NULL,
+    operator_id BIGINT,
+    operator_role VARCHAR(20),
+    note TEXT,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

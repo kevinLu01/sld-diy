@@ -47,6 +47,9 @@ public class DiyRecommendResponse {
     @Schema(description = "建议")
     private List<String> suggestions;
 
+    @Schema(description = "推荐解释")
+    private List<ExplanationVO> explanations;
+
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -69,5 +72,24 @@ public class DiyRecommendResponse {
 
         @Schema(description = "数量")
         private Integer quantity;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Schema(description = "推荐解释")
+    public static class ExplanationVO {
+        @Schema(description = "产品类型")
+        private String productType;
+
+        @Schema(description = "评分")
+        private Integer score;
+
+        @Schema(description = "命中原因")
+        private String reason;
+
+        @Schema(description = "替代建议")
+        private List<String> alternatives;
     }
 }

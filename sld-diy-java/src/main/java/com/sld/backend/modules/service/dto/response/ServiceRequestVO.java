@@ -3,6 +3,7 @@ package com.sld.backend.modules.service.dto.response;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 服务请求VO
@@ -28,4 +29,15 @@ public class ServiceRequestVO {
     private String feedback;
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
+    private List<HistoryVO> histories;
+
+    @Data
+    public static class HistoryVO {
+        private String fromStatus;
+        private String toStatus;
+        private Long operatorId;
+        private String operatorRole;
+        private String note;
+        private LocalDateTime createTime;
+    }
 }

@@ -90,9 +90,15 @@
                         </div>
                     </div>
                     
-                    <div class="bg-white rounded-xl shadow p-6">
-                        <h3 class="text-lg font-bold mb-4">最近订单</h3>
-                        <div id="recentOrders"></div>
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <h3 class="text-lg font-bold mb-4">最近订单</h3>
+                            <div id="recentOrders"></div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow p-6">
+                            <h3 class="text-lg font-bold mb-4">最近变更</h3>
+                            <div id="recentChanges"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -422,6 +428,34 @@
                 html += '</tbody></table>';
                 document.getElementById('recentOrders').innerHTML = html;
             }
+
+            await loadRecentChanges();
+        }
+
+        async function loadRecentChanges() {
+            var changesRes = await apiCall(API_BASE + '/admin/audit-logs?limit=10');
+            if (!changesRes || changesRes.code !== 200) {
+                document.getElementById('recentChanges').innerHTML = '<div class="text-gray-500">暂无数据</div>';
+                return;
+            }
+
+            var rows = getListData(changesRes.data);
+            if (!rows.length) {
+                document.getElementById('recentChanges').innerHTML = '<div class="text-gray-500">暂无变更记录</div>';
+                return;
+            }
+
+            var actionMap = { create: '新增', update: '更新', delete: '删除' };
+            var html = '<div class="space-y-2">';
+            rows.forEach(function (r) {
+                html += '<div class="border border-gray-100 rounded-lg p-3">' +
+                    '<div class="text-sm font-semibold text-gray-700">' + (actionMap[r.action] || r.action) + ' / ' + (r.entityType || '-') + '</div>' +
+                    '<div class="text-xs text-gray-500 mt-1">操作者: ' + (r.operatorId || '-') + '，资源ID: ' + (r.entityId || '-') + '</div>' +
+                    '<div class="text-xs text-gray-400 mt-1">' + (r.createTime || '-') + '</div>' +
+                '</div>';
+            });
+            html += '</div>';
+            document.getElementById('recentChanges').innerHTML = html;
         }
         
         // ===== 产品 =====

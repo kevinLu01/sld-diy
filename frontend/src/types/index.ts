@@ -173,6 +173,12 @@ export interface DiyRecommendation {
   energyEfficiency?: string;
   estimatedPowerConsumption?: string;
   suggestions?: string[];
+  explanations?: Array<{
+    productType: string;
+    score: number;
+    reason: string;
+    alternatives?: string[];
+  }>;
 }
 
 // 解决方案相关
