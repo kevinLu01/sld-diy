@@ -41,6 +41,14 @@ public class DiyController {
         return Result.success(diyService.getDiyConfig());
     }
 
+    @GetMapping("/scene-blueprints")
+    @Operation(summary = "获取场景化BOM蓝图")
+    public Result<Map<String, Object>> getSceneBlueprints(
+        @RequestParam(required = false) String sceneCode
+    ) {
+        return Result.success(diyService.getSceneBlueprints(sceneCode));
+    }
+
     @GetMapping("/solutions")
     @Operation(summary = "获取解决方案列表")
     public Result<PageResult<SolutionVO>> listSolutions(

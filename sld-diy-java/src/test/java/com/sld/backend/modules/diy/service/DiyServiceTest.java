@@ -14,8 +14,11 @@ import com.sld.backend.modules.diy.entity.DiyConfig;
 import com.sld.backend.modules.diy.entity.DiyProject;
 import com.sld.backend.modules.diy.entity.DiyRecommendation;
 import com.sld.backend.modules.diy.mapper.DiyConfigMapper;
+import com.sld.backend.modules.diy.mapper.DiyComponentOptionMapper;
 import com.sld.backend.modules.diy.mapper.DiyProjectMapper;
 import com.sld.backend.modules.diy.mapper.DiyRecommendationMapper;
+import com.sld.backend.modules.diy.mapper.DiySceneComponentMapper;
+import com.sld.backend.modules.diy.mapper.DiySceneTemplateMapper;
 import com.sld.backend.modules.product.mapper.CompatibilityMapper;
 import com.sld.backend.modules.product.mapper.ProductMapper;
 import com.sld.backend.modules.diy.service.impl.DiyServiceImpl;
@@ -51,6 +54,15 @@ class DiyServiceTest {
 
     @Mock
     private DiyRecommendationMapper diyRecommendationMapper;
+
+    @Mock
+    private DiySceneTemplateMapper diySceneTemplateMapper;
+
+    @Mock
+    private DiySceneComponentMapper diySceneComponentMapper;
+
+    @Mock
+    private DiyComponentOptionMapper diyComponentOptionMapper;
 
     @Mock
     private ProductMapper productMapper;
@@ -94,6 +106,7 @@ class DiyServiceTest {
         // Arrange
         when(diyConfigMapper.selectAllActive()).thenReturn(List.of(testConfig));
         when(diyRecommendationMapper.selectAllActive()).thenReturn(List.of());
+        when(diySceneTemplateMapper.selectAllActive()).thenReturn(List.of());
 
         // Act
         Map<String, Object> result = diyService.getDiyConfig();

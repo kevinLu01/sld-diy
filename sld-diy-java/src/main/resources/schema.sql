@@ -296,6 +296,54 @@ CREATE TABLE IF NOT EXISTS t_diy_recommendation (
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS t_diy_scene_template (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    scene_code VARCHAR(64) NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+    application_notes VARCHAR(255),
+    temp_min DECIMAL(8,2),
+    temp_max DECIMAL(8,2),
+    capacity_min DECIMAL(10,2),
+    capacity_max DECIMAL(10,2),
+    is_active BOOLEAN DEFAULT TRUE,
+    sort_order INT DEFAULT 0,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS t_diy_scene_component (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    scene_id BIGINT NOT NULL,
+    component_code VARCHAR(64) NOT NULL,
+    component_name VARCHAR(100) NOT NULL,
+    component_role VARCHAR(20) DEFAULT 'main',
+    is_required BOOLEAN DEFAULT TRUE,
+    min_qty INT DEFAULT 1,
+    max_qty INT DEFAULT 1,
+    selection_mode VARCHAR(20) DEFAULT 'single',
+    spec_requirement VARCHAR(255),
+    sort_order INT DEFAULT 0,
+    is_active BOOLEAN DEFAULT TRUE,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS t_diy_component_option (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    scene_component_id BIGINT NOT NULL,
+    product_id BIGINT,
+    option_name VARCHAR(120) NOT NULL,
+    brand_name VARCHAR(80),
+    model_spec VARCHAR(120),
+    spec_json TEXT,
+    base_price DECIMAL(10,2),
+    is_active BOOLEAN DEFAULT TRUE,
+    sort_order INT DEFAULT 0,
+    create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- ===== 解决方案相关 =====
 CREATE TABLE IF NOT EXISTS t_solution (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,

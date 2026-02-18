@@ -48,6 +48,34 @@ interface ScenarioOption {
   description?: string;
 }
 
+interface SceneOptionSpec {
+  id: number;
+  optionName: string;
+  brandName?: string;
+  modelSpec?: string;
+  basePrice?: number;
+}
+
+interface SceneComponentSpec {
+  id: number;
+  componentCode: string;
+  componentName: string;
+  componentRole: 'main' | 'auxiliary';
+  required: boolean;
+  selectionMode?: 'single' | 'multi';
+  specRequirement?: string;
+  options: SceneOptionSpec[];
+}
+
+interface SceneBlueprint {
+  id: number;
+  sceneCode: string;
+  name: string;
+  description?: string;
+  applicationNotes?: string;
+  components: SceneComponentSpec[];
+}
+
 const DIYToolPage: React.FC = () => {
   const navigate = useNavigate();
   const screens = Grid.useBreakpoint();
@@ -74,6 +102,19 @@ const DIYToolPage: React.FC = () => {
       label: item.label,
       description: item.description,
     })) || [];
+
+  const { data: sceneBlueprintData, isFetching: sceneBlueprintLoading } = useQuery({
+    queryKey: ['diy-scene-blueprints', selectedScenario],
+    queryFn: () =>
+      diyService.getSceneBlueprints(
+        selectedScenario && selectedScenario !== 'custom' ? selectedScenario : undefined
+      ),
+    enabled: !!selectedScenario && selectedScenario !== 'custom',
+  });
+
+  const currentSceneBlueprint: SceneBlueprint | undefined = (
+    sceneBlueprintData?.data?.scenes || []
+  ).find((s: SceneBlueprint) => s.sceneCode === selectedScenario);
 
   // 获取推荐的产品
   const recommendMutation = useMutation({
@@ -137,6 +178,18 @@ const DIYToolPage: React.FC = () => {
     } else if (currentStep === 1) {
       // 配置需求
       form.validateFields().then((values) => {
+        if (currentSceneBlueprint?.components?.length) {
+          const selections = values.componentSelections || {};
+          const missingRequired = currentSceneBlueprint.components.filter(
+            (component) => component.required && !selections[component.componentCode]
+          );
+          if (missingRequired.length > 0) {
+            message.warning(
+              `请先选择必选组件: ${missingRequired.map((m) => m.componentName).join('、')}`
+            );
+            return;
+          }
+        }
         recommendMutation.mutate(values);
       });
     } else if (currentStep === 2) {
@@ -399,6 +452,47 @@ const DIYToolPage: React.FC = () => {
                   </Form.Item>
                 </Space>
               </Form.Item>
+
+              {currentSceneBlueprint?.components?.length ? (
+                <Card
+                  size="small"
+                  title={`场景完整组件清单（${currentSceneBlueprint.name}）`}
+                  loading={sceneBlueprintLoading}
+                  style={{ background: '#fafafa' }}
+                >
+                  <Space direction="vertical" style={{ width: '100%' }} size={12}>
+                    {currentSceneBlueprint.components.map((component) => (
+                      <Card key={component.id} size="small">
+                        <Space direction="vertical" style={{ width: '100%' }}>
+                          <Space wrap>
+                            <Tag color={component.componentRole === 'auxiliary' ? 'purple' : 'blue'}>
+                              {component.componentRole === 'auxiliary' ? '辅件' : '主件'}
+                            </Tag>
+                            <Text strong>{component.componentName}</Text>
+                            {component.required ? <Tag color="red">必选</Tag> : <Tag>可选</Tag>}
+                          </Space>
+                          {component.specRequirement ? (
+                            <Text type="secondary">{component.specRequirement}</Text>
+                          ) : null}
+                          <Form.Item
+                            label="选择规格"
+                            name={['componentSelections', component.componentCode]}
+                            rules={component.required ? [{ required: true, message: `请选择${component.componentName}` }] : undefined}
+                          >
+                            <Select
+                              placeholder={`请选择${component.componentName}规格`}
+                              options={component.options.map((option) => ({
+                                value: option.id,
+                                label: `${option.optionName}${option.brandName ? ` / ${option.brandName}` : ''}${option.basePrice ? ` / ¥${option.basePrice}` : ''}`,
+                              }))}
+                            />
+                          </Form.Item>
+                        </Space>
+                      </Card>
+                    ))}
+                  </Space>
+                </Card>
+              ) : null}
             </Card>
           )}
 

@@ -78,3 +78,10 @@
 4. J3
 5. J4
 6. J5（全链路）
+
+## Step2-K 增量改造（场景化BOM模型）
+- [x] K1 后端新增场景蓝图模型（scene -> components -> options）
+- [x] K2 新接口 `GET /api/v1/diy/scene-blueprints?sceneCode=`
+- [x] K3 默认“冷库制冷”模板数据（压缩机/蒸发器/膨胀阀/铜管/控制器/冷媒）
+- [x] K4 前台DIY第2步展示“场景完整组件清单 + 规格选型”
+- [x] K5 本地验证：`mvn -Dtest=DiyServiceTest test` + `npm run build` 通过

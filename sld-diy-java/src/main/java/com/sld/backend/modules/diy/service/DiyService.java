@@ -21,6 +21,11 @@ public interface DiyService {
     Map<String, Object> getDiyConfig();
 
     /**
+     * 获取场景蓝图（场景 -> 组件类型 -> 规格选项）
+     */
+    Map<String, Object> getSceneBlueprints(String sceneCode);
+
+    /**
      * 智能推荐配件
      */
     DiyRecommendResponse recommend(DiyRecommendRequest request);

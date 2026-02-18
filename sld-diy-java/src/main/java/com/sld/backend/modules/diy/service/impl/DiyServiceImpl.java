@@ -13,11 +13,17 @@ import com.sld.backend.modules.diy.dto.response.DiyProjectVO;
 import com.sld.backend.modules.diy.dto.response.DiyRecommendResponse;
 import com.sld.backend.modules.diy.dto.response.DiyShareResponse;
 import com.sld.backend.modules.diy.entity.DiyConfig;
+import com.sld.backend.modules.diy.entity.DiyComponentOption;
 import com.sld.backend.modules.diy.entity.DiyProject;
 import com.sld.backend.modules.diy.entity.DiyRecommendation;
+import com.sld.backend.modules.diy.entity.DiySceneComponent;
+import com.sld.backend.modules.diy.entity.DiySceneTemplate;
+import com.sld.backend.modules.diy.mapper.DiyComponentOptionMapper;
 import com.sld.backend.modules.diy.mapper.DiyConfigMapper;
 import com.sld.backend.modules.diy.mapper.DiyProjectMapper;
 import com.sld.backend.modules.diy.mapper.DiyRecommendationMapper;
+import com.sld.backend.modules.diy.mapper.DiySceneComponentMapper;
+import com.sld.backend.modules.diy.mapper.DiySceneTemplateMapper;
 import com.sld.backend.modules.diy.service.DiyService;
 import com.sld.backend.modules.product.entity.Compatibility;
 import com.sld.backend.modules.product.entity.Product;
@@ -42,6 +48,9 @@ public class DiyServiceImpl implements DiyService {
     private final DiyProjectMapper diyProjectMapper;
     private final DiyConfigMapper diyConfigMapper;
     private final DiyRecommendationMapper diyRecommendationMapper;
+    private final DiySceneTemplateMapper diySceneTemplateMapper;
+    private final DiySceneComponentMapper diySceneComponentMapper;
+    private final DiyComponentOptionMapper diyComponentOptionMapper;
     private final ProductMapper productMapper;
     private final CompatibilityMapper compatibilityMapper;
 
@@ -61,7 +70,86 @@ public class DiyServiceImpl implements DiyService {
         result.put("recommendations", recommendations.stream()
             .map(this::toRecommendationVO)
             .collect(Collectors.toList()));
+        result.put("sceneBlueprints", getSceneBlueprints(null).get("scenes"));
         
+        return result;
+    }
+
+    @Override
+    public Map<String, Object> getSceneBlueprints(String sceneCode) {
+        List<DiySceneTemplate> scenes = diySceneTemplateMapper.selectAllActive();
+        if (sceneCode != null && !sceneCode.isBlank()) {
+            scenes = scenes.stream()
+                .filter(s -> sceneCode.equalsIgnoreCase(s.getSceneCode()))
+                .collect(Collectors.toList());
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        if (scenes.isEmpty()) {
+            result.put("scenes", Collections.emptyList());
+            return result;
+        }
+
+        List<Long> sceneIds = scenes.stream().map(DiySceneTemplate::getId).collect(Collectors.toList());
+        List<DiySceneComponent> components = diySceneComponentMapper.selectBySceneIds(sceneIds);
+        List<Long> componentIds = components.stream().map(DiySceneComponent::getId).collect(Collectors.toList());
+        List<DiyComponentOption> options = componentIds.isEmpty()
+            ? Collections.emptyList()
+            : diyComponentOptionMapper.selectByComponentIds(componentIds);
+
+        Map<Long, List<DiySceneComponent>> componentMap = components.stream()
+            .collect(Collectors.groupingBy(DiySceneComponent::getSceneId, LinkedHashMap::new, Collectors.toList()));
+        Map<Long, List<DiyComponentOption>> optionMap = options.stream()
+            .collect(Collectors.groupingBy(DiyComponentOption::getSceneComponentId, LinkedHashMap::new, Collectors.toList()));
+
+        List<Map<String, Object>> scenePayload = new ArrayList<>();
+        for (DiySceneTemplate scene : scenes) {
+            Map<String, Object> sceneVo = new LinkedHashMap<>();
+            sceneVo.put("id", scene.getId());
+            sceneVo.put("sceneCode", scene.getSceneCode());
+            sceneVo.put("name", scene.getName());
+            sceneVo.put("description", scene.getDescription());
+            sceneVo.put("applicationNotes", scene.getApplicationNotes());
+            sceneVo.put("tempMin", scene.getTempMin());
+            sceneVo.put("tempMax", scene.getTempMax());
+            sceneVo.put("capacityMin", scene.getCapacityMin());
+            sceneVo.put("capacityMax", scene.getCapacityMax());
+
+            List<Map<String, Object>> componentPayload = new ArrayList<>();
+            for (DiySceneComponent comp : componentMap.getOrDefault(scene.getId(), Collections.emptyList())) {
+                Map<String, Object> compVo = new LinkedHashMap<>();
+                compVo.put("id", comp.getId());
+                compVo.put("componentCode", comp.getComponentCode());
+                compVo.put("componentName", comp.getComponentName());
+                compVo.put("componentRole", normalizeComponentRole(comp.getComponentRole()));
+                compVo.put("required", Boolean.TRUE.equals(comp.getRequired()));
+                compVo.put("minQty", comp.getMinQty());
+                compVo.put("maxQty", comp.getMaxQty());
+                compVo.put("selectionMode", comp.getSelectionMode());
+                compVo.put("specRequirement", comp.getSpecRequirement());
+
+                List<Map<String, Object>> optionPayload = optionMap.getOrDefault(comp.getId(), Collections.emptyList())
+                    .stream()
+                    .map(opt -> {
+                        Map<String, Object> optVo = new LinkedHashMap<>();
+                        optVo.put("id", opt.getId());
+                        optVo.put("productId", opt.getProductId());
+                        optVo.put("optionName", opt.getOptionName());
+                        optVo.put("brandName", opt.getBrandName());
+                        optVo.put("modelSpec", opt.getModelSpec());
+                        optVo.put("specJson", opt.getSpecJson());
+                        optVo.put("basePrice", opt.getBasePrice());
+                        return optVo;
+                    })
+                    .collect(Collectors.toList());
+                compVo.put("options", optionPayload);
+                componentPayload.add(compVo);
+            }
+            sceneVo.put("components", componentPayload);
+            scenePayload.add(sceneVo);
+        }
+
+        result.put("scenes", scenePayload);
         return result;
     }
 

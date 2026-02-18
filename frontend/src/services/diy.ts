@@ -13,6 +13,13 @@ export const diyService = {
     return apiClient.get<any, ApiResponse<any>>('/diy/config');
   },
 
+  // 获取场景蓝图（场景->组件->规格）
+  getSceneBlueprints: (sceneCode?: string) => {
+    return apiClient.get<any, ApiResponse<any>>('/diy/scene-blueprints', {
+      params: sceneCode ? { sceneCode } : undefined,
+    });
+  },
+
   // 智能推荐配件
   recommend: (data: {
     scenario: string;
