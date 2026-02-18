@@ -1,9 +1,6 @@
 # Step2 Sprint1 执行看板
 
 ## To Do
-- [ ] B2: 统一401/403错误语义
-- [ ] C1: 契约测试框架初始化
-- [ ] C2: 注册->DIY->购物车->下单->后台CRUD 集成测试
 - [ ] A1: 双表读写盘点
 - [ ] A2: 目标模型字段对照
 - [ ] A3: 迁移/回滚SQL草案
@@ -11,11 +8,14 @@
 - [ ] I1: 微信登录接入方案设计（OAuth2流程/绑定策略/安全策略）
 
 ## In Progress
-- [ ] B2: 统一401/403错误语义
+- [ ] A1: 双表读写盘点
 
 ## Done
 - [x] Step2任务拆分文档已完成
 - [x] B1: `@CurrentUserId` 参数解析器实现（已上线，线上smoke通过）
+- [x] B2: 统一401/403错误语义（已上线，401/403 JSON契约验证通过）
+- [x] C1: 契约烟测已接入（ApiContractSmokeIntegrationTest）
+- [x] C2: 关键链路集成测试已接入（CriticalFlowIntegrationTest）
 
 ## 风险
 - 双表迁移涉及历史数据，需先在预发全量演练。

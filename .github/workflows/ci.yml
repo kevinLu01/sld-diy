@@ -89,6 +89,12 @@ jobs:
           REDIS_PORT: 6379
         run: mvn -DskipTests package -B
 
+      - name: 🧪 Run Contract & Critical Flow Tests
+        working-directory: ./sld-diy-java
+        env:
+          SPRING_PROFILES_ACTIVE: test
+        run: mvn -Dtest=ApiContractSmokeIntegrationTest,CriticalFlowIntegrationTest test -B
+
       - name: ✅ Java Backend Build Success
         run: echo "✅ Java backend build successful"
 
