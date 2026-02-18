@@ -132,3 +132,12 @@
   - `mvn -Dtest=DiyServiceTest,CriticalFlowIntegrationTest test` PASS
   - `npm run build` PASS
 - 待执行: J5.3 线上前后台点击流回归 + J5.4回写
+
+## Checkpoint - 2026-02-18 18:30 CST
+- Leader心跳: OK
+- 线上回归结果:
+  - GitHub Actions: CI/Deploy Frontend/Deploy Java Backend 均 success
+  - 发现并修复: 线上 DB 缺少 `custom_scenario_name` 等新字段，已执行 `V20260218_05_diy_customization_private_quote.sql`
+  - API验证: 私发报价接口与DIY私发分享接口均返回200
+  - 页面验证: 前台出现“自定义场景”；后台出现“创建私发链接”和“组件角色(主件/辅件)”
+- Step2-J 状态: J1~J5 全部完成

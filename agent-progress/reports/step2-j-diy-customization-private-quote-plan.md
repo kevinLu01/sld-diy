@@ -51,8 +51,21 @@
 ### J5（P0）测试与回归
 - [x] J5.1 单元测试：服务层推荐/分享逻辑
 - [x] J5.2 集成测试：API关键链路
-- [ ] J5.3 业务流程测试：前台 + 后台点击流
-- [ ] J5.4 结果回写进度文档
+- [x] J5.3 业务流程测试：前台 + 后台点击流
+- [x] J5.4 结果回写进度文档
+
+## 测试证据
+- 后端单测+集成测试:
+  - `cd sld-diy-java && mvn -Dtest=DiyServiceTest,CriticalFlowIntegrationTest test` -> PASS
+- 前端构建:
+  - `cd frontend && npm run build` -> PASS
+- 线上业务流/API:
+  - `POST /api/v1/admin/diy-projects/1/private-offer` -> `code=200`
+  - `POST /api/v1/diy/projects` + `POST /api/v1/diy/projects/{id}/share`(private_offer) -> `code=200`
+  - `GET /api/v1/diy/share/{token}` 可返回私发报价字段
+- 线上页面点击流:
+  - 前台 DIY 页面出现“自定义场景”卡片并可触发输入框
+  - 后台 DIY 页面出现“创建私发链接”按钮与“组件角色（主件/辅件）”配置项
 
 验收:
 - 单测通过
