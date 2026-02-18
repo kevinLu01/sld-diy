@@ -1,0 +1,45 @@
+# Step1 全链路验证
+- 时间: 2026-02-18 10:53:28 CST
+- [PASS] auth_register => http=200 code=200 msg=操作成功
+- [PASS] auth_login_user => http=200 code=200 msg=操作成功
+- [PASS] auth_login_admin => http=200 code=200 msg=操作成功
+- [PASS] health => http=200 code=200 msg=操作成功
+- [PASS] categories => http=200 code=200 msg=操作成功
+- [PASS] products => http=200 code=200 msg=操作成功
+- [PASS] solutions => http=200 code=200 msg=操作成功
+- [PASS] knowledge => http=200 code=200 msg=操作成功
+- [PASS] search => http=200 code=200 msg=操作成功
+- [PASS] users_profile_get => http=200 code=200 msg=操作成功
+- [PASS] users_profile_update => http=200 code=200 msg=操作成功
+- [PASS] users_business_verify => http=200 code=200 msg=操作成功
+- [PASS] users_fav_add => http=200 code=200 msg=操作成功
+- [PASS] users_fav_list => http=200 code=200 msg=操作成功
+- [PASS] users_fav_remove => http=200 code=200 msg=操作成功
+- [PASS] diy_recommend => http=200 code=200 msg=操作成功
+- [PASS] diy_validate => http=200 code=200 msg=操作成功
+- [PASS] diy_project_save => http=200 code=200 msg=操作成功
+- [PASS] diy_project_list => http=200 code=200 msg=操作成功
+- [PASS] diy_project_detail => http=200 code=200 msg=操作成功
+- [PASS] diy_project_share => http=200 code=200 msg=操作成功
+- [PASS] diy_share_token => http=200 code=200 msg=操作成功
+- [PASS] cart_get => http=200 code=200 msg=操作成功
+- [PASS] cart_add => http=200 code=200 msg=操作成功
+- [PASS] cart_update => http=200 code=200 msg=操作成功
+- [PASS] cart_delete => http=200 code=200 msg=操作成功
+- [PASS] order_create => http=200 code=200 msg=操作成功
+- [PASS] order_list => http=200 code=200 msg=操作成功
+- [PASS] order_detail => http=200 code=200 msg=操作成功
+- [PASS] order_cancel => http=200 code=200 msg=操作成功
+- [PASS] services_create => http=200 code=200 msg=操作成功
+- [PASS] services_list => http=200 code=200 msg=操作成功
+- [PASS] services_detail => http=200 code=200 msg=操作成功
+- [WARN] services_rate => http=200 code=400 msg=服务未完成，无法评价
+- [PASS] admin_stats => http=200 code=200 msg=操作成功
+- [PASS] admin_users => http=200 code=200 msg=操作成功
+- [PASS] admin_category_create => http=200 code=200 msg=操作成功
+- [PASS] admin_category_delete => http=200 code=200 msg=操作成功
+
+## 汇总
+- PASS: 37
+- WARN: 1
+- FAIL: 0

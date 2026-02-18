@@ -97,3 +97,19 @@
 - 深度逻辑结论: 依赖 API+日志证据确认 DIY recommend/save/share 与 cart/order(带Bearer)链路正常
 - 过程风险: 浏览器自动化在 AntD 下拉交互存在不稳定，已通过“页面截图+接口验证”方式保障结果可信
 - 下次汇报: 2026-02-18 09:15 CST
+
+## Checkpoint - 2026-02-18 10:53 CST
+- Leader心跳: OK
+- 新增修复已上线:
+  - `fix(java): fallback user id from jwt auth when header missing`
+  - `fix(java): allow diy project apis to resolve user id from jwt`
+  - `fix(java): generate category slug when admin request omits it`
+- 流水线状态:
+  - Deploy Java Backend `#22124346039` success
+  - Deploy Java Backend `#22124448949` success
+  - Deploy Java Backend `#22124533619` success
+- 全链路回归:
+  - 报告 `agent-progress/reports/step1-full-validation.md`
+  - 结果 `PASS=37 WARN=1 FAIL=0`（唯一WARN为业务预期：服务单未完成不可评价）
+- DB观察:
+  - `sld_diy` 中 `t_*` 与 CamelCase 两套表并存，当前功能可用，但需后续统一
