@@ -42,6 +42,7 @@ interface SelectedProduct {
 const DIYToolPage: React.FC = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
+  const selectedScenario = Form.useWatch('scenario', form);
   const [currentStep, setCurrentStep] = useState(0);
   const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([]);
   const [recommendedProducts, setRecommendedProducts] = useState<Record<string, Product[]>>({});
@@ -175,7 +176,19 @@ const DIYToolPage: React.FC = () => {
         <Form form={form} layout="vertical">
           {/* 步骤 0: 选择场景 */}
           {currentStep === 0 && (
-            <Card title="第一步：选择应用场景">
+            <Card
+              title="第一步：选择应用场景"
+              extra={
+                selectedScenario ? (
+                  <Tag color="blue">
+                    已选中：
+                    {scenarios.find((s) => s.value === selectedScenario)?.label}
+                  </Tag>
+                ) : (
+                  <Text type="secondary">请先选择一个应用场景</Text>
+                )
+              }
+            >
               <Form.Item
                 name="scenario"
                 label="应用场景"
@@ -189,12 +202,25 @@ const DIYToolPage: React.FC = () => {
                         onClick={() => form.setFieldValue('scenario', s.value)}
                         style={{
                           border:
-                            form.getFieldValue('scenario') === s.value
+                            selectedScenario === s.value
                               ? '2px solid #1890ff'
                               : '1px solid #d9d9d9',
+                          background: selectedScenario === s.value ? '#e6f4ff' : '#fff',
                         }}
                       >
-                        <Title level={4}>{s.label}</Title>
+                        <Space
+                          align="center"
+                          style={{ width: '100%', justifyContent: 'space-between' }}
+                        >
+                          <Title level={4} style={{ margin: 0 }}>
+                            {s.label}
+                          </Title>
+                          {selectedScenario === s.value && (
+                            <Tag color="success" icon={<CheckCircleOutlined />}>
+                              已选中
+                            </Tag>
+                          )}
+                        </Space>
                         <Text type="secondary">{s.description}</Text>
                       </Card>
                     </Col>
