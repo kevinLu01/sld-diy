@@ -35,6 +35,7 @@ public class Article {
     @TableField("helpful_count")
     private Integer helpfulCount;
 
+    @TableField(exist = false)
     private String status;
 
     private String author;
