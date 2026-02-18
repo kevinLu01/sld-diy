@@ -75,7 +75,7 @@ public class DiyServiceImpl implements DiyService {
             List<Product> products = productMapper.selectList(
                 new LambdaQueryWrapper<Product>()
                     .eq(Product::getCategoryId, rec.getCategoryId())
-                    .eq(Product::getStatus, "on_shelf")
+                    .in(Product::getStatus, "on_shelf", "active")
                     .last("LIMIT 5")
             );
 
