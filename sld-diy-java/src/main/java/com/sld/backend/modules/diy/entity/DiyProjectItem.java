@@ -7,7 +7,7 @@ import lombok.Data;
  * DIY 方案项实体
  */
 @Data
-@TableName("DiyProjectItem")
+@TableName("t_diy_project_item")
 public class DiyProjectItem {
 
     @TableId(type = IdType.AUTO)
@@ -16,6 +16,7 @@ public class DiyProjectItem {
     /**
      * 项目ID
      */
+    @TableField("diy_project_id")
     private Long projectId;
 
     /**
@@ -36,5 +37,6 @@ public class DiyProjectItem {
     /**
      * 排序
      */
+    @TableField(exist = false)
     private Integer sortOrder;
 }

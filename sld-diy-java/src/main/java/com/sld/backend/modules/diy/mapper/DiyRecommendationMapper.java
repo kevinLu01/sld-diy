@@ -18,9 +18,9 @@ public interface DiyRecommendationMapper extends BaseMapper<DiyRecommendation> {
      * 根据场景获取推荐配置
      */
     @Select("SELECT dr.*, c.name as category_name, c.slug as category_slug " +
-            "FROM DiyRecommendation dr " +
-            "LEFT JOIN Category c ON dr.categoryId = c.id " +
-            "WHERE dr.scenario = #{scenario} AND dr.isActive = 1 " +
+            "FROM t_diy_recommendation dr " +
+            "LEFT JOIN t_category c ON dr.category_id = c.id " +
+            "WHERE dr.scenario = #{scenario} AND dr.is_active = 1 " +
             "ORDER BY dr.priority")
     List<DiyRecommendation> selectByScenario(@Param("scenario") String scenario);
 
@@ -28,9 +28,9 @@ public interface DiyRecommendationMapper extends BaseMapper<DiyRecommendation> {
      * 获取所有启用的推荐配置
      */
     @Select("SELECT dr.*, c.name as category_name, c.slug as category_slug " +
-            "FROM DiyRecommendation dr " +
-            "LEFT JOIN Category c ON dr.categoryId = c.id " +
-            "WHERE dr.isActive = 1 " +
+            "FROM t_diy_recommendation dr " +
+            "LEFT JOIN t_category c ON dr.category_id = c.id " +
+            "WHERE dr.is_active = 1 " +
             "ORDER BY dr.scenario, dr.priority")
     List<DiyRecommendation> selectAllActive();
 }

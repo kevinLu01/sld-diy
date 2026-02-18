@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 产品兼容性实体
  */
 @Data
-@TableName("Compatibility")
+@TableName("t_compatibility")
 public class Compatibility {
 
     @TableId(type = IdType.AUTO)
@@ -18,16 +18,19 @@ public class Compatibility {
     /**
      * 产品A ID
      */
+    @TableField("product_a_id")
     private Long productAId;
 
     /**
      * 产品B ID
      */
+    @TableField("product_b_id")
     private Long productBId;
 
     /**
      * 兼容类型：compatible-兼容，incompatible-不兼容，recommended-推荐搭配
      */
+    @TableField("compatibility_type")
     private String compatibilityType;
 
     /**
@@ -38,7 +41,7 @@ public class Compatibility {
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
     /**

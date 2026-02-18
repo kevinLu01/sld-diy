@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 品牌实体
  */
 @Data
-@TableName("Brand")
+@TableName("t_brand")
 public class Brand {
 
     @TableId(type = IdType.AUTO)
@@ -38,16 +38,21 @@ public class Brand {
     /**
      * 国家
      */
+    @TableField("website")
     private String country;
 
     /**
      * 是否启用
      */
+    @TableField("status")
     private Boolean isActive;
 
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
+
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updatedAt;
 }

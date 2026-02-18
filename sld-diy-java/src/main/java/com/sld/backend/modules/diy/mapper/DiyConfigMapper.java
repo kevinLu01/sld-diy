@@ -17,12 +17,12 @@ public interface DiyConfigMapper extends BaseMapper<DiyConfig> {
     /**
      * 根据分类获取配置列表
      */
-    @Select("SELECT * FROM DiyConfig WHERE category = #{category} AND isActive = 1 ORDER BY sortOrder")
+    @Select("SELECT * FROM t_diy_config WHERE category = #{category} AND is_active = 1 ORDER BY sort_order")
     List<DiyConfig> selectByCategory(@Param("category") String category);
 
     /**
      * 获取所有启用的配置
      */
-    @Select("SELECT * FROM DiyConfig WHERE isActive = 1 ORDER BY category, sortOrder")
+    @Select("SELECT * FROM t_diy_config WHERE is_active = 1 ORDER BY category, sort_order")
     List<DiyConfig> selectAllActive();
 }

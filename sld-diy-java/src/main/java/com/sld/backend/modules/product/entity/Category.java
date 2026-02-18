@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 分类实体
  */
 @Data
-@TableName("Category")
+@TableName("t_category")
 public class Category {
 
     @TableId(type = IdType.AUTO)
@@ -23,6 +23,7 @@ public class Category {
     /**
      * 父分类ID
      */
+    @TableField("parent_id")
     private Long parentId;
 
     /**
@@ -43,16 +44,21 @@ public class Category {
     /**
      * 排序
      */
+    @TableField("sort_order")
     private Integer sortOrder;
 
     /**
      * 是否启用
      */
+    @TableField("status")
     private Boolean isActive;
 
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
+
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updatedAt;
 }

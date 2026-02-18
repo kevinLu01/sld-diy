@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 解决方案实体
  */
 @Data
-@TableName("Solution")
+@TableName("t_solution")
 public class Solution {
 
     @TableId(type = IdType.AUTO)
@@ -39,6 +39,7 @@ public class Solution {
     /**
      * 封面图
      */
+    @TableField("cover_image")
     private String coverImage;
 
     /**
@@ -49,11 +50,13 @@ public class Solution {
     /**
      * 温度范围
      */
+    @TableField("temperature_range")
     private String temperatureRange;
 
     /**
      * 容量范围
      */
+    @TableField("capacity_range")
     private String capacityRange;
 
     /**
@@ -64,21 +67,25 @@ public class Solution {
     /**
      * 总价
      */
+    @TableField("total_price")
     private BigDecimal totalPrice;
 
     /**
      * 安装指导
      */
+    @TableField("installation_guide")
     private String installationGuide;
 
     /**
      * 浏览次数
      */
+    @TableField("view_count")
     private Integer viewCount;
 
     /**
      * 使用次数
      */
+    @TableField("usage_count")
     private Integer usageCount;
 
     /**
@@ -94,17 +101,18 @@ public class Solution {
     /**
      * 创建者ID
      */
+    @TableField(exist = false)
     private Long createdBy;
 
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 
     /**
      * 更新时间
      */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updatedAt;
 }

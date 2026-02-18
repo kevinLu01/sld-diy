@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * 产品实体
  */
 @Data
-@TableName("Product")
+@TableName("t_product")
 public class Product {
 
     @TableId(type = IdType.AUTO)
@@ -29,11 +29,13 @@ public class Product {
     /**
      * 品牌ID
      */
+    @TableField("brand_id")
     private Long brandId;
 
     /**
      * 分类ID
      */
+    @TableField("category_id")
     private Long categoryId;
 
     /**
@@ -49,21 +51,25 @@ public class Product {
     /**
      * 原价
      */
+    @TableField("original_price")
     private BigDecimal originalPrice;
 
     /**
      * 成本价
      */
+    @TableField(exist = false)
     private BigDecimal costPrice;
 
     /**
      * 库存数量
      */
+    @TableField("stock")
     private Integer stockQuantity;
 
     /**
      * 单位
      */
+    @TableField(exist = false)
     private String unit;
 
     /**
@@ -74,11 +80,13 @@ public class Product {
     /**
      * 视频URL
      */
+    @TableField("video")
     private String videoUrl;
 
     /**
      * 3D模型URL
      */
+    @TableField("model3d")
     private String model3dUrl;
 
     /**
@@ -89,11 +97,13 @@ public class Product {
     /**
      * 浏览次数
      */
+    @TableField("view_count")
     private Integer viewCount;
 
     /**
      * 销量
      */
+    @TableField("sales_count")
     private Integer salesCount;
 
     /**
@@ -104,12 +114,12 @@ public class Product {
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 
     /**
      * 更新时间
      */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updatedAt;
 }

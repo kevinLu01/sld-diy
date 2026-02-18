@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
  * DIY 推荐配置实体
  */
 @Data
-@TableName("DiyRecommendation")
+@TableName("t_diy_recommendation")
 public class DiyRecommendation {
 
     @TableId(type = IdType.AUTO)
@@ -24,11 +24,13 @@ public class DiyRecommendation {
     /**
      * 产品类型
      */
+    @TableField("product_type")
     private String productType;
 
     /**
      * 分类ID
      */
+    @TableField("category_id")
     private Long categoryId;
 
     /**
@@ -39,33 +41,37 @@ public class DiyRecommendation {
     /**
      * 是否必选
      */
+    @TableField("is_required")
     private Boolean isRequired;
 
     /**
      * 最小数量
      */
+    @TableField("cooling_capacity_min")
     private Integer minQuantity;
 
     /**
      * 最大数量
      */
+    @TableField("cooling_capacity_max")
     private Integer maxQuantity;
 
     /**
      * 是否启用
      */
+    @TableField("is_active")
     private Boolean isActive;
 
     /**
      * 创建时间
      */
-    @TableField(fill = FieldFill.INSERT)
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 
     /**
      * 更新时间
      */
-    @TableField(fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updatedAt;
 
     /**
