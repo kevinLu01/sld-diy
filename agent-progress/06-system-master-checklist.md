@@ -93,4 +93,6 @@
 
 ## Step2/3 产出文件
 - `agent-progress/reports/step2-optimization-recommendations.md`
+- `agent-progress/reports/step2-task-breakdown.md`
+- `agent-progress/reports/step2-sprint1-board.md`
 - `agent-progress/reports/step3-industry-solution-fit.md`
