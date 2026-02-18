@@ -24,7 +24,9 @@ import com.sld.backend.modules.product.mapper.BrandMapper;
 import com.sld.backend.modules.product.mapper.CategoryMapper;
 import com.sld.backend.modules.product.mapper.ProductMapper;
 import com.sld.backend.modules.solution.entity.Solution;
+import com.sld.backend.modules.solution.entity.SolutionProduct;
 import com.sld.backend.modules.solution.mapper.SolutionMapper;
+import com.sld.backend.modules.solution.mapper.SolutionProductMapper;
 import com.sld.backend.modules.user.entity.User;
 import com.sld.backend.modules.user.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +53,7 @@ public class AdminServiceImpl implements AdminService {
     private final BrandMapper brandMapper;
     private final OrderMapper orderMapper;
     private final SolutionMapper solutionMapper;
+    private final SolutionProductMapper solutionProductMapper;
     private final ArticleMapper articleMapper;
     private final UserMapper userMapper;
     private final DiyConfigMapper diyConfigMapper;
@@ -282,6 +285,9 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Map<String, Object> createSolution(CreateSolutionRequest request) {
+        if (isPublished(request.getStatus())) {
+            throw new BusinessException(ErrorCode.BAD_REQUEST, "新建方案请先保存为草稿并配置产品后再发布");
+        }
         Solution solution = new Solution();
         BeanUtils.copyProperties(request, solution);
         solution.setViewCount(0);
@@ -298,6 +304,17 @@ public class AdminServiceImpl implements AdminService {
         if (solution == null) {
             throw new BusinessException(ErrorCode.SOLUTION_NOT_FOUND);
         }
+
+        String targetStatus = request.getStatus() != null ? request.getStatus() : solution.getStatus();
+        if (isPublished(targetStatus)) {
+            long productCount = solutionProductMapper.selectCount(
+                new LambdaQueryWrapper<SolutionProduct>().eq(SolutionProduct::getSolutionId, id)
+            );
+            if (productCount <= 0) {
+                throw new BusinessException(ErrorCode.BAD_REQUEST, "发布失败：请先为方案绑定至少1个产品");
+            }
+        }
+
         BeanUtils.copyProperties(request, solution);
         solution.setUpdatedAt(LocalDateTime.now());
         solutionMapper.updateById(solution);
@@ -618,6 +635,14 @@ public class AdminServiceImpl implements AdminService {
             }
         }
         return null;
+    }
+
+    private boolean isPublished(String status) {
+        if (status == null) {
+            return false;
+        }
+        String s = status.trim().toLowerCase();
+        return "published".equals(s) || "active".equals(s) || "1".equals(s);
     }
 
     private Map<String, Object> convertDiyRecommendationToMap(DiyRecommendation rec) {
