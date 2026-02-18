@@ -18,17 +18,19 @@ public class Favorite {
     /**
      * 用户ID
      */
+    @TableField("user_id")
     private Long userId;
 
     /**
      * 产品ID
      */
+    @TableField("product_id")
     private Long productId;
 
     /**
      * 创建时间
      */
-    @TableField(value = "createdAt", fill = FieldFill.INSERT)
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
     /**

@@ -17,6 +17,6 @@ public interface SolutionProductMapper extends BaseMapper<SolutionProduct> {
     /**
      * 根据方案ID获取产品列表
      */
-    @Select("SELECT * FROM t_solution_product WHERE solution_id = #{solutionId} ORDER BY sort_order")
+    @Select("SELECT * FROM t_solution_product WHERE solution_id = #{solutionId} ORDER BY create_time")
     List<SolutionProduct> selectBySolutionId(@Param("solutionId") Long solutionId);
 }

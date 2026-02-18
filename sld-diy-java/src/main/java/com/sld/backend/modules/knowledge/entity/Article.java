@@ -23,44 +23,47 @@ public class Article {
 
     private String tags;
 
+    @TableField("cover_image")
     private String coverImage;
 
     private String attachments;
 
+    @TableField("view_count")
     private Integer viewCount;
 
+    @TableField("helpful_count")
     private Integer helpfulCount;
 
     private String status;
 
     private String author;
 
-    @TableField(value = "createdAt", fill = FieldFill.INSERT)
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    @TableField(value = "updatedAt", fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 
     // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
 
-    @TableField(exist = false)
+    @TableField("summary")
     private String summary;
 
-    @TableField(exist = false)
+    @TableField("source")
     private String source;
 
-    @TableField(exist = false)
+    @TableField("like_count")
     private Integer likeCount;
 
-    @TableField(exist = false)
+    @TableField("sort_order")
     private Integer sortOrder;
 
-    @TableField(exist = false)
+    @TableField("publish_status")
     private Integer publishStatus;
 
-    @TableField(exist = false)
+    @TableField("publish_time")
     private LocalDateTime publishTime;
 
-    @TableField(exist = false)
+    @TableField("deleted")
     private Integer deleted;
 }

@@ -34,10 +34,11 @@ export const useUserStore = create<UserState>()(
 
       login: async (account, password) => {
         const response = await authService.login({ account, password });
-        const { user, token } = response.data;
+        const { token } = response.data;
+        const profile = await authService.getCurrentUser();
         
         localStorage.setItem('token', token);
-        set({ user, token, isAuthenticated: true });
+        set({ user: profile.data, token, isAuthenticated: true });
       },
 
       logout: () => {

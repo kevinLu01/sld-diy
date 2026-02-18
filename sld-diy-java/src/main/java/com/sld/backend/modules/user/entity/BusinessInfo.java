@@ -18,17 +18,23 @@ public class BusinessInfo {
     /**
      * 用户ID
      */
+    @TableField("user_id")
     private Long userId;
 
     /**
      * 公司名称
      */
+    @TableField("company_name")
     private String companyName;
 
     /**
      * 营业执照URL
      */
+    @TableField("business_license")
     private String businessLicense;
+
+    @TableField("credit_code")
+    private String creditCode;
 
     /**
      * 所属行业
@@ -43,23 +49,20 @@ public class BusinessInfo {
     /**
      * 联系人
      */
+    @TableField("contact_person")
     private String contactPerson;
+
+    @TableField("contact_phone")
+    private String contactPhone;
 
     private Boolean verified;
 
+    @TableField("verified_at")
     private LocalDateTime verifiedAt;
 
-    @TableField(value = "createdAt", fill = FieldFill.INSERT)
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
-
-    // ===== 以下字段不在数据库中，保留以兼容 Service 层 =====
-
-    @TableField(exist = false)
-    private String creditCode;
-
-    @TableField(exist = false)
-    private String contactPhone;
-
-    @TableField(exist = false)
+    
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 }

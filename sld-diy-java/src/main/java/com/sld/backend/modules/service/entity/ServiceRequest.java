@@ -18,21 +18,25 @@ public class ServiceRequest {
     /**
      * 服务单号
      */
+    @TableField("request_no")
     private String requestNo;
 
     /**
      * 用户ID
      */
+    @TableField("user_id")
     private Long userId;
 
     /**
      * 关联订单ID
      */
+    @TableField("order_id")
     private Long orderId;
 
     /**
      * 服务类型：installation-安装，maintenance-维护，consultation-咨询，repair-维修
      */
+    @TableField("service_type")
     private String serviceType;
 
     /**
@@ -48,16 +52,19 @@ public class ServiceRequest {
     /**
      * 联系信息（JSON）
      */
+    @TableField("contact_info")
     private String contactInfo;
 
     /**
      * 预约时间
      */
+    @TableField("scheduled_time")
     private LocalDateTime scheduledTime;
 
     /**
      * 指派给（工程师ID）
      */
+    @TableField("assigned_to")
     private Long assignedTo;
 
     /**
@@ -83,9 +90,9 @@ public class ServiceRequest {
     /**
      * 创建时间
      */
-    @TableField(value = "createdAt", fill = FieldFill.INSERT)
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
-    @TableField(value = "updatedAt", fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "update_time", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
 }
